@@ -2,14 +2,14 @@
   <div class="table-demo-container layout-padding">
     <div class="table-demo-padding layout-padding-view layout-padding-auto">
       <div class="system-menu-search mb15">
-        <el-button size="large" :type="selectedLocation === 'xueyuan' ? 'success' : 'info'" class="ml10" @click="selectLocation('xueyuan')">
+        <el-button size="large" :type="selectedLocation === 'xueyuan' ? 'primary' : 'info'" class="ml10" @click="selectLocation('xueyuan')">
           <el-icon>
             <ele-Monitor />
           </el-icon>
           学院路校区
         </el-button>
         &nbsp; &nbsp;
-        <el-button size="large" :type="selectedLocation === 'shahe' ? 'success' : 'info'" class="ml10" @click="selectLocation('shahe')" width="300px">
+        <el-button size="large" :type="selectedLocation === 'shahe' ? 'primary' : 'info'" class="ml10" @click="selectLocation('shahe')">
           <el-icon>
             <ele-Promotion />
           </el-icon>
@@ -36,6 +36,7 @@
             ref="tableRef"
             v-bind="stateXyGroup.tableData"
             class="booking-table-demo"
+            @cellClick = "onCellClick"
         />
       </div>
       <div v-else-if="selectedLocation === 'shahe'&& selectedWay === 'group'">
@@ -43,6 +44,7 @@
             ref="tableRef"
             v-bind="stateShGroup.tableData"
             class="booking-table-demo"
+            @cellClick = "onCellClick"
         />
       </div>
       <div v-else-if="selectedLocation === 'xueyuan'&& selectedWay === 'single'">
@@ -50,6 +52,7 @@
             ref="tableRef"
             v-bind="stateXySingle.tableData"
             class="booking-table-demo"
+            @cellClick = "onCellClick"
         />
       </div>
       <div v-else-if="selectedLocation === 'shahe'&& selectedWay === 'single'">
@@ -57,8 +60,17 @@
             ref="tableRef"
             v-bind="stateShSingle.tableData"
             class="booking-table-demo"
+            @cellClick = "onCellClick"
         />
       </div>
+    </div>
+    <div class="flex-warp-item-box" style="display: flex; justify-content: center; margin-top: 20px;">
+      <el-button type="success" size="large">
+        <el-icon>
+          <ele-Check />
+        </el-icon>
+        提交预约
+      </el-button>
     </div>
   </div>
 </template>
@@ -72,6 +84,9 @@ const windowHeight = ref(window.innerHeight)
 const selectedLocation = ref('xueyuan');
 const selectedWay = ref('group');
 const events = ['8:00-9:30', '10:00-11:30', '14:00-15:30', '16:00-17:30'];
+
+const selectedRow = ref(0);
+const selectedColumn = ref(0);
 
 function selectLocation(location: string) {
   selectedLocation.value = location;
@@ -276,6 +291,13 @@ const getTableData = () => {
 function getScreenSize() {
   windowWidth.value = window.innerWidth;
   windowHeight.value = window.innerHeight;
+}
+
+const onCellClick = (info: any) => {
+  console.log('点击的行数据:', info.row);
+  console.log('点击的列数据:', info.column);
+  selectedRow.value = info.row;
+  selectedColumn.value = info.column;
 }
 
 
