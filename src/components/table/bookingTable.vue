@@ -27,7 +27,10 @@
             </span>
           </template>
           <template v-else>
-            <span :style="{ backgroundColor: scope.row[item.key], display: 'inline-block', width: '100%', height: '100px' }"></span>
+            <span :class="{ 'cell-active': isSelected(scope.$index, index) }"
+                  :style="{ backgroundColor: scope.row[item.key], display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center' }"
+                  @click="handleCellClick(scope.$index, index, scope.row[item.key])"
+                  > <i v-if="isSelected(scope.$index, index)" class="check-mark">✓</i> </span>
           </template>
         </template>
       </el-table-column>
@@ -113,6 +116,8 @@ import { storeToRefs } from 'pinia';
 import { useThemeConfig } from '/@/stores/themeConfig';
 import '/@/theme/tableTool.scss';
 
+const selectedCell = ref<any>(null);
+
 // 定义父组件传过来的值
 const props = defineProps({
   // 列表内容
@@ -138,7 +143,7 @@ const props = defineProps({
 });
 
 // 定义子组件向父组件传值/事件
-const emit = defineEmits(['delRow', 'pageChange', 'sortHeader']);
+const emit = defineEmits(['delRow', 'pageChange', 'sortHeader', 'cellClick']);
 
 // 定义变量内容
 const toolSetRef = ref();
@@ -178,6 +183,21 @@ const onCheckChange = () => {
   state.checkListAll = headers === props.header.length;
   state.checkListIndeterminate = headers > 0 && headers < props.header.length;
 };
+
+const isSelected= (rowIndex: number, columnIndex: number) => {
+  return selectedCell.value && selectedCell.value.row === rowIndex && selectedCell.value.column === columnIndex;
+}
+
+const handleCellClick = (row: number, column: number, color: string) => {
+  if (color != "#f54545") {
+    if (isSelected(row, column)) {
+      selectedCell.value = { row: 0, column: 0 }; // 取消选择当前单元格
+    } else {
+      selectedCell.value = { row: row, column: column}; // 选中当前单元格
+    }
+    emit('cellClick', {row: selectedCell.value.row, column: selectedCell.value.column});
+  }
+}
 // 表格多选改变时，用于导出
 const onSelectionChange = (val: EmptyObjectType[]) => {
   state.selectlist = val;
@@ -275,6 +295,24 @@ defineExpose({
   .el-table {
     flex: 1;
     overflow: auto;
+    .check-mark {
+      font-size: 50px; /* 调整对勾的大小 */
+      line-height: 100px;
+      user-select: none
+    }
+
+    .cell-active {
+      position: relative;
+      background-color: lightpink !important;
+    }
+
+    .cell-active::after {
+      content: ''; /* 对勾符号 */
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
   }
   .table-footer {
     display: flex;
