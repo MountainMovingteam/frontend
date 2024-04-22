@@ -65,18 +65,20 @@
       </div>
     </div>
     <div class="flex-warp-item-box" style="display: flex; justify-content: center; margin-top: 20px;">
-      <el-button type="success" size="large">
+      <el-button type="success" size="large" @click="onOpenSubmit">
         <el-icon>
           <ele-Check />
         </el-icon>
         提交预约
       </el-button>
     </div>
+    <SubmitDialog :campus="selectedLocation" :bookingWay="selectedWay" :row="selectedRow" :column="selectedColumn" ref="submitDialogRef" @refresh="getTableData()"/>
   </div>
 </template>
 
 <script setup lang="ts">
 import {defineAsyncComponent, onMounted, reactive, ref} from "vue";
+import {ElMessage} from "element-plus";
 
 const windowWidth = ref(window.innerWidth);
 const windowHeight = ref(window.innerHeight)
@@ -95,9 +97,10 @@ function selectLocation(location: string) {
 function selectWay(way: string) {
   selectedWay.value = way;
 }
-
+const SubmitDialog = defineAsyncComponent(() => import('/@/views/booking/dialog.vue'));
 const Table = defineAsyncComponent(() => import('/@/components/table/bookingTable.vue'));
 // 定义变量内容
+const submitDialogRef = ref();
 const tableRef = ref<RefType>();
 const stateXyGroup = reactive<TableState>({
   tableData: {
@@ -300,10 +303,26 @@ const onCellClick = (info: any) => {
   selectedColumn.value = info.column;
 }
 
+function areValuesValid(rowValue: number, columnValue: number) {
+  const isRowInRange = rowValue >= 0 && rowValue <= 3;
+  const isColumnInRange = columnValue >= 1 && columnValue <= 7;
+  return isRowInRange && isColumnInRange;
+}
+
+const onOpenSubmit = (type: string) => {
+  if (areValuesValid(selectedRow.value, selectedColumn.value)) {
+    submitDialogRef.value.openDialog(type);
+  } else {
+    ElMessage({
+      type: 'warning',
+      message: '请选择预约时间'
+    });
+  }
+};
 
 onMounted(() => {
-  getTableData();
   getScreenSize();
+  getTableData();
 
 });
 
