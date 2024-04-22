@@ -1,0 +1,133 @@
+<template>
+    <div>
+        <el-tooltip class="box-item" effect="dark" content="添加讲解员" placement="left">
+            <div class="add-icon" @click="openDialog">
+                <el-icon>
+                    <Plus />
+                </el-icon>
+            </div>
+        </el-tooltip>
+    </div>
+
+    <el-dialog v-model="addDialogVisible" @close="closeDialog">
+        <!-- 添加标题 -->
+        <template #title>
+            <div style="text-align: center;">
+                <span class="custom-title">添加讲解员</span>
+            </div>
+        </template>
+        <el-form :model="form" label-width="auto" style="max-width: 90%">
+            <el-form-item label="姓名" prop="name" :rules="[{ required: true, message: '请输入姓名', trigger: 'blur' }]">
+                <el-input v-model="form.name" />
+            </el-form-item>
+            <el-form-item label="学号" prop="num" :rules="[{ required: true, message: '请输入学号', trigger: 'blur' }]">
+                <el-input v-model="form.num" />
+            </el-form-item>
+            <el-form-item label="熟练度" prop="tag" :rules="[{ required: true, message: '请选择熟练度', trigger: 'change' }]">
+                <el-select v-model="form.tag">
+                    <el-option label="入门" value="入门" />
+                    <el-option label="熟练" value="熟练" />
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <div class="dialog-footer">
+            <el-button type="success" @click="onSubmit" :disabled="!isFormValid">添加</el-button>
+            <el-button type="info" @click="closeDialog">取消</el-button>
+        </div>
+    </el-dialog>
+</template>
+
+<script>
+import { Plus } from '@element-plus/icons-vue'
+import { reactive } from 'vue'
+
+export default {
+    data ()
+    {
+        return {
+            addDialogVisible: false,
+            form: reactive( {
+                name: '',
+                num: '',
+                tag: ''
+            } )
+        }
+    },
+    computed: {
+        isFormValid ()
+        {
+            return this.form.name && this.form.num && this.form.tag;
+        }
+    },
+    components: {
+        Plus
+    },
+    methods: {
+        openDialog ()
+        {
+            this.addDialogVisible = true;
+        },
+        closeDialog ()
+        {
+            this.addDialogVisible = false;
+        },
+        onSubmit ()
+        {
+            if ( !this.isFormValid )
+            {
+                this.$message.error( '请填写完整的表单信息！' );
+                return;
+            }
+            // 提交表单的逻辑
+            this.addDialogVisible = false;
+            this.form = reactive( {
+                name: '',
+                num: '',
+                tag: ''
+            } )
+        }
+    }
+}
+</script>
+
+<style lang="scss" scoped>
+.box-item {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #fff;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+.add-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background-color: #2b85ec;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 999;
+}
+
+.custom-title {
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+}
+
+.dialog-footer {
+    justify-content: flex-end;
+    padding: 40px 0 0 0;
+    display: flex;
+}
+</style>
