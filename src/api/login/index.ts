@@ -22,6 +22,13 @@ export function useLoginApi() {
 				data,
 			});
 		},
+		register: (data: object) => {
+			return request({
+				url: '',
+				method:'post',
+				data,
+			})
+		}
 	};
 }
 /*
