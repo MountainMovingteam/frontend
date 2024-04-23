@@ -72,7 +72,15 @@
         提交预约
       </el-button>
     </div>
-    <SubmitDialog :campus="selectedLocation" :bookingWay="selectedWay" :row="selectedRow" :column="selectedColumn" ref="submitDialogRef" @refresh="getTableData()"/>
+    <SubmitDialog :campus="selectedLocation"
+                  :bookingWay="selectedWay"
+                  :row="selectedRow"
+                  :column="selectedColumn"
+                  ref="submitDialogRef"
+                  @refresh="getTableData()"
+                  @updateCampus="updateCampus"
+                  @updateBookingWay="updateBookingWay"
+    />
   </div>
 </template>
 
@@ -90,12 +98,26 @@ const events = ['8:00-9:30', '10:00-11:30', '14:00-15:30', '16:00-17:30'];
 const selectedRow = ref(0);
 const selectedColumn = ref(0);
 
+const updateCampus = (campus: string) => {
+  console.log('hiiiiiiiiiiiiiiiiiiiiiiiiii')
+  selectLocation(campus);
+}
+
+const updateBookingWay = (bookingway: string) => {
+  console.log('he')
+  selectWay(bookingway);
+}
+
 function selectLocation(location: string) {
   selectedLocation.value = location;
+  selectedRow.value = 0;
+  selectedColumn.value = 0;
 }
 
 function selectWay(way: string) {
   selectedWay.value = way;
+  selectedRow.value = 0;
+  selectedColumn.value = 0;
 }
 const SubmitDialog = defineAsyncComponent(() => import('/@/views/booking/dialog.vue'));
 const Table = defineAsyncComponent(() => import('/@/components/table/bookingTable.vue'));
@@ -295,6 +317,7 @@ function getScreenSize() {
   windowWidth.value = window.innerWidth;
   windowHeight.value = window.innerHeight;
 }
+
 
 const onCellClick = (info: any) => {
   console.log('点击的行数据:', info.row);
