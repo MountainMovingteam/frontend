@@ -364,6 +364,10 @@ const onSubmit = () => {
     if (validateGroupBooking()) {
       closeDialog();
       refreshData();
+      ElMessage({
+        type: 'success',
+        message: '预约成功'
+      });
       emit('refresh');
     } else {
       return;
@@ -372,6 +376,10 @@ const onSubmit = () => {
     if (validateSingleBooking()) {
       closeDialog();
       refreshData();
+      ElMessage({
+        type: 'success',
+        message: '预约成功'
+      });
       emit('refresh');
     } else {
       return;
