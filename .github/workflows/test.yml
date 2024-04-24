@@ -2,9 +2,9 @@ name: test
 
 on:
   push:
-    branches: [ "feature/homepage" ]
+    branches: [ "dev" ]
   pull_request:
-    branches: [ "feature/homepage" ]
+    branches: [ "dev" ]
 
 jobs:
   build:
