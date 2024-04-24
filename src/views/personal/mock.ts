@@ -21,29 +21,29 @@ export const newsInfoList = [
  */
 export const recommendList = [
 	{
-		title: '优惠券',
-		msg: '现金券、折扣券、营销必备',
+		title: '竞赛问答',
+		msg: '参与竞赛，回答问题',
 		icon: 'ele-Food',
 		bg: '#48D18D',
 		iconColor: '#64d89d',
 	},
 	{
-		title: '多人拼团',
-		msg: '社交电商、开辟流量',
+		title: 'xxxx',
+		msg: 'aaaaa',
 		icon: 'ele-ShoppingCart',
 		bg: '#F95959',
 		iconColor: '#F86C6B',
 	},
 	{
-		title: '分销中心',
-		msg: '轻松招募分销员，成功推广奖励',
+		title: 'zzzz',
+		msg: 'xxxxx',
 		icon: 'ele-School',
 		bg: '#8595F4',
 		iconColor: '#92A1F4',
 	},
 	{
-		title: '秒杀',
-		msg: '超低价抢购引导更多销量',
+		title: 'cccc',
+		msg: 'dddddd',
 		icon: 'ele-AlarmClock',
 		bg: '#FEBB50',
 		iconColor: '#FDC566',
