@@ -1,11 +1,20 @@
 <template>
     <div class="border">
         <div class="header">
-            <div class="topic">{{ localName }}</div>
+            <div style="display: flex; align-items: center;">
+                <el-icon style="margin-right: 6px; font-size: 18px;">
+                    <Avatar />
+                </el-icon>
+                <div class="topic">
+                    {{ localName }}
+                </div>
+            </div>
             <el-tag type="danger" effect="light">{{ localTag }}</el-tag>
         </div>
 
         <div class="text">学号：{{ localNum }}</div>
+        <div class="text">工作日：{{ localWeekday }}</div>
+        <div class="text">场次：{{ localComputedSession }}</div>
         <div class="buttonContainer">
             <el-button type="blue" @click="dialogVisible = true" class="hover-lighten">修改信息 </el-button>
             <el-button type="danger" @click="myDelete()">
@@ -16,24 +25,40 @@
         </div>
     </div>
     <el-dialog v-model="dialogVisible" title="修改信息" width="500" draggable>
-        <el-form :model="form" label-width="auto" style="max-width: 600px">
-            <el-form-item label="姓名">
+        <el-form :model="form" label-width="auto" style="max-width: 90%">
+            <el-form-item label="姓名" prop="name" :rules="[{ required: true, message: '请输入姓名', trigger: 'blur' }]">
                 <el-input v-model="form.name" />
             </el-form-item>
-            <el-form-item label="学号">
+            <el-form-item label="学号" prop="num" :rules="[{ required: true, message: '请输入学号', trigger: 'blur' }]">
                 <el-input v-model="form.num" />
             </el-form-item>
-            <el-form-item label="熟练度">
+            <el-form-item label="熟练度" prop="tag" :rules="[{ required: true, message: '请选择熟练度', trigger: 'change' }]">
                 <el-select v-model="form.tag">
                     <el-option label="入门" value="入门" />
                     <el-option label="熟练" value="熟练" />
+                </el-select>
+            </el-form-item>
+            <el-form-item label="工作日" prop="tag" :rules="[{ required: true, message: '请选择工作日', trigger: 'change' }]">
+                <el-select v-model="form.weekday">
+                    <el-option label="周一" value="周一" />
+                    <el-option label="周二" value="周二" />
+                    <el-option label="周三" value="周三" />
+                    <el-option label="周四" value="周四" />
+                </el-select>
+            </el-form-item>
+            <el-form-item label="场次" prop="session" :rules="[{ required: true, message: '请选择场次', trigger: 'change' }]">
+                <el-select v-model="form.session">
+                    <el-option label="8:00 ~ 9:30" value=1 />
+                    <el-option label="10:00 ~ 11:30" value=2 />
+                    <el-option label="14:00 ~ 15:30" value=3 />
+                    <el-option label="16:00 ~ 17:30" value=4 />
                 </el-select>
             </el-form-item>
         </el-form>
         <template #footer>
             <div class="dialog-footer">
                 <el-button type="info" @click="dialogVisible = false">取消</el-button>
-                <el-button type="success" @click="fixData()">
+                <el-button type="success" @click="fixData()" :disabled="!isFormValid">
                     确认
                 </el-button>
             </div>
@@ -43,7 +68,7 @@
 
 <script lang="ts">
 import axios from 'axios'
-import { Delete, Download } from '@element-plus/icons-vue'
+import { Delete, Avatar } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus';
 import { reactive } from 'vue'
 export default {
@@ -53,23 +78,48 @@ export default {
             localName: this.name,
             localNum: this.num,
             localTag: this.tag,
+            localWeekday: this.weekday,
+            localSession: this.session,
             form: reactive({
                 //将初始值设置为props中的数值
                 name: this.name,
                 num: this.num,
-                tag: this.tag
+                tag: this.tag,
+                weekday: this.weekday,
+                session: this.session,
             })
         }
     },
+    computed: {
+        localComputedSession() {
+            if (this.localSession == 1) {
+                return "8:00 ~ 9:30";
+            } else if (this.localSession == 2) {
+                return "10:00 ~ 11:30";
+            } else if (this.localSession == 3) {
+                return "14:00 ~ 16:30";
+            } else if (this.localSession == 4) {
+                return "16:00 ~ 17:30";
+            } else {
+                return "";
+            }
+        },
+        isFormValid() {
+            return this.form.name && this.form.num && this.form.tag;
+        }
+    },
     components: {
-        Delete
+        Delete,
+        Avatar
     },
     methods: {
         myDelete() {
             axios.post('/api/delete', {
                 name: this.localName,
                 num: this.localNum,
-                tag: this.localTag
+                tag: this.localTag,
+                weekday: this.localWeekday,
+                session: this.localSession,
             })
                 .then(res => {
                     if (res.data == "success") {
@@ -87,9 +137,11 @@ export default {
             this.localName = this.form.name
             this.localNum = this.form.num
             this.localTag = this.form.tag
+            this.localWeekday = this.form.weekday
+            this.localSession = this.form.session
         },
     },
-    props: ["name", "num", "tag"]
+    props: ["name", "num", "tag", "weekday", "session"]
 }
 </script>
 
@@ -101,7 +153,7 @@ export default {
 }
 
 .border {
-    border: 4px solid #4c82ff63;
+    border: 3px solid #4c82ff63;
     border-radius: 8px;
     padding-top: 15px;
     padding-bottom: 15px;
@@ -115,11 +167,13 @@ export default {
 
 .topic {
     font-size: 20px;
+    /* 字体加粗加斜 */
+    font-weight: bolder;
 }
 
-W .text {
+.text {
     font-size: 16px;
-    margin-top: 10px;
+    margin-top: 16px;
 }
 
 .buttonContainer {

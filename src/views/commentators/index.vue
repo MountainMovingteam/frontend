@@ -4,14 +4,9 @@
             <el-header class="header">
                 <div class="input-container">
                     <!-- 搜索框 -->
+                    <el-cascader :options="options" :props="props" collapse-tags collapse-tags-tooltip clearable
+                        style="width: 40%;" />
                     <el-input v-model="input" style="max-width: 600px" placeholder="Please input" class="input-with-select">
-                        <template #prepend>
-                            <el-select v-model="select" placeholder="熟练度" style="width: 115px">
-                                <el-option label="所有" value="1" />
-                                <el-option label="入门" value="2" />
-                                <el-option label="熟练" value="3" />
-                            </el-select>
-                        </template>
                         <template #append>
                             <el-button>
                                 <el-icon>
@@ -22,9 +17,9 @@
                     </el-input>
                 </div>
                 <!-- 功能按钮 -->
+                <div style="width: 10%;"></div>
                 <div>
-                    <el-button type="red" class="hover-lighten" @click="this.deleteDialogVisible = true">清空讲解员
-                    </el-button>
+                    <el-button type="red" class="hover-lighten" @click="this.deleteDialogVisible = true">清空讲解员</el-button>
                     <el-button type="success" class="hover-lighten" @click="exportAll()">导出讲解员 </el-button>
                     <el-button type="info" class="hover-lighten" @click="this.uploadDialogVisible = true">导入讲解员 </el-button>
                 </div>
@@ -34,7 +29,8 @@
                 <div>
                     <el-row v-for="(commentators, index) in filteredCommentators" :gutter="20" :key="index">
                         <el-col v-for="(commentator, index) in commentators" :key="index" :span="8">
-                            <CommentatorCard :name="commentator.name" :num="commentator.num" :tag="commentator.tag" />
+                            <CommentatorCard :name="commentator.name" :num="commentator.num" :tag="commentator.tag"
+                                :weekday="commentator.weekday" :session="commentator.session" />
                         </el-col>
                     </el-row>
                 </div>
@@ -71,68 +67,81 @@ export default {
                 {
                     "name": '李四',
                     "num": 114514,
-                    "tag": "入门"
+                    "tag": "入门",
+                    "weekday": "周一",
+                    "session": 1
                 },
-                {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                },
-                {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                },
-
             ],
             select: ref( '' ),
             input: ref( '' ),
             deleteDialogVisible: false,
             uploadDialogVisible: false,
+            options: [
+                {
+                    value: 1,
+                    label: "熟练度",
+                    children: [
+                        {
+                            value: 11,
+                            label: "入门"
+                        },
+                        {
+                            value: 12,
+                            label: "熟练"
+                        },
+                    ]
+                },
+                {
+                    value: 2,
+                    label: "星期",
+                    children: [
+                        {
+                            value: 21,
+                            label: "周一"
+                        },
+                        {
+                            value: 22,
+                            label: "周二"
+                        },
+                        {
+                            value: 23,
+                            label: "周三"
+                        },
+                        {
+                            value: 24,
+                            label: "周四"
+                        },
+                        {
+                            value: 25,
+                            label: "周五"
+                        },
+                    ]
+
+                },
+                {
+                    value: 3,
+                    label: "场次",
+                    children: [
+                        {
+                            value: 31,
+                            label: "8:00 ~ 9:30"
+                        },
+                        {
+                            value: 32,
+                            label: "10:00 ~ 11:30"
+                        },
+                        {
+                            value: 33,
+                            label: "14:00 ~ 15:30"
+                        },
+                        {
+                            value: 34,
+                            label: "16:00 ~ 17:30"
+                        },
+                    ]
+                }
+            ],
+            props: { multiple: true }
         }
     },
     components: {
@@ -186,22 +195,20 @@ export default {
 
         async exportAll ()
         {
+            //console.log( this.commentators )
+            const buf = JSON.parse( JSON.stringify( this.commentators ) );
             try
             {
                 // 模拟异步下载操作
                 const downloadPromise = new Promise( ( resolve, reject ) =>
                 {
-                    download( this.commentators, '讲解员.xlsx', () =>
+                    download( buf, '讲解员.xlsx', () =>
                     {
-                        // 下载完成后调用 resolve
                         resolve();
                     } );
                 } );
 
                 await downloadPromise; // 等待下载完成
-
-                // 下载完成后继续执行后续操作
-                console.log( 'Download completed' );
 
                 return Promise.resolve();
             } catch ( error )
@@ -230,7 +237,9 @@ export default {
 }
 
 .input-container {
-    width: 400px;
+    height: 66%;
+    display: flex;
+    justify-content: space-between;
 }
 
 .input-with-select .el-input-group__prepend {
