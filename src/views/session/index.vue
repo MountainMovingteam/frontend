@@ -45,9 +45,11 @@
 <script setup lang="ts">
 import {defineAsyncComponent, onMounted, reactive, ref} from "vue";
 import '/@/types/session.d.ts'
+import {ElMessage} from "element-plus";
 
-const selectedLocation = ref('shahe');
-// const SubmitDialog = defineAsyncComponent(() => import('/@/views/session/'));
+const selectedLocation = ref('xueyuan');
+const submitDialogRef = ref();
+const SubmitDialog = defineAsyncComponent(() => import('/@/views/session/dialog.vue'));
 const Table = defineAsyncComponent(() => import('/@/components/table/sessionTable.vue'));
 const xyTable = reactive<TableState>(<TableState>{
   tableData: {
@@ -113,6 +115,17 @@ const getTableData = () => {
   for (let i = 0; i < 4; i++) {
     xyTable.tableData.data.push({
       event: `第${i + 1}场 ${events[i]}`,
+      day1: `wangda`,
+      day2: `lier`,
+      day3: `zhangsan`,
+      day4: `lisi`,
+      day5: `wangwu`,
+      day6: `dingliu`,
+      day7: `qianqi`,
+    });
+
+    shTable.tableData.data.push({
+      event: `第${i + 1}场 ${events[i]}`,
       day1: `1`,
       day2: `2`,
       day3: `3`,
@@ -120,17 +133,6 @@ const getTableData = () => {
       day5: `5`,
       day6: `6`,
       day7: `7`,
-    });
-
-    shTable.tableData.data.push({
-      event: `第${i + 1}场 ${events[i]}`,
-      // day1: "#f54545", // 使用颜色名称
-      // day2: "#99FF99", // 使用十六进制颜色码
-      // day3: "#99FF99", // 使用 RGB 颜色值
-      // day4: "#90EE90",
-      // day5: "#90EE90",
-      // day6: "#90EE90",
-      // day7: "#90EE90",
     });
   }
 
@@ -153,7 +155,26 @@ function getScreenSize() {
 const onCellClick = (info: any) => {
   selectedRow.value = info.row;
   selectedColumn.value = info.column;
+  onOpenSubmit("success");
 }
+
+function areValuesValid(rowValue: number, columnValue: number) {
+  const isRowInRange = rowValue >= 0 && rowValue <= 3;
+  const isColumnInRange = columnValue >= 1 && columnValue <= 7;
+  return isRowInRange && isColumnInRange;
+}
+
+
+const onOpenSubmit = (type: string) => {
+  if (areValuesValid(selectedRow.value, selectedColumn.value)) {
+    submitDialogRef.value.openDialog(type);
+  } else {
+    ElMessage({
+      type: 'warning',
+      message: '请选择预约时间'
+    });
+  }
+};
 
 onMounted(() => {
   getScreenSize();
