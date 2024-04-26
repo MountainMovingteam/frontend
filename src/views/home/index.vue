@@ -9,11 +9,15 @@
 					:lg="12"
 					:xl="12"
 				>
-					<div class="home-card-item" style='height: 300px;margin-top: 0px;'>
-						<img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" style="height: 100%;width:100%"/>
+					<div class="el-hide-xs-only home-card-item " style=';height: 325px; margin-top: auto' v-if='isCollapse'>
+						<el-carousel :interval="5000" arrow="always">
+							<el-carousel-item v-for="item in 4" :key="item">
+							<h3 text="2xl" justify="center">{{ item }}</h3>
+							</el-carousel-item>
+						</el-carousel>
 					</div>
-					<div class="el-hide-xs-only home-card-item " style=';height: 300px; margin-top: auto' >
-						
+					<div class="home-card-item" style='height: 325px;margin-top: 0px;'>
+						<img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" style="height: 100%;width:100%"/>
 					</div>
 				</div>
 			</el-col>
@@ -24,7 +28,7 @@
 				:lg="12"
 				:xl="12"
 			>
-			<div class='home-card-item' style='background-color: aqua;'>
+			<div class='home-card-item' >
 				<ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto">
 					<li v-for="i in count" :key="i" class="infinite-list-item">
 						<div class="left-content">
@@ -56,6 +60,11 @@ const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
 const { isTagsViewCurrenFull } = storeToRefs(storesTagsViewRoutes);
 const count = ref(0)
+const screenWidth = ref(window.innerWidth)
+const isCollapse = ref(screenWidth.value >= 768)
+const handleResize = () => {
+  screenWidth.value = window.innerWidth
+}
 const load = () => {
   count.value += 2
 }
@@ -96,6 +105,7 @@ onMounted(() => {
 // 由于页面缓存原因，keep-alive
 onActivated(() => {
 	initEchartsResizeFun();
+	window.addEventListener("resize", handleResize)
 });
 // 监听 pinia 中的 tagsview 开启全屏变化，重新 resize 图表，防止不出现/大小不变等
 watch(
@@ -119,6 +129,15 @@ watch(
 		immediate: true,
 	}
 );
+
+watch(screenWidth, (newValue, oldValue) => {
+  if (newValue < 768) {
+    isCollapse.value = false
+  } else {
+    isCollapse.value = true
+  }
+  console.log("值发生了变更", newValue, oldValue, isCollapse.value)
+})
 </script>
 
 <style scoped lang="scss">
@@ -130,7 +149,7 @@ $homeNavLengh: 8;
 
 		.infinite-list {
 			overflow-y: hidden;
-			height: 600px;
+			height: 650px;
 			width: 100%;
 			padding: 0;
 			margin: 0;
@@ -168,7 +187,7 @@ $homeNavLengh: 8;
 			
 		.home-card-item {
 			width: 100%;
-			height: 600px;
+			height: 650px;
 			border-radius: 4px;
 			transition: all ease 0.3s;
 			padding: 20px;
@@ -194,11 +213,26 @@ $homeNavLengh: 8;
 				font-weight: bold;
 				height: 30px;
 			}
+			.el-carousel__item h3 {
+				color: #475669;
+				opacity: 0.75;
+				line-height: 300px;
+				margin: 0;
+				text-align: center;
+				}
+
+				.el-carousel__item:nth-child(2n) {
+				background-color: #99a9bf;
+				}
+
+				.el-carousel__item:nth-child(2n + 1) {
+				background-color: #d3dce6;
+				}
 		}
 	}
 	.home-card-three {
 		.home-card-item {
-			height:600px;
+			height:650px;
 			width: 100%;
 			overflow: hidden;
 			.home-monitor {
