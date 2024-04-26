@@ -39,12 +39,12 @@
             <div class="'dialogContainer'">
                 <!-- 清空按钮dioloag -->
                 <DeleteDialog v-model="deleteDialogVisible" :message="'此操作将永久删除所有讲解员, 是否导出当前讲解员?'" @exportAll="exportAll"
-                    @cancel="cancelDelete" @deleteAll="deleteAll"></DeleteDialog>
+                    @cancel="cancelDelete" @deleteAll="deleteAll" @getCommentators="getCommentators"></DeleteDialog>
                 <!-- 上传按钮dialog -->
 
                 <Upload v-model="uploadDialogVisible" @exportAll="exportAll" @cancel="cancelUpload"></Upload>
                 <!-- 添加按钮dialog -->
-                <AddDialog></AddDialog>
+                <AddDialog @getCommentators="getCommentators"></AddDialog>
             </div>
         </el-container>
     </div>
@@ -59,6 +59,7 @@ import download from "./exportXLSX.js";
 import { Search } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import axios from 'axios'
 export default {
     data ()
     {
@@ -67,7 +68,7 @@ export default {
                 {
                     "name": '李四',
                     "num": 114514,
-                    "tag": "入门",
+                    "tag": "熟练",
                     "weekday": "周一",
                     "session": "8:00 ~ 9:30"
                 },
@@ -82,37 +83,37 @@ export default {
                     label: "熟练度",
                     children: [
                         {
-                            value: 11,
+                            value: "入门",
                             label: "入门"
                         },
                         {
-                            value: 12,
+                            value: "熟练",
                             label: "熟练"
                         },
                     ]
                 },
                 {
                     value: 2,
-                    label: "星期",
+                    label: "工作日",
                     children: [
                         {
-                            value: 21,
+                            value: "周一",
                             label: "周一"
                         },
                         {
-                            value: 22,
+                            value: "周二",
                             label: "周二"
                         },
                         {
-                            value: 23,
+                            value: "周三",
                             label: "周三"
                         },
                         {
-                            value: 24,
+                            value: "周四",
                             label: "周四"
                         },
                         {
-                            value: 25,
+                            value: "周五",
                             label: "周五"
                         },
                     ]
@@ -123,19 +124,19 @@ export default {
                     label: "场次",
                     children: [
                         {
-                            value: 31,
+                            value: "8:00 ~ 9:30",
                             label: "8:00 ~ 9:30"
                         },
                         {
-                            value: 32,
+                            value: "10:00 ~ 11:30",
                             label: "10:00 ~ 11:30"
                         },
                         {
-                            value: 33,
+                            value: "14:00 ~ 15:30",
                             label: "14:00 ~ 15:30"
                         },
                         {
-                            value: 34,
+                            value: "16:00 ~ 17:30",
                             label: "16:00 ~ 17:30"
                         },
                     ]
@@ -143,6 +144,10 @@ export default {
             ],
             props: { multiple: true }
         }
+    },
+    mounted ()
+    {
+        this.getCommentators();
     },
     components: {
         CommentatorCard,
@@ -163,27 +168,83 @@ export default {
         },
     },
     methods: {
+        getCommentators ()
+        {
+            axios.get( '/api/manager/lecturer' ).then( response =>
+            {
+                if ( response.status === 200 )
+                {
+                    this.commentators = response.data.list;
+                } else
+                {
+                    // 处理未获取到数据的情况
+                    ElMessage.error( '获取数据失败' );
+                }
+            } ).catch( error =>
+            {
+                // 处理请求失败的情况
+                ElMessage.error( '获取数据失败' );
+            } );
+        },
+
+
         mySearch ()
         {
-            console.log( this.select )
-            console.log( this.input )
-            this.select = []
-            this.input = ref( '' )
+            //     console.log( this.select )
+            //     console.log( this.input )
+            axios.post( '/api/manager/lecturer/find', {
+                "tags": this.select,
+                "content": this.input
+            } ).then( response =>
+            {
+                if ( response.status === 200 )
+                {
+                    this.commentators = response.data.list;
+                    this.select = []
+                    this.input = ref( '' )
+                } else
+                {
+                    // 处理未获取到数据的情况
+                    ElMessage.error( '获取数据失败' );
+                }
+            } ).catch( error =>
+            {
+                // 处理请求失败的情况
+                ElMessage.error( '获取数据失败' );
+            } );
         },
 
         // 清空按钮所需函数
         deleteAll ()
         {
-            this.commentators = [];
+            axios.delete( 'api/manage/lecturerAll' ).then( response =>
+            {
+                if ( response.status === 200 )
+                {
+                    this.commentators = [];
+                    ElMessage( {
+                        type: 'success',
+                        message: '删除成功'
+                    } );
+                } else
+                {
+                    // 处理未获取到数据的情况
+                    ElMessage.error( '删除失败' );
+                }
+            } ).catch( error =>
+            {
+                // 处理请求失败的情况
+                ElMessage.error( '删除失败' );
+            } );
             this.deleteDialogVisible = false;
-            this.filteredCommentators;
+            //this.filteredCommentators;
             //console.log( this.deleteDialogVisible )
         },
         cancelDelete ()
         {
             // 用户点击直接清空按钮后的操作
             this.deleteDialogVisible = false;
-            this.$message( {
+            ElMessage( {
                 type: 'info',
                 message: '已取消操作'
             } );
@@ -194,7 +255,7 @@ export default {
         cancelUpload ()
         {
             this.uploadDialogVisible = false;
-            this.$message( {
+            ElMessage( {
                 type: 'info',
                 message: '已取消操作'
             } );
