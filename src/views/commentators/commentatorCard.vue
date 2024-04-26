@@ -14,7 +14,7 @@
 
         <div class="text">学号：{{ localNum }}</div>
         <div class="text">工作日：{{ localWeekday }}</div>
-        <div class="text">场次：{{ localComputedSession }}</div>
+        <div class="text">场次：{{ localSession }}</div>
         <div class="buttonContainer">
             <el-button type="blue" @click="dialogVisible = true" class="hover-lighten">修改信息 </el-button>
             <el-button type="danger" @click="myDelete()">
@@ -48,10 +48,10 @@
             </el-form-item>
             <el-form-item label="场次" prop="session" :rules="[{ required: true, message: '请选择场次', trigger: 'change' }]">
                 <el-select v-model="form.session">
-                    <el-option label="8:00 ~ 9:30" value=1 />
-                    <el-option label="10:00 ~ 11:30" value=2 />
-                    <el-option label="14:00 ~ 15:30" value=3 />
-                    <el-option label="16:00 ~ 17:30" value=4 />
+                    <el-option label="8:00 ~ 9:30" value="8:00 ~ 9:30" />
+                    <el-option label="10:00 ~ 11:30" value="10:00 ~ 11:30" />
+                    <el-option label="14:00 ~ 15:30" value="14:00 ~ 15:30" />
+                    <el-option label="16:00 ~ 17:30" value="16:00 ~ 17:30" />
                 </el-select>
             </el-form-item>
         </el-form>
@@ -91,21 +91,8 @@ export default {
         }
     },
     computed: {
-        localComputedSession() {
-            if (this.localSession == 1) {
-                return "8:00 ~ 9:30";
-            } else if (this.localSession == 2) {
-                return "10:00 ~ 11:30";
-            } else if (this.localSession == 3) {
-                return "14:00 ~ 16:30";
-            } else if (this.localSession == 4) {
-                return "16:00 ~ 17:30";
-            } else {
-                return "";
-            }
-        },
         isFormValid() {
-            return this.form.name && this.form.num && this.form.tag;
+            return this.form.name && this.form.num && this.form.tag && this.form.weekday && this.form.session;
         }
     },
     components: {

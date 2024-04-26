@@ -39,10 +39,10 @@
             </el-form-item>
             <el-form-item label="场次" prop="session" :rules="[{ required: true, message: '请选择场次', trigger: 'change' }]">
                 <el-select v-model="form.session">
-                    <el-option label="8:00 ~ 9:30" value=1 />
-                    <el-option label="10:00 ~ 11:30" value=2 />
-                    <el-option label="14:00 ~ 15:30" value=3 />
-                    <el-option label="16:00 ~ 17:30" value=4 />
+                    <el-option label="8:00 ~ 9:30" value="8:00 ~ 9:30" />
+                    <el-option label="10:00 ~ 11:30" value="10:00 ~ 11:30" />
+                    <el-option label="14:00 ~ 15:30" value="14:00 ~ 15:30" />
+                    <el-option label="16:00 ~ 17:30" value="16:00 ~ 17:30" />
                 </el-select>
             </el-form-item>
         </el-form>
