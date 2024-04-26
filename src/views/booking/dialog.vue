@@ -31,6 +31,7 @@
                     :value="day"
                 >
                   {{ day }}
+<!--                  //asd-->
                 </el-option>
               </el-select>
             </el-form-item>

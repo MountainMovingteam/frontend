@@ -31,9 +31,9 @@
 <!--                  :style="{ backgroundColor: scope.row[item.key], display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center' }"-->
 <!--                  @click="handleCellClick(scope.$index, index, scope.row[item.key] )"-->
 <!--            > <i v-if="isSelected(scope.$index, index)" class="check-mark">✓</i> </span>-->
-            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100px;"@click="handleCellClick(scope.$index, index, scope.row[item.key] )">
+            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100px;" @click="handleCellClick(scope.$index, index, scope.row[item.key] )">
               {{ scope.row[item.key] }}
-            </span>
+              </span>
           </template>
 <!--          格内功能-->
         </template>
