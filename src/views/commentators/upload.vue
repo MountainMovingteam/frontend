@@ -1,7 +1,7 @@
 <template>
     <el-dialog v-model="uploadDialogVisible" title="上传文件" :width="'50%'">
-        <el-upload ref="uploadRef" class="uploadAll-demo" drag
-            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" :auto-upload="false">
+        <el-upload v-model:file-list="uploadFile" ref="uploadRef" class="uploadAll-demo" drag :limit="1"
+            :on-exceed="handleExceed" action="#" :auto-upload="false">
             <el-icon class="el-icon--uploadAll"><upload-filled /></el-icon>
             <div class="el-uploadAll__text">
                 拖动文件到此处上传或 <em>点击上传</em>
@@ -23,18 +23,52 @@
 <script lang="ts">
 import { UploadFilled } from '@element-plus/icons-vue'
 import { ref } from 'vue'
-import type { UploadInstance } from 'element-plus'
+import { genFileId } from 'element-plus'
+import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import axios from 'axios'
+
 export default {
     setup() {
         const uploadRef = ref<UploadInstance>()
+        // 定义响应式变量 uploadFile
+        const uploadFile: any = [];
 
         const submitUploadAll = () => {
+            //console.log(uploadFile.value[0])
+            //console.log(uploadFile)
+            axios.post('/api/upload', uploadFile[0].raw).then(response => {
+                if (response.status === 200) {
+                    ElMessage({
+                        message: '上传成功',
+                        type: 'success'
+                    });
+                } else {
+                    ElMessage({
+                        message: '上传失败',
+                        type: 'error'
+                    });
+                }
+            }).catch(error => {
+                ElMessage({
+                    message: '上传失败',
+                    type: 'error'
+                });
+            })
             uploadRef.value!.submit()
+        }
+        const handleExceed: UploadProps['onExceed'] = (files) => {
+            uploadRef.value!.clearFiles()
+            const file = files[0] as UploadRawFile
+            file.uid = genFileId()
+            uploadRef.value!.handleStart(file)
         }
 
         return {
             uploadRef,
-            submitUploadAll
+            submitUploadAll,
+            handleExceed,
+            uploadFile
         }
     },
     props: {
@@ -45,6 +79,7 @@ export default {
     },
     data() {
         return {
+
         }
     },
     computed: {
