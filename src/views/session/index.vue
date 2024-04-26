@@ -122,6 +122,8 @@ const getTableData = () => {
       day5: `wangwu`,
       day6: `dingliu`,
       day7: `qianqi`,
+      color1: `yellow`,
+      color2:`white`
     });
 
     shTable.tableData.data.push({
