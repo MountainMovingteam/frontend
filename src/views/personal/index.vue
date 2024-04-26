@@ -108,7 +108,7 @@
 							</el-col>
 							<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 								<el-form-item>
-									<el-button type="primary">
+									<el-button type="primary" style='background-color: #409eff;border-color: #409eff;'>
 										<el-icon>
 											<ele-Position />
 										</el-icon>
@@ -126,7 +126,7 @@
 								<div class="personal-edit-safe-item-left-value">当前密码强度：强</div>
 							</div>
 							<div class="personal-edit-safe-item-right">
-								<el-button text type="primary" @click='changePassword'>立即修改</el-button>
+								<el-button text type="primary"  @click='changePassword'>立即修改</el-button>
 							</div>
 						</div>
 					</div>
@@ -179,10 +179,10 @@
 								
 								<div style="display: flex; justify-content: right; margin-top: 10px;">
 									<el-form-item>
-										<el-button  type="primary" size='middle' v-waves class="" @click="onConfirmChange" :loading="changePw.loading">
+										<el-button  type="primary" style='background-color: #409eff;border-color: #409eff;' size='middle' v-waves class="" @click="onConfirmChange" :loading="changePw.loading">
 											<span>确认修改</span>
 										</el-button>
-										<el-button  type="primary" size='middle' v-waves class="" @click="onCancelChange" :loading="changePw.loading">
+										<el-button  type="info"  size='middle' v-waves class="" @click="onCancelChange" :loading="changePw.loading">
 											<span>取消修改</span>
 										</el-button>
 									</el-form-item>
