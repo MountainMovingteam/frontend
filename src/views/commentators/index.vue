@@ -4,16 +4,11 @@
             <el-header class="header">
                 <div class="input-container">
                     <!-- 搜索框 -->
+                    <el-cascader v-model="select" :options="options" :props="props" collapse-tags collapse-tags-tooltip
+                        clearable style="width: 40%;" />
                     <el-input v-model="input" style="max-width: 600px" placeholder="Please input" class="input-with-select">
-                        <template #prepend>
-                            <el-select v-model="select" placeholder="熟练度" style="width: 115px">
-                                <el-option label="所有" value="1" />
-                                <el-option label="入门" value="2" />
-                                <el-option label="熟练" value="3" />
-                            </el-select>
-                        </template>
                         <template #append>
-                            <el-button>
+                            <el-button @click="mySearch()">
                                 <el-icon>
                                     <Search />
                                 </el-icon>
@@ -22,9 +17,9 @@
                     </el-input>
                 </div>
                 <!-- 功能按钮 -->
+                <div style="width: 10%;"></div>
                 <div>
-                    <el-button type="red" class="hover-lighten" @click="this.deleteDialogVisible = true">清空讲解员
-                    </el-button>
+                    <el-button type="red" class="hover-lighten" @click="this.deleteDialogVisible = true">清空讲解员</el-button>
                     <el-button type="success" class="hover-lighten" @click="exportAll()">导出讲解员 </el-button>
                     <el-button type="info" class="hover-lighten" @click="this.uploadDialogVisible = true">导入讲解员 </el-button>
                 </div>
@@ -34,7 +29,8 @@
                 <div>
                     <el-row v-for="(commentators, index) in filteredCommentators" :gutter="20" :key="index">
                         <el-col v-for="(commentator, index) in commentators" :key="index" :span="8">
-                            <CommentatorCard :name="commentator.name" :num="commentator.num" :tag="commentator.tag" />
+                            <CommentatorCard :name="commentator.name" :num="commentator.num" :tag="commentator.tag"
+                                :weekday="commentator.weekday" :session="commentator.session" />
                         </el-col>
                     </el-row>
                 </div>
@@ -43,12 +39,12 @@
             <div class="'dialogContainer'">
                 <!-- 清空按钮dioloag -->
                 <DeleteDialog v-model="deleteDialogVisible" :message="'此操作将永久删除所有讲解员, 是否导出当前讲解员?'" @exportAll="exportAll"
-                    @cancel="cancelDelete" @deleteAll="deleteAll"></DeleteDialog>
+                    @cancel="cancelDelete" @deleteAll="deleteAll" @getCommentators="getCommentators"></DeleteDialog>
                 <!-- 上传按钮dialog -->
 
                 <Upload v-model="uploadDialogVisible" @exportAll="exportAll" @cancel="cancelUpload"></Upload>
                 <!-- 添加按钮dialog -->
-                <AddDialog></AddDialog>
+                <AddDialog @getCommentators="getCommentators"></AddDialog>
             </div>
         </el-container>
     </div>
@@ -63,6 +59,7 @@ import download from "./exportXLSX.js";
 import { Search } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import axios from 'axios'
 export default {
     data ()
     {
@@ -71,69 +68,86 @@ export default {
                 {
                     "name": '李四',
                     "num": 114514,
-                    "tag": "入门"
+                    "tag": "熟练",
+                    "weekday": "周一",
+                    "session": "8:00 ~ 9:30"
                 },
-                {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                },
-                {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                }, {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "入门"
-                },
-
             ],
-            select: ref( '' ),
+            select: [],
             input: ref( '' ),
             deleteDialogVisible: false,
             uploadDialogVisible: false,
+            options: [
+                {
+                    value: 1,
+                    label: "熟练度",
+                    children: [
+                        {
+                            value: "入门",
+                            label: "入门"
+                        },
+                        {
+                            value: "熟练",
+                            label: "熟练"
+                        },
+                    ]
+                },
+                {
+                    value: 2,
+                    label: "工作日",
+                    children: [
+                        {
+                            value: "周一",
+                            label: "周一"
+                        },
+                        {
+                            value: "周二",
+                            label: "周二"
+                        },
+                        {
+                            value: "周三",
+                            label: "周三"
+                        },
+                        {
+                            value: "周四",
+                            label: "周四"
+                        },
+                        {
+                            value: "周五",
+                            label: "周五"
+                        },
+                    ]
+
+                },
+                {
+                    value: 3,
+                    label: "场次",
+                    children: [
+                        {
+                            value: "8:00 ~ 9:30",
+                            label: "8:00 ~ 9:30"
+                        },
+                        {
+                            value: "10:00 ~ 11:30",
+                            label: "10:00 ~ 11:30"
+                        },
+                        {
+                            value: "14:00 ~ 15:30",
+                            label: "14:00 ~ 15:30"
+                        },
+                        {
+                            value: "16:00 ~ 17:30",
+                            label: "16:00 ~ 17:30"
+                        },
+                    ]
+                }
+            ],
+            props: { multiple: true }
         }
+    },
+    mounted ()
+    {
+        this.getCommentators();
     },
     components: {
         CommentatorCard,
@@ -154,19 +168,83 @@ export default {
         },
     },
     methods: {
+        getCommentators ()
+        {
+            axios.get( '/api/manager/lecturer' ).then( response =>
+            {
+                if ( response.status === 200 )
+                {
+                    this.commentators = response.data.list;
+                } else
+                {
+                    // 处理未获取到数据的情况
+                    ElMessage.error( '获取数据失败' );
+                }
+            } ).catch( error =>
+            {
+                // 处理请求失败的情况
+                ElMessage.error( '获取数据失败' );
+            } );
+        },
+
+
+        mySearch ()
+        {
+            //     console.log( this.select )
+            //     console.log( this.input )
+            axios.post( '/api/manager/lecturer/find', {
+                "tags": this.select,
+                "content": this.input
+            } ).then( response =>
+            {
+                if ( response.status === 200 )
+                {
+                    this.commentators = response.data.list;
+                    this.select = []
+                    this.input = ref( '' )
+                } else
+                {
+                    // 处理未获取到数据的情况
+                    ElMessage.error( '获取数据失败' );
+                }
+            } ).catch( error =>
+            {
+                // 处理请求失败的情况
+                ElMessage.error( '获取数据失败' );
+            } );
+        },
+
         // 清空按钮所需函数
         deleteAll ()
         {
-            this.commentators = [];
+            axios.delete( 'api/manage/lecturerAll' ).then( response =>
+            {
+                if ( response.status === 200 )
+                {
+                    this.commentators = [];
+                    ElMessage( {
+                        type: 'success',
+                        message: '删除成功'
+                    } );
+                } else
+                {
+                    // 处理未获取到数据的情况
+                    ElMessage.error( '删除失败' );
+                }
+            } ).catch( error =>
+            {
+                // 处理请求失败的情况
+                ElMessage.error( '删除失败' );
+            } );
             this.deleteDialogVisible = false;
-            this.filteredCommentators;
+            //this.filteredCommentators;
             //console.log( this.deleteDialogVisible )
         },
         cancelDelete ()
         {
             // 用户点击直接清空按钮后的操作
             this.deleteDialogVisible = false;
-            this.$message( {
+            ElMessage( {
                 type: 'info',
                 message: '已取消操作'
             } );
@@ -177,7 +255,7 @@ export default {
         cancelUpload ()
         {
             this.uploadDialogVisible = false;
-            this.$message( {
+            ElMessage( {
                 type: 'info',
                 message: '已取消操作'
             } );
@@ -186,22 +264,20 @@ export default {
 
         async exportAll ()
         {
+            //console.log( this.commentators )
+            const buf = JSON.parse( JSON.stringify( this.commentators ) );
             try
             {
                 // 模拟异步下载操作
                 const downloadPromise = new Promise( ( resolve, reject ) =>
                 {
-                    download( this.commentators, '讲解员.xlsx', () =>
+                    download( buf, '讲解员.xlsx', () =>
                     {
-                        // 下载完成后调用 resolve
                         resolve();
                     } );
                 } );
 
                 await downloadPromise; // 等待下载完成
-
-                // 下载完成后继续执行后续操作
-                console.log( 'Download completed' );
 
                 return Promise.resolve();
             } catch ( error )
@@ -230,7 +306,9 @@ export default {
 }
 
 .input-container {
-    width: 400px;
+    height: 66%;
+    display: flex;
+    justify-content: space-between;
 }
 
 .input-with-select .el-input-group__prepend {

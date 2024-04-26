@@ -193,11 +193,6 @@ const isSelected= (rowIndex: number, columnIndex: number) => {
 }
 
 const handleCellClick = (row: number, column: number, color: string) => {
-  if (isSelected(row, column)) {
-    selectedCell.value = { row: 0, column: 0 }; // 取消选择当前单元格
-  } else {
-    selectedCell.value = { row: row, column: column}; // 选中当前单元格
-  }
     emit('cellClick', {row: selectedCell.value.row, column: selectedCell.value.column});
 }
 // 表格多选改变时，用于导出

@@ -29,6 +29,22 @@
                     <el-option label="熟练" value="熟练" />
                 </el-select>
             </el-form-item>
+            <el-form-item label="工作日" prop="tag" :rules="[{ required: true, message: '请选择工作日', trigger: 'change' }]">
+                <el-select v-model="form.weekday">
+                    <el-option label="周一" value="周一" />
+                    <el-option label="周二" value="周二" />
+                    <el-option label="周三" value="周三" />
+                    <el-option label="周四" value="周四" />
+                </el-select>
+            </el-form-item>
+            <el-form-item label="场次" prop="session" :rules="[{ required: true, message: '请选择场次', trigger: 'change' }]">
+                <el-select v-model="form.session">
+                    <el-option label="8:00 ~ 9:30" value="8:00 ~ 9:30" />
+                    <el-option label="10:00 ~ 11:30" value="10:00 ~ 11:30" />
+                    <el-option label="14:00 ~ 15:30" value="14:00 ~ 15:30" />
+                    <el-option label="16:00 ~ 17:30" value="16:00 ~ 17:30" />
+                </el-select>
+            </el-form-item>
         </el-form>
         <div class="dialog-footer">
             <el-button type="success" @click="onSubmit" :disabled="!isFormValid">添加</el-button>
@@ -40,6 +56,7 @@
 <script>
 import { Plus } from '@element-plus/icons-vue'
 import { reactive } from 'vue'
+import axios from "axios";
 
 export default {
     data ()
@@ -49,14 +66,16 @@ export default {
             form: reactive( {
                 name: '',
                 num: '',
-                tag: ''
+                tag: '',
+                weekday: '',
+                session: ''
             } )
         }
     },
     computed: {
         isFormValid ()
         {
-            return this.form.name && this.form.num && this.form.tag;
+            return this.form.name && this.form.num && this.form.tag && this.form.weekday && this.form.session;
         }
     },
     components: {
@@ -75,16 +94,35 @@ export default {
         {
             if ( !this.isFormValid )
             {
-                this.$message.error( '请填写完整的表单信息！' );
+                ElMessage.error( '请填写完整的表单信息！' );
                 return;
             }
+            axios.post( 'api/manage/lecturer/add', {
+                "name": this.form.name,
+                "num": this.form.num,
+                "tag": this.form.tag == "入门" ? 1 : 2,
+                "weekday": this.form.weekday,
+                "session": this.form.session
+            } )
+                .then( () =>
+                {
+                    ElMessage.success( '添加成功！' );
+                    this.closeDialog();
+                    this.form = reactive( {
+                        name: '',
+                        num: '',
+                        tag: '',
+                        weekday: '',
+                        session: ''
+                    } );
+                    this.$emit( 'getCommentotars' )
+                } )
+                .catch( () =>
+                {
+                    ElMessage.error( '添加失败，请重试！' );
+                } );
             // 提交表单的逻辑
             this.addDialogVisible = false;
-            this.form = reactive( {
-                name: '',
-                num: '',
-                tag: ''
-            } )
         }
     }
 }
