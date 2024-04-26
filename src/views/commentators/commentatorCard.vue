@@ -101,16 +101,13 @@ export default {
     },
     methods: {
         myDelete() {
-            axios.post('/api/delete', {
-                name: this.localName,
+            axios.post('api/manage/lecturer/delete', {
                 num: this.localNum,
-                tag: this.localTag,
-                weekday: this.localWeekday,
-                session: this.localSession,
             })
                 .then(res => {
-                    if (res.data == "success") {
+                    if (res.status == 200) {
                         ElMessage.success("删除成功");
+                        this.$emit("getCommentators")
                     } else {
                         ElMessage.error("删除失败");
                     }
@@ -120,12 +117,30 @@ export default {
                 })
         },
         fixData() {
+            axios.post('api/manage/lecturer/update', {
+                "old_num": this.localNum,
+                "name": this.form.name,
+                "num": this.form.num,
+                "tag": this.form.tag == "入门" ? 1 : 2,
+                "weekday": this.form.weekday,
+                "session": this.form.session
+            })
+                .then(res => {
+                    if (res.status == 200) {
+                        ElMessage.success("更新成功");
+                        this.localName = this.form.name
+                        this.localNum = this.form.num
+                        this.localTag = this.form.tag
+                        this.localWeekday = this.form.weekday
+                        this.localSession = this.form.session
+                    } else {
+                        ElMessage.error("更新失败");
+                    }
+                })
+                .catch(err => {
+                    ElMessage.error("服务器错误");
+                })
             this.dialogVisible = false
-            this.localName = this.form.name
-            this.localNum = this.form.num
-            this.localTag = this.form.tag
-            this.localWeekday = this.form.weekday
-            this.localSession = this.form.session
         },
     },
     props: ["name", "num", "tag", "weekday", "session"]
