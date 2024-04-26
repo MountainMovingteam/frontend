@@ -22,13 +22,13 @@
       >
         <template v-slot="scope">
           <template v-if="item.key === 'event'">
-            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100px;">
+            <span style="display: flex; align-items: center; justify-content: flex-start; height: 88px;">
               {{ scope.row[item.key] }}
             </span>
           </template>
           <template v-else>
             <span :class="{ 'cell-active': isSelected(scope.$index, index) }"
-                  :style="{ backgroundColor: scope.row[item.key], display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center' }"
+                  :style="{ backgroundColor: scope.row[item.key], display: 'inline-block', width: '100%', height: '88px', position: 'relative', textAlign: 'center' }"
                   @click="handleCellClick(scope.$index, index, scope.row[item.key])"
                   > <i v-if="isSelected(scope.$index, index)" class="check-mark">✓</i> </span>
           </template>
@@ -296,8 +296,8 @@ defineExpose({
     flex: 1;
     overflow: auto;
     .check-mark {
-      font-size: 50px; /* 调整对勾的大小 */
-      line-height: 100px;
+      font-size: 45px; /* 调整对勾的大小 */
+      line-height: 88px;
       user-select: none
     }
 
