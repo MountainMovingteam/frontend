@@ -4,11 +4,11 @@
             <el-header class="header">
                 <div class="input-container">
                     <!-- 搜索框 -->
-                    <el-cascader :options="options" :props="props" collapse-tags collapse-tags-tooltip clearable
-                        style="width: 40%;" />
+                    <el-cascader v-model="select" :options="options" :props="props" collapse-tags collapse-tags-tooltip
+                        clearable style="width: 40%;" />
                     <el-input v-model="input" style="max-width: 600px" placeholder="Please input" class="input-with-select">
                         <template #append>
-                            <el-button>
+                            <el-button @click="mySearch()">
                                 <el-icon>
                                     <Search />
                                 </el-icon>
@@ -69,10 +69,10 @@ export default {
                     "num": 114514,
                     "tag": "入门",
                     "weekday": "周一",
-                    "session": 1
+                    "session": "8:00 ~ 9:30"
                 },
             ],
-            select: ref( '' ),
+            select: [],
             input: ref( '' ),
             deleteDialogVisible: false,
             uploadDialogVisible: false,
@@ -163,6 +163,14 @@ export default {
         },
     },
     methods: {
+        mySearch ()
+        {
+            console.log( this.select )
+            console.log( this.input )
+            this.select = []
+            this.input = ref( '' )
+        },
+
         // 清空按钮所需函数
         deleteAll ()
         {
