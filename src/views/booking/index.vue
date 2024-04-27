@@ -269,7 +269,7 @@ const getTableData = () => {
   stateXySingle.tableData.config.loading = true;
   stateShSingle.tableData.config.loading = true;
   for (let i = 0; i < 4; i++) {
-    stateXyGroup.tableData.data.push({
+    stateXyGroup.tableData.data.splice(i, 1, {
       event: `第${i + 1}场 ${events[i]}`,
       day1: "#6ef848", // 使用颜色名称
       day2: "#99FF99", // 使用十六进制颜色码
@@ -280,7 +280,7 @@ const getTableData = () => {
       day7: "#99FF99",
     });
 
-    stateShGroup.tableData.data.push({
+    stateShGroup.tableData.data.splice(i, 1, {
       event: `第${i + 1}场 ${events[i]}`,
       day1: "#f54545", // 使用颜色名称
       day2: "#99FF99", // 使用十六进制颜色码
@@ -291,7 +291,7 @@ const getTableData = () => {
       day7: "#90EE90",
     });
 
-    stateXySingle.tableData.data.push({
+    stateXySingle.tableData.data.splice(i, 1, {
       event: `第${i + 1}场 ${events[i]}`,
       day1: "#f54545", // 使用颜色名称
       day2: "#f54545", // 使用十六进制颜色码
@@ -302,7 +302,7 @@ const getTableData = () => {
       day7: "#99FF99",
     });
 
-    stateShSingle.tableData.data.push({
+    stateShSingle.tableData.data.splice(i, 1, {
       event: `第${i + 1}场 \n\n ${events[i]}`,
       day1: "#f54545", // 使用颜色名称
       day2: "#f54545", // 使用十六进制颜色码
