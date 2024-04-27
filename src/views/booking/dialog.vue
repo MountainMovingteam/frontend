@@ -149,6 +149,7 @@ import { useRoutesList } from '/@/stores/routesList';
 import { i18n } from '/@/i18n';
 import {ElMessage} from "element-plus";
 import {groupBooking, singleBooking} from "/@/api/booking";
+import {PropType} from "vue-demi";
 // import { setBackEndControlRefreshRoutes } from "/@/router/backEnd";
 
 const props = defineProps({
@@ -168,6 +169,14 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  groupColors: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
+  singleColors: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  }
 });
 
 // 定义子组件向父组件传值/事件
@@ -192,7 +201,9 @@ const state = reactive({
   days: initializeDays(),
   selectedEvent: '',
   events : ['第1场 8:00-9:30', '第2场 10:00-11:30', '第3场 14:00-15:30', '第4场 16:00-17:30'],
-  accessibleEvents: [1, 2, 3],
+  accessibleEvents: [] as number[],
+  groupColors: [] as string[],
+  singleColors: [] as string[],
   teamMembers: [
     { name: '', studentId: '', phone: '', college: ''}
   ],
@@ -342,7 +353,28 @@ const openDialog = (type: string, row?: any) => {
   state.selectedEvent = state.events[state.data.row];
   state.data.column = props.column;
   state.selectedDay = state.days[state.data.column - 1];
-
+  state.groupColors = props.groupColors;
+  state.singleColors = props.singleColors;
+  let start = 4 * (state.data.column - 1) + 1;
+  if (state.data.campus === 'shahe') {
+    start += 28;
+  }
+  console.log("start" + start);
+  state.accessibleEvents = [];
+  for(let i = start; i < start + 4;i++) {
+    if (state.data.bookingWay === 'group') {
+      if (state.groupColors[i] == "#99FF99") {
+        state.accessibleEvents.push(i - start);
+      }
+    } else {
+      if (state.singleColors[i] == "#99FF99") {
+        state.accessibleEvents.push(i - start);
+      }
+    }
+  }
+  console.log("groupcolors" + state.groupColors)
+  console.log("singlecolors" + state.singleColors)
+  console.log("accessibleEvents" + state.accessibleEvents)
   if (type === 'edit') {
     // 模拟数据，实际请走接口
     row.menuType = 'menu';
@@ -451,12 +483,14 @@ const onGroupBooking = () => {
           type: 'success',
           message: '预约成功'
         });
+        closeDialog();
       })
       .catch(() => {
         ElMessage({
           type: 'error',
           message: '预约失败，请重试!',
         });
+        closeDialog();
       });
 }
 
@@ -501,12 +535,14 @@ const onSingleBooking = () => {
           type: 'success',
           message: '预约成功'
         });
+        closeDialog();
       })
       .catch(() => {
         ElMessage({
           type: 'error',
           message: '预约失败，请重试!',
         });
+        closeDialog();
       });
 }
 
@@ -518,7 +554,6 @@ const onSubmit = () => {
   if (state.data.bookingWay === 'group') {
     if (validateGroupBooking()) {
       onGroupBooking();
-      closeDialog();
       refreshData();
       emit('refresh');
     } else {
@@ -527,7 +562,6 @@ const onSubmit = () => {
   } else {
     if (validateSingleBooking()) {
       onSingleBooking();
-      closeDialog();
       refreshData();
       emit('refresh');
     } else {
