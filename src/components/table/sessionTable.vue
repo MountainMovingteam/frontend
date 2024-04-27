@@ -31,8 +31,8 @@
 <!--                  :style="{ backgroundColor: scope.row[item.key], display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center' }"-->
 <!--                  @click="handleCellClick(scope.$index, index, scope.row[item.key] )"-->
 <!--            > <i v-if="isSelected(scope.$index, index)" class="check-mark">✓</i> </span>-->
-            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100px;" @click="handleCellClick(scope.$index, index, scope.row[item.key] )">
-              {{ scope.row[item.key] }}
+            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100px;":style="{ backgroundColor: scope.row[item.key].color, display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center' }" @click="handleCellClick(scope.$index, index, scope.row[item.key] )">
+              {{ scope.row[item.key].text }}
               </span>
           </template>
 <!--          格内功能-->
@@ -51,62 +51,6 @@
         <el-empty description="暂无数据" />
       </template>
     </el-table>
-    <!--    <div class="table-footer mt15">-->
-    <!--      <el-pagination-->
-    <!--          v-model:current-page="state.page.pageNum"-->
-    <!--          v-model:page-size="state.page.pageSize"-->
-    <!--          :pager-count="5"-->
-    <!--          :page-sizes="[10, 20, 30]"-->
-    <!--          :total="config.total"-->
-    <!--          layout="total, sizes, prev, pager, next, jumper"-->
-    <!--          background-->
-    <!--          @size-change="onHandleSizeChange"-->
-    <!--          @current-change="onHandleCurrentChange"-->
-    <!--      >-->
-    <!--      </el-pagination>-->
-    <!--      <div class="table-footer-tool">-->
-    <!--        <SvgIcon name="iconfont icon-dayin" :size="19" title="打印" @click="onPrintTable" />-->
-    <!--        <SvgIcon name="iconfont icon-yunxiazai_o" :size="22" title="导出" @click="onImportTable" />-->
-    <!--        <SvgIcon name="iconfont icon-shuaxin" :size="22" title="刷新" @click="onRefreshTable" />-->
-    <!--        <el-popover-->
-    <!--            placement="top-end"-->
-    <!--            trigger="click"-->
-    <!--            transition="el-zoom-in-top"-->
-    <!--            popper-class="table-tool-popper"-->
-    <!--            :width="300"-->
-    <!--            :persistent="false"-->
-    <!--            @show="onSetTable"-->
-    <!--        >-->
-    <!--          <template #reference>-->
-    <!--            <SvgIcon name="iconfont icon-quanjushezhi_o" :size="22" title="设置" />-->
-    <!--          </template>-->
-    <!--          <template #default>-->
-    <!--            <div class="tool-box">-->
-    <!--              <el-tooltip content="拖动进行排序" placement="top-start">-->
-    <!--                <SvgIcon name="fa fa-question-circle-o" :size="17" class="ml11" color="#909399" />-->
-    <!--              </el-tooltip>-->
-    <!--              <el-checkbox-->
-    <!--                  v-model="state.checkListAll"-->
-    <!--                  :indeterminate="state.checkListIndeterminate"-->
-    <!--                  class="ml10 mr1"-->
-    <!--                  label="列显示"-->
-    <!--                  @change="onCheckAllChange"-->
-    <!--              />-->
-    <!--              <el-checkbox v-model="getConfig.isSerialNo" class="ml12 mr1" label="序号" />-->
-    <!--              <el-checkbox v-model="getConfig.isSelection" class="ml12 mr1" label="多选" />-->
-    <!--            </div>-->
-    <!--            <el-scrollbar>-->
-    <!--              <div ref="toolSetRef" class="tool-sortable">-->
-    <!--                <div class="tool-sortable-item" v-for="v in header" :key="v.key" :data-key="v.key">-->
-    <!--                  <i class="fa fa-arrows-alt handle cursor-pointer"></i>-->
-    <!--                  <el-checkbox v-model="v.isCheck" size="default" class="ml12 mr8" :label="v.title" @change="onCheckChange" />-->
-    <!--                </div>-->
-    <!--              </div>-->
-    <!--            </el-scrollbar>-->
-    <!--          </template>-->
-    <!--        </el-popover>-->
-    <!--      </div>-->
-    <!--    </div>-->
   </div>
 </template>
 
@@ -192,8 +136,8 @@ const isSelected= (rowIndex: number, columnIndex: number) => {
   return selectedCell.value && selectedCell.value.row === rowIndex && selectedCell.value.column === columnIndex;
 }
 
-const handleCellClick = (row: number, column: number, color: string) => {
-    emit('cellClick', {row: selectedCell.value.row, column: selectedCell.value.column});
+const handleCellClick = (row: number, column: number, text: string) => {
+    emit('cellClick', {row: row, column: column});
 }
 // 表格多选改变时，用于导出
 const onSelectionChange = (val: EmptyObjectType[]) => {
@@ -219,6 +163,10 @@ const pageReset = () => {
   state.page.pageSize = 10;
   emit('pageChange', state.page);
 };
+
+function getCellColor(type) {
+  return type === 0 ? 'white' : 'yellow';
+}
 // 打印
 const onPrintTable = () => {
   // https://printjs.crabbly.com/#documentation
