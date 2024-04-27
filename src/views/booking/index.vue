@@ -297,19 +297,53 @@ const getTableData = () => {
     console.log(data);
     state.place_details = data.place_details;
   });
+  const daysOfWeek = getDaysOfWeek();
+  let tuesdayColor = [];
   let colors = [];
   colors.push(null);
   if (state.place_details.length <= 1) {
     for (let i = 1; i <= 56;i++) {
       colors[i] = "#99FF99";
     }
+    for (let i = 0;i < 4;i++) {
+      tuesdayColor[i] = "#99FF99";
+    }
   } else {
     for (let i = 1; i < state.place_details.length; i++) {
       const place_detail = state.place_details[i];
       if (place_detail.enrolled > 0) {
-        colors[i] = "#99FF99";
-      } else {
         colors[i] = "#f54545";
+      } else {
+        colors[i] = "#99FF99";
+      }
+    }
+    for (let i = 0;i < 7;i++) {
+      if (daysOfWeek[i] === '二') {
+        let index = 4 * i + 3;
+        let place_detail = state.place_details[index];
+        if (place_detail.enrolled < place_detail.capacity) {
+          tuesdayColor.push("#99FF99");
+        } else {
+          tuesdayColor.push("#f54545");
+        }
+        place_detail = state.place_details[index + 1];
+        if (place_detail.enrolled < place_detail.capacity) {
+          tuesdayColor.push("#99FF99");
+        } else {
+          tuesdayColor.push("#f54545");
+        }
+        place_detail = state.place_details[index + 28];
+        if (place_detail.enrolled < place_detail.capacity) {
+          tuesdayColor.push("#99FF99");
+        } else {
+          tuesdayColor.push("#f54545");
+        }
+        place_detail = state.place_details[index + 1 + 28];
+        if (place_detail.enrolled < place_detail.capacity) {
+          tuesdayColor.push("#99FF99");
+        } else {
+          tuesdayColor.push("#f54545");
+        }
       }
     }
   }
@@ -317,7 +351,7 @@ const getTableData = () => {
   stateShGroup.tableData.config.loading = true;
   stateXySingle.tableData.config.loading = true;
   stateShSingle.tableData.config.loading = true;
-  const daysOfWeek = getDaysOfWeek();
+
   for (let i = 0; i < 4; i++) {
     stateXyGroup.tableData.data.splice(i, 1, {
       event: `第${i + 1}场 ${events[i]}`,
@@ -343,24 +377,24 @@ const getTableData = () => {
 
     stateXySingle.tableData.data.splice(i, 1, {
       event: `第${i + 1}场 ${events[i]}`,
-      day1: daysOfWeek[0] === '二' && i >= 2? colors[i + 1]: "#f54545",
-      day2: daysOfWeek[1] === '二' && i >= 2? colors[i + 1 + 4]: "#f54545",
-      day3: daysOfWeek[2] === '二' && i >= 2? colors[i + 1 + 8]: "#f54545",
-      day4: daysOfWeek[3] === '二' && i >= 2? colors[i + 1 + 12]: "#f54545",
-      day5: daysOfWeek[4] === '二' && i >= 2? colors[i + 1 + 16]: "#f54545",
-      day6: daysOfWeek[5] === '二' && i >= 2? colors[i + 1 + 20]: "#f54545",
-      day7: daysOfWeek[6] === '二' && i >= 2? colors[i + 1 + 24]: "#f54545",
+      day1: daysOfWeek[0] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+      day2: daysOfWeek[1] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+      day3: daysOfWeek[2] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+      day4: daysOfWeek[3] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+      day5: daysOfWeek[4] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+      day6: daysOfWeek[5] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+      day7: daysOfWeek[6] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
     });
 
     stateShSingle.tableData.data.splice(i, 1, {
       event: `第${i + 1}场 \n\n ${events[i]}`,
-      day1: daysOfWeek[0] === '二' && i >= 2? colors[28 + i + 1]: "#f54545",
-      day2: daysOfWeek[1] === '二' && i >= 2? colors[28 + i + 1 + 4]: "#f54545",
-      day3: daysOfWeek[2] === '二' && i >= 2? colors[28 + i + 1 + 8]: "#f54545",
-      day4: daysOfWeek[3] === '二' && i >= 2? colors[28 + i + 1 + 12]: "#f54545",
-      day5: daysOfWeek[4] === '二' && i >= 2? colors[28 + i + 1 + 16]: "#f54545",
-      day6: daysOfWeek[5] === '二' && i >= 2? colors[28 + i + 1 + 20]: "#f54545",
-      day7: daysOfWeek[6] === '二' && i >= 2? colors[28 + i + 1 + 24]: "#f54545",
+      day1: daysOfWeek[0] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+      day2: daysOfWeek[1] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+      day3: daysOfWeek[2] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+      day4: daysOfWeek[3] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+      day5: daysOfWeek[4] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+      day6: daysOfWeek[5] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+      day7: daysOfWeek[6] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
     });
   }
   const days = ['day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7'];
