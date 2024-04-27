@@ -54,59 +54,76 @@
           </el-col>
 
           <el-col v-if="state.data.bookingWay === 'group'" :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
+            <el-form :model="state" :rules="rules" ref="form">
             <el-form-item label="团队信息" :span="24"></el-form-item>
               <template v-for="(member, index) in state.teamMembers" >
                 <el-row class="mb10" type="flex" justify="space-between">
-                  <span style="margin-left: 12px; font-weight: bold;">成员{{ index === 0 ? index + 1 + '（负责人）' : index + 1 }}</span>
-                  <el-form-item v-if="index != 0" >
+                  <span style="margin-left: 5px; font-weight: bold;">成员{{ index === 0 ? index + 1 + '（负责人）' : index + 1 }}</span>
+                  <el-form-item style="margin-right: 18px;" v-if="index != 0" >
                     <el-col>
                       <el-button @click="removeTeamMember(index)" type="danger" size="small">删除该成员</el-button>
                     </el-col>
                   </el-form-item>
                 </el-row>
 
-                <el-form-item :span="24">
-                  <el-col class="mb10">
+                <el-form-item :span="24" class="mb20" label="姓名" :prop="'teamMembers[' + index + '].name'" :rules="rules.teamMembers[index].name">
+                  <el-col>
                     <el-input v-model="member.name" placeholder="姓名" clearable></el-input>
                   </el-col>
                 </el-form-item>
 
-                <el-form-item :span="24">
-                  <el-col class="mb10">
+                <el-form-item :span="24" class="mb20" label="学号" :prop="'teamMembers[' + index + '].studentId'" :rules="rules.teamMembers[index].studentId">
+                  <el-col>
                     <el-input v-model="member.studentId" placeholder="学号" clearable></el-input>
                   </el-col>
                 </el-form-item>
 
-                <el-form-item :span="24">
-                  <el-col class="mb10">
+                <el-form-item :span="24" v-if="index === 0" class="mb20" label="电话" :prop="'teamMembers[' + index + '].phone'" :rules="rules.teamMembers[index].phone">
+                  <el-col>
                     <el-input v-model="member.phone" placeholder="电话号码" clearable></el-input>
                   </el-col>
                 </el-form-item>
 
-                <el-button v-if="index === state.teamMembers.length - 1 && state.teamMembers.length < 20"
+                <el-form-item :span="24" v-if="index === 0" class="mb20" label="学院" :prop="'teamMembers[' + index + '].college'" :rules="rules.teamMembers[index].college">
+                  <el-col>
+                    <el-input v-model="member.college" placeholder="学院名称" clearable></el-input>
+                  </el-col>
+                </el-form-item>
+
+                <el-button style="margin-top: 20px;" v-if="index === state.teamMembers.length - 1 && state.teamMembers.length < 20"
                            @click="addTeamMember">增加成员</el-button>
               </template>
+            </el-form>
           </el-col>
 
-          <el-col v-else-if="state.data.bookingWay === 'single'" :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
-            <el-form-item label="个人信息"></el-form-item>
-            <el-form-item :span="24">
-              <el-col class="mb10">
-              <el-input v-model="state.personalInfo.name" placeholder="姓名" clearable></el-input>
-              </el-col>
-            </el-form-item>
+          <el-col v-else-if="state.data.bookingWay === 'single'" :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb10">
+            <el-form :model="state" :rules="rules" ref="form">
+              <el-form-item label="个人信息"></el-form-item>
 
-            <el-form-item :span="24">
-              <el-col class="mb10">
-                <el-input v-model="state.personalInfo.studentId" placeholder="学号" clearable></el-input>
-              </el-col>
-            </el-form-item>
+              <el-form-item :span="24" class="mb20" label="姓名" prop="personalInfo.name" :rules="rules.personalInfo.name">
+                <el-col>
+                <el-input v-model="state.personalInfo.name" placeholder="姓名" clearable></el-input>
+                </el-col>
+              </el-form-item>
 
-            <el-form-item :span="24">
-              <el-col class="mb10">
-                <el-input v-model="state.personalInfo.phone" placeholder="电话号码" clearable></el-input>
-              </el-col>
-            </el-form-item>
+              <el-form-item :span="24" class="mb20" label="学号" prop="personalInfo.studentId" :rules="rules.personalInfo.studentId">
+                <el-col>
+                  <el-input v-model="state.personalInfo.studentId" placeholder="学号" clearable></el-input>
+                </el-col>
+              </el-form-item>
+
+              <el-form-item :span="24" class="mb20" label="电话" prop="personalInfo.phone" :rules="rules.personalInfo.phone">
+                <el-col>
+                  <el-input v-model="state.personalInfo.phone" placeholder="电话号码" clearable></el-input>
+                </el-col>
+              </el-form-item>
+
+              <el-form-item :span="24" class="mb20" label="学院" prop="personalInfo.college" :rules="rules.personalInfo.college">
+                <el-col>
+                  <el-input v-model="state.personalInfo.college" placeholder="学院名称" clearable></el-input>
+                </el-col>
+              </el-form-item>
+              </el-form>
           </el-col>
 
         </el-row>
@@ -176,9 +193,9 @@ const state = reactive({
   events : ['第1场 8:00-9:30', '第2场 10:00-11:30', '第3场 14:00-15:30', '第4场 16:00-17:30'],
   accessibleEvents: [1, 2, 3],
   teamMembers: [
-    { name: '', studentId: '', phone: '' }
+    { name: '', studentId: '', phone: '', college: ''}
   ],
-  personalInfo: { name: '', studentId: '', phone: '' }, // 初始个人信息
+  personalInfo: { name: '', studentId: '', phone: '', college: ''}, // 初始个人信息
   ruleForm: {
     menuSuperior: [],
     menuType: 'menu',
@@ -210,20 +227,69 @@ const state = reactive({
   },
 });
 
+const rules = reactive({
+  teamMembers: (() => {
+    const members = [];
+    members.push({
+      name: [
+        { required: true, message: '请输入负责人的姓名', trigger: 'blur' }
+      ],
+      studentId: [
+        { required: true, message: '请输入负责人的学号', trigger: 'blur' }
+      ],
+      phone: [
+        { required: true, message: '请输入负责人的电话号码', trigger: 'blur' }
+      ],
+      college: [
+        { required: true, message: '请输入团队的学院名称', trigger: 'blur' }
+      ]
+    });
+    for (let i = 1; i < 20; i++) {
+      members.push({
+        name: [
+          { required: true, message: '请输入姓名', trigger: 'blur' }
+        ],
+        studentId: [
+          { required: true, message: '请输入学号', trigger: 'blur' }
+        ],
+        phone: [],
+        college: []
+      });
+    }
+    return members;
+  })(),
+  personalInfo: {
+    name: [
+      { required: true, message: '请输入姓名', trigger: 'blur' }
+    ],
+    studentId: [
+      { required: true, message: '请输入学号', trigger: 'blur' }
+    ],
+    phone: [
+      { required: true, message: '请输入电话号码', trigger: 'blur' }
+    ],
+    college: [
+      { required: true, message: '请输入学院名称', trigger: 'blur' }
+    ]
+  }
+});
+
 const refreshData = () => {
   state.teamMembers.splice(1);
   const firstMember = state.teamMembers[0];
   firstMember.name = '';
   firstMember.studentId = '';
   firstMember.phone = '';
+  firstMember.college = '';
 
   state.personalInfo.name = '';
   state.personalInfo.studentId = '';
   state.personalInfo.phone = '';
+  state.personalInfo.college = '';
 }
 
 const addTeamMember = () => {
-  state.teamMembers.push({ name: '', studentId: '', phone: '' });
+  state.teamMembers.push({ name: '', studentId: '', phone: '', college: ''});
 };
 
 const removeTeamMember = (index: number) => {
@@ -281,10 +347,10 @@ const openDialog = (type: string, row?: any) => {
     row.menuType = 'menu';
     row.menuSort = Math.floor(Math.random() * 100);
     state.ruleForm = JSON.parse(JSON.stringify(row));
-    state.dialog.title = '修改菜单';
+    state.dialog.title = '预约信息';
     state.dialog.submitTxt = '修 改';
   } else {
-    state.dialog.title = '新增菜单';
+    state.dialog.title = '预约信息';
     state.dialog.submitTxt = '新 增';
     // 清空表单，此项需加表单验证才能使用
     // nextTick(() => {
@@ -325,7 +391,8 @@ const validateSeletion = () => {
 const validateGroupBooking = () => {
   const leader = state.teamMembers[0];
   const otherMembers = state.teamMembers.slice(1);
-  if (leader.name.trim() === '' || leader.studentId.trim() === '' || leader.phone.trim() === '') {
+  if (leader.name.trim() === '' || leader.studentId.trim() === ''
+      || leader.phone.trim() === '' || leader.college.trim() === '') {
     ElMessage({
       type: 'error',
       message: '请完整填写负责人的个人信息！'
@@ -336,17 +403,24 @@ const validateGroupBooking = () => {
     if (member.name.trim() === '' || member.studentId.trim() === '') {
       ElMessage({
         type: 'error',
-        message: '请至少完整填写其他成员的姓名和学号！'
+        message: '请完整填写其他成员个人信息！'
       });
       return false;
     }
+  }
+  if (state.teamMembers.length < 10) {
+    ElMessage({
+      type: 'error',
+      message: '团队预约至少超过10人！'
+    });
+    return false;
   }
   return true;
 }
 
 const validateSingleBooking = () => {
   const person = state.personalInfo;
-  if (person.name.trim() === '' || person.studentId.trim() === '' || person.phone.trim() === '') {
+  if (person.name.trim() === '' || person.studentId.trim() === '' || person.phone.trim() === '' || person.college.trim() === '') {
     ElMessage({
       type: 'error',
       message: '请完整填写个人信息！'
@@ -398,3 +472,11 @@ defineExpose({
   openDialog,
 });
 </script>
+
+<style>
+.required-label .el-form-item__label::after {
+  content: '*';
+  color: red;
+  margin-left: 4px;
+}
+</style>

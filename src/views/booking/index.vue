@@ -1,30 +1,49 @@
 <template>
   <div class="table-demo-container layout-padding">
     <div class="table-demo-padding layout-padding-view layout-padding-auto">
+      <div class="layout-pd">
+        <el-alert
+            :title="'预约须知：学院路周三下午体验馆不开放对外预约，个人预约仅可预约周二晚时段，如个人预约时段人数少于10人则自动取消，请同学们关注邮箱或本平台通知'"
+            type="warning"
+            :closable="false"
+        ></el-alert>
+      </div>
+      <div>
+        <el-form-item class="mb1">
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;校区选择：
+        </el-form-item>
+      </div>
       <div class="system-menu-search mb15">
-        <el-button size="large" :type="selectedLocation === 'xueyuan' ? 'primary' : 'info'" class="ml10" @click="selectLocation('xueyuan')">
+        &nbsp;
+        <el-button size="default" :type="selectedLocation === 'xueyuan' ? 'info' : 'white'" class="ml10" @click="selectLocation('xueyuan')">
           <el-icon>
             <ele-Monitor />
           </el-icon>
           学院路校区
         </el-button>
         &nbsp; &nbsp;
-        <el-button size="large" :type="selectedLocation === 'shahe' ? 'primary' : 'info'" class="ml10" @click="selectLocation('shahe')">
+        <el-button size="default" :type="selectedLocation === 'shahe' ? 'info' : 'white'" class="ml10" @click="selectLocation('shahe')">
           <el-icon>
             <ele-Promotion />
           </el-icon>
           &nbsp;&nbsp;沙河校区&nbsp;&nbsp;
         </el-button>
       </div>
+      <div>
+        <el-form-item class="mb1">
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;预约方式选择：
+        </el-form-item>
+      </div>
       <div class="system-menu-search mb15">
-        <el-button size="large" :type="selectedWay === 'group' ? 'primary' : 'info'" class="ml10" @click="selectWay('group')">
+        &nbsp;
+        <el-button size="default" :type="selectedWay === 'group' ? 'info' : 'white'" class="ml10" @click="selectWay('group')">
           <el-icon>
             <ele-Ship />
           </el-icon>
-          &nbsp;&nbsp;团队预约&nbsp;&nbsp;
+          &nbsp;&nbsp;团队预约&nbsp;
         </el-button>
         &nbsp;&nbsp;&nbsp;
-        <el-button size="large" :type="selectedWay === 'single' ? 'primary' : 'info'" class="ml10" @click="selectWay('single')">
+        <el-button size="default" :type="selectedWay === 'single' ? 'info' : 'white'" class="ml10" @click="selectWay('single')">
           <el-icon>
             <ele-User />
           </el-icon>
