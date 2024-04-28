@@ -1,187 +1,132 @@
 <template>
-	<div class="personal layout-pd">
-    </div>
+	<div class="home-container " >
+		<div class='home-card-item'>
+			<div class="home-card-item-title">通知中心</div>
+			<ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto;margin-left: auto;margin-right: auto;">
+				<li v-for="i in count" :key="i" class="infinite-list-item" @click='openDialog(i)'>
+					<div class="left-content">
+						<div class="text-line-title">Title {{ i }}</div>
+						<div class="text-line-content">Text Line 2</div>
+					</div>
+					<div class="right-content">
+						<div class="text-line-content" style='margin-top: 100%;'> time </div>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<DetailDialog ref="DetailDialogRef" @refresh="getInfoData" />
+	</div>
 </template>
 
-<script setup lang="ts" name="personal">
-import { reactive, computed } from 'vue';
-import { formatAxis } from '/@/utils/formatTime';
-
+<script setup lang="ts" name="notification">
+import { defineAsyncComponent,reactive, computed,ref } from 'vue';
+const DetailDialog = defineAsyncComponent(() => import('/@/views/notification/dialog.vue'));
+const DetailDialogRef = ref();
+const count = ref(0)
+const load = () => {
+  count.value += 2
+}
 // 定义变量内容
-const state = reactive<PersonalState>({
-	personalForm: {
-		name: '',
-		email: '',
-		autograph: '',
-		occupation: '',
-		phone: '',
-		sex: ''
-	},
+const state = reactive<any>({
+
 });
 
+const getInfoData = () => {
 
+}
+
+const openDialog = (i:any) => {
+	console.log(i);
+	const data = {
+		title: 'Hello',
+		content: 'Some content here',
+		time: '2024-04-30'
+	};
+	DetailDialogRef.value.openDialog(i,data);
+}
 </script>
 
 <style scoped lang="scss">
-@import '../../theme/mixins/index.scss';
-.personal {
-	.personal-user {
-		height: 130px;
-		display: flex;
-		align-items: center;
-		.personal-user-left {
-			width: 100px;
-			height: 130px;
-			border-radius: 3px;
-			:deep(.el-upload) {
-				height: 100%;
+$homeNavLengh: 8;
+
+.home-container {
+	overflow: hidden;
+	max-height: 100%;
+	
+		.infinite-list {
+			@media only screen and (max-width: 768px) {
+				height: 800px;
 			}
-			.personal-user-left-upload {
-				img {
-					width: 100%;
-					height: 100%;
-					border-radius: 3px;
-				}
-				&:hover {
-					img {
-						animation: logoAnimation 0.3s ease-in-out;
-					}
-				}
+			@media only screen and (min-width: 768px) {
+				height:500px;
 			}
-		}
-		.personal-user-right {
-			flex: 1;
-			padding: 0 15px;
-			.personal-title {
-				font-size: 18px;
-				@include text-ellipsis(1);
+			list-style: none;
 			}
-			.personal-item {
+			.infinite-list .infinite-list-item {
+				border-top: 1px solid #ccc;
+				border-bottom: 1px solid #ccc;
 				display: flex;
-				align-items: center;
-				font-size: 13px;
-				.personal-item-label {
-					color: var(--el-text-color-secondary);
-					@include text-ellipsis(1);
+				//align-items: center;
+				justify-content: center;
+				height: 70px;
+				
+				
+				.left-content {
+    				flex: 1; /* 左侧内容占据剩余空间 */
 				}
-				.personal-item-value {
-					@include text-ellipsis(1);
+
+				.right-content {
+					
+					margin-top: 5px;
+					margin-right: 10px;
+					margin-bottom: 5px;
+				}
+
+				.text-line-title {
+					margin-top: 5px; 
+					font-weight: bold; 
+    				font-size: 16px;
+				}
+
+				.text-line-content {
+					margin-top: 10px;
 				}
 			}
-		}
-	}
-	.personal-info {
-		.personal-info-more {
-			float: right;
-			color: var(--el-text-color-secondary);
-			font-size: 13px;
-			&:hover {
-				color: var(--el-color-primary);
-				cursor: pointer;
+			
+		.home-card-item {
+			@media only screen and (max-width: 768px) {
+				width:100%;
 			}
-		}
-		.personal-info-box {
-			height: 130px;
+			@media only screen and (min-width: 768px) {
+				width:60%;
+			}
+			margin-left: auto;
+			margin-right: auto;
+			border-radius: 4px;
+			transition: all ease 0.3s;
+			padding: 20px;
 			overflow: hidden;
-			.personal-info-ul {
-				list-style: none;
-				.personal-info-li {
-					font-size: 13px;
-					padding-bottom: 10px;
-					.personal-info-li-title {
-						display: inline-block;
-						@include text-ellipsis(1);
-						color: var(--el-text-color-secondary);
-						text-decoration: none;
-					}
-					& a:hover {
-						color: var(--el-color-primary);
-						cursor: pointer;
-					}
-				}
+			background: var(--el-color-white);
+			color: var(--el-text-color-primary);
+			border: 1px solid var(--next-border-color-light);
+			&:hover {
+				box-shadow: 0 2px 12px var(--next-color-dark-hover);
+				transition: all ease 0.3s;
 			}
-		}
-	}
-	.personal-recommend-row {
-		.personal-recommend-col {
-			.personal-recommend {
-				position: relative;
-				height: 100px;
-				border-radius: 3px;
-				overflow: hidden;
-				cursor: pointer;
-				&:hover {
-					i {
-						right: 0px !important;
-						bottom: 0px !important;
-						transition: all ease 0.3s;
-					}
-				}
+			&-icon {
+				width: 70px;
+				height: 70px;
+				border-radius: 100%;
+				flex-shrink: 1;
 				i {
-					position: absolute;
-					right: -10px;
-					bottom: -10px;
-					font-size: 70px;
-					transform: rotate(-30deg);
-					transition: all ease 0.3s;
-				}
-				.personal-recommend-auto {
-					padding: 15px;
-					position: absolute;
-					left: 0;
-					top: 5%;
-					color: var(--next-color-white);
-					.personal-recommend-msg {
-						font-size: 12px;
-						margin-top: 10px;
-					}
+					color: var(--el-text-color-placeholder);
 				}
 			}
-		}
-	}
-	.personal-edit {
-		.personal-edit-title {
-			position: relative;
-			padding-left: 10px;
-			color: var(--el-text-color-regular);
-			&::after {
-				content: '';
-				width: 2px;
-				height: 10px;
-				position: absolute;
-				left: 0;
-				top: 50%;
-				transform: translateY(-50%);
-				background: var(--el-color-primary);
+			&-title {
+				font-size: 15px;
+				font-weight: bold;
+				height: 30px;
 			}
 		}
-		.personal-edit-safe-box {
-			border-bottom: 1px solid var(--el-border-color-light, #ebeef5);
-			padding: 15px 0;
-			.personal-edit-safe-item {
-				width: 100%;
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				.personal-edit-safe-item-left {
-					flex: 1;
-					overflow: hidden;
-					.personal-edit-safe-item-left-label {
-						color: var(--el-text-color-regular);
-						margin-bottom: 5px;
-					}
-					.personal-edit-safe-item-left-value {
-						color: var(--el-text-color-secondary);
-						@include text-ellipsis(1);
-						margin-right: 15px;
-					}
-				}
-			}
-			&:last-of-type {
-				padding-bottom: 0;
-				border-bottom: none;
-			}
-		}
-	}
 }
 </style>
