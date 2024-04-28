@@ -6,6 +6,7 @@ export default {
 		session:'场次管理',
 		commentators:'讲解员管理',
 		personal: '个人中心',
+		notification:'通知中心'
 	},
 	staticRoutes: {
 		signIn: '登录',
