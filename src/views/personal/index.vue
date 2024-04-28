@@ -48,7 +48,7 @@
 				<el-card shadow="hover">
 					<template #header>
 						<span>消息通知</span>
-						<span class="personal-info-more">更多</span>
+						<span class="personal-info-more" @click='moreNotifications'>更多</span>
 					</template>
 					<div class="personal-info-box">
 						<ul class="personal-info-ul">
@@ -200,7 +200,7 @@
 import { reactive, computed } from 'vue';
 import { formatAxis } from '/@/utils/formatTime';
 import { newsInfoList, recommendList } from './mock';
-
+import router from '/@/router';
 // 定义变量内容
 const state = reactive<PersonalState>({
 	newsInfoList,
@@ -250,6 +250,10 @@ const onConfirmChange= () => {
 
 const onCancelChange = () => {
 	clearCpwInfo();
+}
+
+const moreNotifications = () => {
+	router.push('/notification');
 }
 </script>
 
