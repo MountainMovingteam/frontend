@@ -46,7 +46,7 @@ const onAllReadClick = () => {
 };
 // 前往通知中心点击
 const onGoToGiteeClick = () => {
-	router.push('/notification');
+	//router.push('/notification');
 };
 </script>
 

@@ -19,14 +19,12 @@
 </template>
 
 <script setup lang="ts" name="systemUserDialog">
-import { da } from 'element-plus/es/locale';
 import { reactive, ref } from 'vue';
 
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
 
 // 定义变量内容
-const userDialogFormRef = ref();
 const state = reactive({
 	notice: {
         content: '',
