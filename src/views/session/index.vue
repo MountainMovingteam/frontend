@@ -321,13 +321,13 @@ const getTableData = () => {
   for (let i = 0; i < 4; i++) {
     xyTable0.tableData.data.push({
       event: `第${i + 1}场 ${events[i]}`,
-      day1: {text:"day1",color:"#ffffff"}, // 使用颜色名称
-      day2: {text:"day2",color:"#ffff00"}, // 使用十六进制颜色码
-      day3: {text:"day3",color:"#ffffff"}, // 使用 RGB 颜色值
-      day4: {text:"day4",color:"#ffff00"},
-      day5: {text:"day5",color:"#ffffff"},
-      day6: {text:"day6",color:"#ffffff"},
-      day7: {text:"day7",color:"#ffff00"},
+      day1: {text:"wangda",color:"#ffffff"}, // 使用颜色名称
+      day2: {text:"qianer",color:"#ffff00"}, // 使用十六进制颜色码
+      day3: {text:"zhangsan",color:"#ffffff"}, // 使用 RGB 颜色值
+      day4: {text:"lisi",color:"#ffff00"},
+      day5: {text:"wangwu",color:"#ffffff"},
+      day6: {text:"dingliu",color:"#ffffff"},
+      day7: {text:"heqi",color:"#ffff00"},
     });
 
     shTable0.tableData.data.push({
