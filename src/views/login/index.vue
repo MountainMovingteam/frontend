@@ -26,7 +26,7 @@
 									<Account />
 								</el-tab-pane>
 								<el-tab-pane :label="$t('message.label.two2')" name="mobile">
-									<Register />
+									<Register @refresh='changeTag()'/>
 								</el-tab-pane>
 							</el-tabs>
 						</div>
@@ -57,6 +57,10 @@ const state = reactive({
 	tabsActiveName: 'account',
 	isScan: false,
 });
+
+const changeTag = () => {
+	state.tabsActiveName = 'account'
+}
 
 // 获取布局配置信息
 const getThemeConfig = computed(() => {

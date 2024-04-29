@@ -74,6 +74,8 @@ import { useLoginApi } from '/@/api/login';
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
+
+const emit = defineEmits(['refresh']);
 // 定义变量内容
 const state = reactive({
 	isShowPassword: false,
@@ -101,6 +103,7 @@ const onRegister = async () => {
 				email:'',phone:'',academy:0,avatar:''}
 			const response = await useLoginApi().register(data);
 			ElMessage.success('注册成功,请登录');
+			emit('refresh');
 			router.push('/home');
 		} catch (error:any) {
 			console.error('Error registerg in:', error.response);
