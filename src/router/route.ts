@@ -122,6 +122,21 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					icon: 'iconfont icon-gerenzhongxin',
 				},
 			}, //component: () => import('/@/layout/routerView/parent.vue')多级嵌套时，最外层component
+			{
+				path: '/notification',
+				name: 'notification',
+				component: () => import('/@/views/notification/index.vue'),
+				meta: {
+					title: 'message.router.notification',
+					isLink: '',
+					isHide: true,
+					isKeepAlive: true,
+					isAffix: false,
+					isIframe: false,
+					roles: ['admin', 'user'],
+					icon: 'iconfont icon-gerenzhongxin',
+				},
+			},
 		],
 	},
 ];

@@ -95,6 +95,8 @@
                   :bookingWay="selectedWay"
                   :row="selectedRow"
                   :column="selectedColumn"
+                  :groupColors="selectedGroupColors"
+                  :singleColors="selectedSingleColors"
                   ref="submitDialogRef"
                   @refresh="getTableData()"
                   @updateCampus="updateCampus"
@@ -106,6 +108,7 @@
 <script setup lang="ts">
 import {defineAsyncComponent, onMounted, reactive, ref} from "vue";
 import {ElMessage} from "element-plus";
+import {getPlaceDetails} from "/@/api/booking";
 
 const windowWidth = ref(window.innerWidth);
 const windowHeight = ref(window.innerHeight)
@@ -116,6 +119,8 @@ const events = ['8:00-9:30', '10:00-11:30', '14:00-15:30', '16:00-17:30'];
 
 const selectedRow = ref(0);
 const selectedColumn = ref(0);
+const selectedGroupColors = ref();
+const selectedSingleColors = ref();
 
 const updateCampus = (campus: string) => {
   console.log('hiiiiiiiiiiiiiiiiiiiiiiiiii')
@@ -140,9 +145,29 @@ function selectWay(way: string) {
 }
 const SubmitDialog = defineAsyncComponent(() => import('/@/views/booking/dialog.vue'));
 const Table = defineAsyncComponent(() => import('/@/components/table/bookingTable.vue'));
+function getDaysOfWeek() {
+  const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+  const today = new Date().getDay();
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const dayIndex = (today + i) % 7;
+    days.push(daysOfWeek[dayIndex]);
+  }
+  return days;
+}
 // 定义变量内容
 const submitDialogRef = ref();
 const tableRef = ref<RefType>();
+const state = reactive<any>({
+  place_details: [
+    {
+      time_index: 0,
+      capacity: 0,
+      enrolled: 0,
+      lecturer: "string",
+      type: 0
+    }
+  ]});
 const stateXyGroup = reactive<TableState>({
   tableData: {
     // 列表数据（必传）
@@ -261,58 +286,148 @@ function addDays(date: any, days: any) {
   result.setDate(result.getDate() + days);
   return result;
 }
-
+//"#6ef848" 绿
+//"#99FF99" 浅绿
+//"#f54545" 红
 // 初始化列表数据
 const getTableData = () => {
+  const response = getPlaceDetails();
+  response.then(response => {
+    const data = response.data;
+    console.log(data);
+    state.place_details = data.place_details;
+  });
+  const daysOfWeek = getDaysOfWeek();
+  let tuesdayColor = [];
+  let colors = [];
+  colors.push(null);
+  if (state.place_details.length <= 1) {
+    for (let i = 1; i <= 56;i++) {
+      colors[i] = "#99FF99";
+    }
+    for (let i = 0;i < 4;i++) {
+      tuesdayColor[i] = "#99FF99";
+    }
+  } else {
+    for (let i = 1; i < state.place_details.length; i++) {
+      const place_detail = state.place_details[i];
+      if (place_detail.enrolled > 0) {
+        colors[i] = "#f54545";
+      } else {
+        colors[i] = "#99FF99";
+      }
+    }
+    for (let i = 0;i < 7;i++) {
+      if (daysOfWeek[i] === '二') {
+        let index = 4 * i + 3;
+        let place_detail = state.place_details[index];
+        if (place_detail.enrolled < place_detail.capacity) {
+          tuesdayColor.push("#99FF99");
+        } else {
+          tuesdayColor.push("#f54545");
+        }
+        place_detail = state.place_details[index + 1];
+        if (place_detail.enrolled < place_detail.capacity) {
+          tuesdayColor.push("#99FF99");
+        } else {
+          tuesdayColor.push("#f54545");
+        }
+        place_detail = state.place_details[index + 28];
+        if (place_detail.enrolled < place_detail.capacity) {
+          tuesdayColor.push("#99FF99");
+        } else {
+          tuesdayColor.push("#f54545");
+        }
+        place_detail = state.place_details[index + 1 + 28];
+        if (place_detail.enrolled < place_detail.capacity) {
+          tuesdayColor.push("#99FF99");
+        } else {
+          tuesdayColor.push("#f54545");
+        }
+      }
+    }
+  }
   stateXyGroup.tableData.config.loading = true;
   stateShGroup.tableData.config.loading = true;
   stateXySingle.tableData.config.loading = true;
   stateShSingle.tableData.config.loading = true;
+
   for (let i = 0; i < 4; i++) {
-    stateXyGroup.tableData.data.push({
+    stateXyGroup.tableData.data.splice(i, 1, {
       event: `第${i + 1}场 ${events[i]}`,
-      day1: "#6ef848", // 使用颜色名称
-      day2: "#99FF99", // 使用十六进制颜色码
-      day3: "#99FF99", // 使用 RGB 颜色值
-      day4: "#99FF99",
-      day5: "#99FF99",
-      day6: "#99FF99",
-      day7: "#99FF99",
+      day1: daysOfWeek[0] === '六' || daysOfWeek[0] === '日'? "#f54545": colors[i + 1],
+      day2: daysOfWeek[1] === '六' || daysOfWeek[1] === '日'? "#f54545": colors[i + 1 + 4],
+      day3: daysOfWeek[2] === '六' || daysOfWeek[2] === '日'? "#f54545": colors[i + 1 + 8],
+      day4: daysOfWeek[3] === '六' || daysOfWeek[3] === '日'? "#f54545": colors[i + 1 + 12],
+      day5: daysOfWeek[4] === '六' || daysOfWeek[4] === '日'? "#f54545": colors[i + 1 + 16],
+      day6: daysOfWeek[5] === '六' || daysOfWeek[5] === '日'? "#f54545": colors[i + 1 + 20],
+      day7: daysOfWeek[6] === '六' || daysOfWeek[6] === '日'? "#f54545": colors[i + 1 + 24],
     });
 
-    stateShGroup.tableData.data.push({
+    stateShGroup.tableData.data.splice(i, 1, {
       event: `第${i + 1}场 ${events[i]}`,
-      day1: "#f54545", // 使用颜色名称
-      day2: "#99FF99", // 使用十六进制颜色码
-      day3: "#99FF99", // 使用 RGB 颜色值
-      day4: "#90EE90",
-      day5: "#90EE90",
-      day6: "#90EE90",
-      day7: "#90EE90",
+      day1: daysOfWeek[0] === '六' || daysOfWeek[0] === '日'? "#f54545": colors[28 + i + 1],
+      day2: daysOfWeek[1] === '六' || daysOfWeek[1] === '日'? "#f54545": colors[28 + i + 1 + 4],
+      day3: daysOfWeek[2] === '六' || daysOfWeek[2] === '日'? "#f54545": colors[28 + i + 1 + 8],
+      day4: daysOfWeek[3] === '六' || daysOfWeek[3] === '日'? "#f54545": colors[28 + i + 1 + 12],
+      day5: daysOfWeek[4] === '六' || daysOfWeek[4] === '日'? "#f54545": colors[28 + i + 1 + 16],
+      day6: daysOfWeek[5] === '六' || daysOfWeek[5] === '日'? "#f54545": colors[28 + i + 1 + 20],
+      day7: daysOfWeek[6] === '六' || daysOfWeek[6] === '日'? "#f54545": colors[28 + i + 1 + 24],
     });
 
-    stateXySingle.tableData.data.push({
+    stateXySingle.tableData.data.splice(i, 1, {
       event: `第${i + 1}场 ${events[i]}`,
-      day1: "#f54545", // 使用颜色名称
-      day2: "#f54545", // 使用十六进制颜色码
-      day3: "#f54545", // 使用 RGB 颜色值
-      day4: "#99FF99",
-      day5: "#f54545",
-      day6: "#f54545",
-      day7: "#99FF99",
+      day1: daysOfWeek[0] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+      day2: daysOfWeek[1] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+      day3: daysOfWeek[2] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+      day4: daysOfWeek[3] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+      day5: daysOfWeek[4] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+      day6: daysOfWeek[5] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+      day7: daysOfWeek[6] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
     });
 
-    stateShSingle.tableData.data.push({
+    stateShSingle.tableData.data.splice(i, 1, {
       event: `第${i + 1}场 \n\n ${events[i]}`,
-      day1: "#f54545", // 使用颜色名称
-      day2: "#f54545", // 使用十六进制颜色码
-      day3: "#f54545", // 使用 RGB 颜色值
-      day4: "#99FF99",
-      day5: "#f54545",
-      day6: "#99FF99",
-      day7: "#99FF99",
+      day1: daysOfWeek[0] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+      day2: daysOfWeek[1] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+      day3: daysOfWeek[2] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+      day4: daysOfWeek[3] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+      day5: daysOfWeek[4] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+      day6: daysOfWeek[5] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+      day7: daysOfWeek[6] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
     });
   }
+  const days = ['day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7'];
+
+  let selectedgroupcolors = [];
+  selectedgroupcolors.push(null);
+  let tableData = [
+    stateXyGroup.tableData.data,
+    stateShGroup.tableData.data
+  ];
+  for (let data of tableData) {
+    for (let day of days) {
+      for (let j = 0; j < 4; j++) {
+        selectedgroupcolors.push(data[j][day]);
+      }
+    }
+  }
+  selectedGroupColors.value = selectedgroupcolors;
+
+  let selectedsinglecolors = [];
+  selectedsinglecolors.push(null);
+  tableData = [
+    stateXySingle.tableData.data,
+    stateShSingle.tableData.data
+  ];
+  for (let data of tableData) {
+    for (let day of days) {
+      for (let j = 0; j < 4; j++) {
+        selectedsinglecolors.push(data[j][day]);
+      }
+    }
+  }
+  selectedSingleColors.value = selectedsinglecolors;
 
   stateXyGroup.tableData.config.total = stateXyGroup.tableData.data.length;
   stateShGroup.tableData.config.total = stateShGroup.tableData.data.length;

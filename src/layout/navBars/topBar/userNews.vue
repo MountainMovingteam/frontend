@@ -22,6 +22,7 @@
 
 <script setup lang="ts" name="layoutBreadcrumbUserNews">
 import { reactive } from 'vue';
+import router from '/@/router';
 
 // 定义变量内容
 const state = reactive({
@@ -45,7 +46,7 @@ const onAllReadClick = () => {
 };
 // 前往通知中心点击
 const onGoToGiteeClick = () => {
-	window.open('https://gitee.com/lyt-top/vue-next-admin');
+	//router.push('/notification');
 };
 </script>
 

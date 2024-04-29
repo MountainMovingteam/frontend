@@ -87,11 +87,11 @@ export default {
                     label: "熟练度",
                     children: [
                         {
-                            value: "入门",
+                            value: 11,
                             label: "入门"
                         },
                         {
-                            value: "熟练",
+                            value: 12,
                             label: "熟练"
                         },
                     ]
@@ -101,23 +101,23 @@ export default {
                     label: "工作日",
                     children: [
                         {
-                            value: "周一",
+                            value: 21,
                             label: "周一"
                         },
                         {
-                            value: "周二",
+                            value: 22,
                             label: "周二"
                         },
                         {
-                            value: "周三",
+                            value: 23,
                             label: "周三"
                         },
                         {
-                            value: "周四",
+                            value: 24,
                             label: "周四"
                         },
                         {
-                            value: "周五",
+                            value: 25,
                             label: "周五"
                         },
                     ]
@@ -128,19 +128,19 @@ export default {
                     label: "场次",
                     children: [
                         {
-                            value: "8:00 ~ 9:30",
+                            value: 31,
                             label: "8:00 ~ 9:30"
                         },
                         {
-                            value: "10:00 ~ 11:30",
+                            value: 32,
                             label: "10:00 ~ 11:30"
                         },
                         {
-                            value: "14:00 ~ 15:30",
+                            value: 33,
                             label: "14:00 ~ 15:30"
                         },
                         {
-                            value: "16:00 ~ 17:30",
+                            value: 34,
                             label: "16:00 ~ 17:30"
                         },
                     ]
@@ -232,7 +232,7 @@ export default {
         // 清空按钮所需函数
         deleteAll ()
         {
-            axios.delete( 'api/manage/lecturerAll' ).then( response =>
+            axios.post( 'api/manage/lecturerAll' ).then( response =>
             {
                 if ( response.status === 200 )
                 {
@@ -281,12 +281,23 @@ export default {
         {
             //console.log( this.commentators )
             const buf = JSON.parse( JSON.stringify( this.commentators ) );
+            let json = buf.map( item =>
+            { //将json数据的键名更换成导出时需要的键名
+                return {
+                    '姓名': item.name,
+                    '学号': item.num,
+                    '熟练度': item.tag,
+                    '工作日': item.weekday,
+                    '场次': item.session,
+                }
+            } )
+
             try
             {
                 // 模拟异步下载操作
                 const downloadPromise = new Promise( ( resolve, reject ) =>
                 {
-                    download( buf, '讲解员.xlsx', () =>
+                    download( json, '讲解员.xlsx', () =>
                     {
                         resolve();
                     } );

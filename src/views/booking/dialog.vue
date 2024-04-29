@@ -71,25 +71,25 @@
                     <el-input v-model="member.name" placeholder="姓名" clearable></el-input>
                   </el-col>
                 </el-form-item>
-
+                <div style="margin-top: 20px;"></div>
                 <el-form-item :span="24" class="mb20" label="学号" :prop="'teamMembers[' + index + '].studentId'" :rules="rules.teamMembers[index].studentId">
                   <el-col>
                     <el-input v-model="member.studentId" placeholder="学号" clearable></el-input>
                   </el-col>
                 </el-form-item>
-
+                <div style="margin-top: 20px;"></div>
                 <el-form-item :span="24" v-if="index === 0" class="mb20" label="电话" :prop="'teamMembers[' + index + '].phone'" :rules="rules.teamMembers[index].phone">
                   <el-col>
                     <el-input v-model="member.phone" placeholder="电话号码" clearable></el-input>
                   </el-col>
                 </el-form-item>
-
+                <div style="margin-top: 20px;"></div>
                 <el-form-item :span="24" v-if="index === 0" class="mb20" label="学院" :prop="'teamMembers[' + index + '].college'" :rules="rules.teamMembers[index].college">
                   <el-col>
-                    <el-input v-model="member.college" placeholder="学院名称" clearable></el-input>
+                    <el-input v-model="member.college" placeholder="系号+学院名称，例如“6系 计算机学院”" clearable></el-input>
                   </el-col>
                 </el-form-item>
-
+                <div style="margin-top: 20px;"></div>
                 <el-button style="margin-top: 20px;" v-if="index === state.teamMembers.length - 1 && state.teamMembers.length < 20"
                            @click="addTeamMember">增加成员</el-button>
               </template>
@@ -105,22 +105,22 @@
                 <el-input v-model="state.personalInfo.name" placeholder="姓名" clearable></el-input>
                 </el-col>
               </el-form-item>
-
+              <div style="margin-top: 20px;"></div>
               <el-form-item :span="24" class="mb20" label="学号" prop="personalInfo.studentId" :rules="rules.personalInfo.studentId">
                 <el-col>
                   <el-input v-model="state.personalInfo.studentId" placeholder="学号" clearable></el-input>
                 </el-col>
               </el-form-item>
-
+              <div style="margin-top: 20px;"></div>
               <el-form-item :span="24" class="mb20" label="电话" prop="personalInfo.phone" :rules="rules.personalInfo.phone">
                 <el-col>
                   <el-input v-model="state.personalInfo.phone" placeholder="电话号码" clearable></el-input>
                 </el-col>
               </el-form-item>
-
+              <div style="margin-top: 20px;"></div>
               <el-form-item :span="24" class="mb20" label="学院" prop="personalInfo.college" :rules="rules.personalInfo.college">
                 <el-col>
-                  <el-input v-model="state.personalInfo.college" placeholder="学院名称" clearable></el-input>
+                  <el-input v-model="state.personalInfo.college" placeholder="系号+学院名称，例如“6系 计算机学院”" clearable></el-input>
                 </el-col>
               </el-form-item>
               </el-form>
@@ -147,8 +147,10 @@
 import {defineAsyncComponent, reactive, onMounted, ref} from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRoutesList } from '/@/stores/routesList';
-import { i18n } from '/@/i18n/index';
+import { i18n } from '/@/i18n';
 import {ElMessage} from "element-plus";
+import {groupBooking, singleBooking} from "/@/api/booking";
+import {PropType} from "vue-demi";
 // import { setBackEndControlRefreshRoutes } from "/@/router/backEnd";
 
 const props = defineProps({
@@ -168,6 +170,14 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  groupColors: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
+  singleColors: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  }
 });
 
 // 定义子组件向父组件传值/事件
@@ -180,6 +190,7 @@ const IconSelector = defineAsyncComponent(() => import('/@/components/iconSelect
 const menuDialogFormRef = ref();
 const stores = useRoutesList();
 const { routesList } = storeToRefs(stores);
+const regex = /^\d+/;
 const state = reactive({
   data : {
     campus: '',
@@ -191,7 +202,9 @@ const state = reactive({
   days: initializeDays(),
   selectedEvent: '',
   events : ['第1场 8:00-9:30', '第2场 10:00-11:30', '第3场 14:00-15:30', '第4场 16:00-17:30'],
-  accessibleEvents: [1, 2, 3],
+  accessibleEvents: [] as number[],
+  groupColors: [] as string[],
+  singleColors: [] as string[],
   teamMembers: [
     { name: '', studentId: '', phone: '', college: ''}
   ],
@@ -241,7 +254,7 @@ const rules = reactive({
         { required: true, message: '请输入负责人的电话号码', trigger: 'blur' }
       ],
       college: [
-        { required: true, message: '请输入团队的学院名称', trigger: 'blur' }
+        { required: true, message: '请输入系号+学院名称，例如“6系 计算机学院”', trigger: 'blur' }
       ]
     });
     for (let i = 1; i < 20; i++) {
@@ -269,7 +282,7 @@ const rules = reactive({
       { required: true, message: '请输入电话号码', trigger: 'blur' }
     ],
     college: [
-      { required: true, message: '请输入学院名称', trigger: 'blur' }
+      { required: true, message: '请输入系号+学院名称，例如“6系 计算机学院”', trigger: 'blur' }
     ]
   }
 });
@@ -341,7 +354,28 @@ const openDialog = (type: string, row?: any) => {
   state.selectedEvent = state.events[state.data.row];
   state.data.column = props.column;
   state.selectedDay = state.days[state.data.column - 1];
-
+  state.groupColors = props.groupColors;
+  state.singleColors = props.singleColors;
+  let start = 4 * (state.data.column - 1) + 1;
+  if (state.data.campus === 'shahe') {
+    start += 28;
+  }
+  console.log("start" + start);
+  state.accessibleEvents = [];
+  for(let i = start; i < start + 4;i++) {
+    if (state.data.bookingWay === 'group') {
+      if (state.groupColors[i] == "#99FF99") {
+        state.accessibleEvents.push(i - start);
+      }
+    } else {
+      if (state.singleColors[i] == "#99FF99") {
+        state.accessibleEvents.push(i - start);
+      }
+    }
+  }
+  console.log("groupcolors" + state.groupColors)
+  console.log("singlecolors" + state.singleColors)
+  console.log("accessibleEvents" + state.accessibleEvents)
   if (type === 'edit') {
     // 模拟数据，实际请走接口
     row.menuType = 'menu';
@@ -389,6 +423,13 @@ const validateSeletion = () => {
 }
 
 const validateGroupBooking = () => {
+  if (state.teamMembers.length < 10) {
+    ElMessage({
+      type: 'error',
+      message: '团队预约至少超过10人！'
+    });
+    return false;
+  }
   const leader = state.teamMembers[0];
   const otherMembers = state.teamMembers.slice(1);
   if (leader.name.trim() === '' || leader.studentId.trim() === ''
@@ -396,6 +437,13 @@ const validateGroupBooking = () => {
     ElMessage({
       type: 'error',
       message: '请完整填写负责人的个人信息！'
+    });
+    return false;
+  }
+  if (!regex.test(leader.college.trim())) {
+    ElMessage({
+      type: 'error',
+      message: '请保证在开头输入系号！'
     });
     return false;
   }
@@ -408,14 +456,43 @@ const validateGroupBooking = () => {
       return false;
     }
   }
-  if (state.teamMembers.length < 10) {
-    ElMessage({
-      type: 'error',
-      message: '团队预约至少超过10人！'
-    });
-    return false;
-  }
   return true;
+}
+
+const onGroupBooking = () => {
+  const [leader, ...persons] = state.teamMembers;
+  const leaderObj = {
+    name: leader.name,
+    id: leader.studentId,
+    phone: leader.phone
+  };
+  const personsArr = persons.map(({name, studentId }) => ({id: studentId, name: name}));
+  const matchResult = state.teamMembers[0].college.trim().match(regex);
+  let collegeNumber = parseInt(<string>matchResult?.[0], 10);
+  let time_index = (state.data.column - 1) * 4 + state.data.row + 1;
+  if (state.data.campus == 'shahe') {
+    time_index += 28;
+  }
+  // console.log("leaderObj", leaderObj);
+  // console.log("personsArr", personsArr);
+  // console.log("collegeNumber", collegeNumber);
+  // console.log("time_index", time_index);
+  const response = groupBooking(leaderObj, personsArr, collegeNumber, time_index);
+  response
+      .then(() => {
+        ElMessage({
+          type: 'success',
+          message: '预约成功'
+        });
+        closeDialog();
+      })
+      .catch(() => {
+        ElMessage({
+          type: 'error',
+          message: '预约失败，请重试!',
+        });
+        closeDialog();
+      });
 }
 
 const validateSingleBooking = () => {
@@ -427,7 +504,47 @@ const validateSingleBooking = () => {
     });
     return false;
   }
+  if (!regex.test(person.college.trim())) {
+    ElMessage({
+      type: 'error',
+      message: '请保证在开头输入系号！'
+    });
+    return false;
+  }
   return true;
+}
+
+const onSingleBooking = () => {
+  let time_index = (state.data.column - 1) * 4 + state.data.row + 1;
+  if (state.data.campus == 'shahe') {
+    time_index += 28;
+  }
+  const matchResult = state.personalInfo.college.trim().match(regex);
+  let collegeNumber = parseInt(<string>matchResult?.[0], 10);
+  // console.log("index" + time_index);
+  // console.log("collegeNumber" + collegeNumber);
+  const response = singleBooking(
+      time_index,
+      state.personalInfo.name,
+      state.personalInfo.studentId,
+      state.personalInfo.phone,
+      collegeNumber
+  );
+  response
+      .then(() => {
+        ElMessage({
+          type: 'success',
+          message: '预约成功'
+        });
+        closeDialog();
+      })
+      .catch(() => {
+        ElMessage({
+          type: 'error',
+          message: '预约失败，请重试!',
+        });
+        closeDialog();
+      });
 }
 
 // 提交
@@ -437,24 +554,16 @@ const onSubmit = () => {
   }
   if (state.data.bookingWay === 'group') {
     if (validateGroupBooking()) {
-      closeDialog();
+      onGroupBooking();
       refreshData();
-      ElMessage({
-        type: 'success',
-        message: '预约成功'
-      });
       emit('refresh');
     } else {
       return;
     }
   } else {
     if (validateSingleBooking()) {
-      closeDialog();
+      onSingleBooking();
       refreshData();
-      ElMessage({
-        type: 'success',
-        message: '预约成功'
-      });
       emit('refresh');
     } else {
       return;
