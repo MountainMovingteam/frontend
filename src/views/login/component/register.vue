@@ -70,6 +70,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { NextLoading } from '/@/utils/loading';
 import { formatAxis } from '/@/utils/formatTime';
 import { useI18n } from 'vue-i18n';
+import { useLoginApi } from '/@/api/login';
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
@@ -91,8 +92,33 @@ const state = reactive({
 const onRegister = async () => {
 	state.loading.register = true;
 	//调用注册
-	const isNoPower = await initFrontEndControlRoutes();
-	registerSuccess(isNoPower);
+	if (state.ruleForm.password != state.ruleForm.password_confirm) {
+		state.loading.register = false;
+		ElMessage.warning('注册失败，两次输入的密码不一致');
+ 	} else {
+		/*
+		"id": "58",
+			"name": "适类列",
+			"email": "p.ywx@qq.com",
+			"phone": "19878668053",
+			"academy": 5,
+			"avatar": "http://dummyimage.com/100x100",
+			"password": "occaecat deserunt enim nostrud eiusmod",
+			"comfirmPassword": "ex cupidatat sint eu"
+		*/
+		try {
+			let data = {id: state.ruleForm.student_id, name: state.ruleForm.student_id,password: state.ruleForm.password, comfirmPassword:state.ruleForm.password_confirm,
+				email:'',phone:'',academy:0,avatar:''}
+			const response = await useLoginApi().register(data);
+			ElMessage.success('注册成功,请登录');
+			router.push('/home');
+		} catch (error:any) {
+			console.error('Error registerg in:', error.response);
+			ElMessage.warning('注册失败');
+		} finally {
+			state.loading.register = false;
+		}
+	}
 };
 
 const currentTime = computed(() => {

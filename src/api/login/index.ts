@@ -24,7 +24,7 @@ export function useLoginApi() {
 		},
 		register: (data: object) => {
 			return request({
-				url: '',
+				url: '/api/base/register',
 				method:'post',
 				data,
 			})
