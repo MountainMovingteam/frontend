@@ -96,16 +96,6 @@ const onRegister = async () => {
 		state.loading.register = false;
 		ElMessage.warning('注册失败，两次输入的密码不一致');
  	} else {
-		/*
-		"id": "58",
-			"name": "适类列",
-			"email": "p.ywx@qq.com",
-			"phone": "19878668053",
-			"academy": 5,
-			"avatar": "http://dummyimage.com/100x100",
-			"password": "occaecat deserunt enim nostrud eiusmod",
-			"comfirmPassword": "ex cupidatat sint eu"
-		*/
 		try {
 			let data = {id: state.ruleForm.student_id, name: state.ruleForm.student_id,password: state.ruleForm.password, comfirmPassword:state.ruleForm.password_confirm,
 				email:'',phone:'',academy:0,avatar:''}
@@ -125,7 +115,7 @@ const currentTime = computed(() => {
 	return formatAxis(new Date());
 });
 
-const registerSuccess = (isNoPower: boolean | undefined) => {
+const registerSuccess = (isNoPower: boolean | undefined) => { //注册后直接登录
 	if (isNoPower) {
 		ElMessage.warning('注册失败');
 	} else {
