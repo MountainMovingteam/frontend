@@ -6,7 +6,7 @@
                     <!-- 搜索框 -->
                     <el-cascader v-model="select" :options="options" :props="props" collapse-tags collapse-tags-tooltip
                         clearable style="width: 40%;" />
-                    <el-input v-model="input" style="max-width: 600px" placeholder="Please input" class="input-with-select">
+                    <el-input v-model="input" style="max-width: 600px" placeholder="请输入" class="input-with-select">
                         <template #append>
                             <el-button @click="mySearch()">
                                 <el-icon>
@@ -30,7 +30,8 @@
                     <el-row v-for="(commentators, index) in filteredCommentators" :gutter="20" :key="index">
                         <el-col v-for="(commentator, index) in commentators" :key="index" :span="8">
                             <CommentatorCard :name="commentator.name" :num="commentator.num" :tag="commentator.tag"
-                                :weekday="commentator.weekday" :session="commentator.session" />
+                                :weekday="commentator.weekday" :session="commentator.session"
+                                :campus="commentator.campus" />
                         </el-col>
                     </el-row>
                 </div>
@@ -51,15 +52,19 @@
 </template>
 
 <script>
-import CommentatorCard from "./commentatorCard.vue";
-import DeleteDialog from "./deleteDialog.vue";
-import AddDialog from "./addDialog.vue";
-import Upload from "./upload.vue";
-import download from "./exportXLSX.js";
+import CommentatorCard from "../../components/4commentator/commentatorCard.vue";
+import DeleteDialog from "../../components/4commentator/deleteDialog.vue";
+import AddDialog from "../../components/4commentator/addDialog.vue";
+import Upload from "../../components/4commentator/uploadDialog.vue";
+
+import download from "../../utils/exportXLSX.ts";
+import { timeIndex2Info, select2PostData } from "../../utils/timeIndex.ts";
+
 import { Search } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import axios from 'axios'
+
 export default {
     data ()
     {
@@ -68,9 +73,8 @@ export default {
                 {
                     "name": '李四',
                     "num": 114514,
-                    "tag": "熟练",
-                    "weekday": "周一",
-                    "session": "8:00 ~ 9:30"
+                    "tag": 2,
+                    "time_index": 15
                 },
             ],
             select: [],
@@ -159,10 +163,20 @@ export default {
     computed: {
         filteredCommentators ()
         {
+            let buf = [];
             let bufCommentators = [];
-            for ( let i = 0; i < this.commentators.length; i += 3 )
+            for ( let i = 0; i < this.commentators.length; i++ )
             {
-                bufCommentators.push( this.commentators.slice( i, i + 3 ) )
+                buf.push( {
+                    ...this.commentators[ i ],
+                    tag: this.commentators[ i ].tag ? '熟练' : '入门',
+                    ...timeIndex2Info( this.commentators[ i ].time_index )
+                } );
+                console.log( buf )
+            }
+            for ( let i = 0; i < buf.length; i += 3 )
+            {
+                bufCommentators.push( buf.slice( i, i + 3 ) )
             }
             return bufCommentators;
         },
@@ -190,13 +204,9 @@ export default {
 
         mySearch ()
         {
-            const data = JSON.parse( JSON.stringify( this.select ) )
-            let postData = []
-            for ( let i = 0; i < data.length; i++ )
-            {
-                postData.push( data[ i ][ 1 ] )
-            }
-            //console.log( postData )
+            //     console.log( this.select )
+            //     console.log( this.input )
+            const postData = select2PostData( this.select )
             axios.post( '/api/manager/lecturer/find', {
                 "tags": postData,
                 "content": this.input
