@@ -28,7 +28,7 @@ function PUT(url: string, options?: any) {
 
 async function withAuth(func: Function, url: String, options:any) {
   try {
-    const headers = { Authorization: 'Bearer ' + Local.get('access') };
+    const headers = { Authorization: Local.get('access') };
     options.headers = headers;
     console.log(options);
     

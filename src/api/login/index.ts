@@ -10,7 +10,7 @@ export function useLoginApi() {
 	return {
 		signIn: (data: object) => {
 			return request({
-				url: '/user/signIn',
+				url: '/api/base/login',
 				method: 'post',
 				data,
 			});
