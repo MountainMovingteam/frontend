@@ -51,11 +51,11 @@
 </template>
 
 <script>
-import CommentatorCard from "./commentatorCard.vue";
-import DeleteDialog from "./deleteDialog.vue";
-import AddDialog from "./addDialog.vue";
-import Upload from "./upload.vue";
-import download from "./exportXLSX.js";
+import CommentatorCard from "../../components/4commentator/commentatorCard.vue";
+import DeleteDialog from "../../components/4commentator/deleteDialog.vue";
+import AddDialog from "../../components/4commentator/addDialog.vue";
+import Upload from "../../components/4commentator/uploadDialog.vue";
+import download from "../../utils/exportXLSX.ts";
 import { Search } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -68,9 +68,8 @@ export default {
                 {
                     "name": '李四',
                     "num": 114514,
-                    "tag": "熟练",
-                    "weekday": "周一",
-                    "session": "8:00 ~ 9:30"
+                    "tag": 0,
+                    "time_index": 15
                 },
             ],
             select: [],
@@ -147,7 +146,7 @@ export default {
     },
     mounted ()
     {
-        this.getCommentators();
+        //this.getCommentators();
     },
     components: {
         CommentatorCard,
@@ -159,10 +158,25 @@ export default {
     computed: {
         filteredCommentators ()
         {
+            let buf = [];
             let bufCommentators = [];
-            for ( let i = 0; i < this.commentators.length; i += 3 )
+            const weekdays = [ '周一', '周二', '周三', '周四', '周五', '周六', '周日' ];
+            const sessions = [ '8:00 ~ 9:30', '10:00 ~ 11:30', '14:00 ~ 15:30', '16:00 ~ 17:30' ];
+            for ( let i = 0; i < this.commentators.length; i++ )
             {
-                bufCommentators.push( this.commentators.slice( i, i + 3 ) )
+                buf.push( {} );
+                buf[ i ].name = this.commentators[ i ].name;
+                buf[ i ].num = this.commentators[ i ].num;
+                buf[ i ].tag = this.commentators[ i ].tag ? "熟练" : "入门";
+                let time_index = this.commentators[ i ].time_index
+                buf[ i ].campus = time_index < 29 ? "学院路" : "沙河";
+                time_index = time_index < 29 ? time_index : time_index - 28;
+                buf[ i ].weekday = weekdays[ Math.ceil( time_index / 4 ) ]
+                buf[ i ].session = sessions[ time_index % 4 - 1 ]
+            }
+            for ( let i = 0; i < buf.length; i += 3 )
+            {
+                bufCommentators.push( buf.slice( i, i + 3 ) )
             }
             return bufCommentators;
         },

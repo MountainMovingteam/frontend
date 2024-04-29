@@ -1,19 +1,19 @@
 import * as XLSX from 'xlsx';
-export default function download(json, fileName) {
+export default function download(json: any, fileName: any) {
 	const type = 'xlsx'; //定义导出文件的格式
 	var tmpDown; //导出的内容
 	var tmpdata = json[0];
 	json.unshift({});
-	var keyMap = []; //获取keys
+	var keyMap: any = []; //获取keys
 	for (var k in tmpdata) {
 		keyMap.push(k);
 		json[0][k] = k;
 	}
-	var tmpdata = []; //用来保存转换好的json
+	var tmpdata: any = []; //用来保存转换好的json
 
 	json
-		.map((v, i) =>
-			keyMap.map((k, j) =>
+		.map((v: any, i: any) =>
+			keyMap.map((k: any, j: any) =>
 				Object.assign(
 					{},
 					{
@@ -23,9 +23,9 @@ export default function download(json, fileName) {
 				)
 			)
 		)
-		.reduce((prev, next) => prev.concat(next))
+		.reduce((prev: any, next: any) => prev.concat(next))
 		.forEach(
-			(v, i) =>
+			(v: any) =>
 				(tmpdata[v.position] = {
 					v: v.v,
 				})
@@ -59,7 +59,7 @@ export default function download(json, fileName) {
 	saveAs(tmpDown, fileName);
 }
 
-function saveAs(obj, fileName) {
+function saveAs(obj: any, fileName: any) {
 	//导出功能实现
 	var tmpa = document.createElement('a');
 	tmpa.download = fileName || '下载';
@@ -71,7 +71,7 @@ function saveAs(obj, fileName) {
 	}, 100);
 }
 
-function s2ab(s) {
+function s2ab(s: any) {
 	//字符串转字符流
 	var buf = new ArrayBuffer(s.length);
 	var view = new Uint8Array(buf);
@@ -79,9 +79,8 @@ function s2ab(s) {
 	return buf;
 }
 
-function getCharCol(n) {
-	let temCol = '',
-		s = '',
+function getCharCol(n: any) {
+	let s = '',
 		m = 0;
 	while (n > 0) {
 		m = (n % 26) + 1;

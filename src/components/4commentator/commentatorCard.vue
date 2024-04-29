@@ -13,6 +13,7 @@
         </div>
 
         <div class="text">学号：{{ localNum }}</div>
+        <div class="text">校区：{{ localCampus }}</div>
         <div class="text">工作日：{{ localWeekday }}</div>
         <div class="text">场次：{{ localSession }}</div>
         <div class="buttonContainer">
@@ -80,6 +81,7 @@ export default {
             localTag: this.tag,
             localWeekday: this.weekday,
             localSession: this.session,
+            localCampus: this.Campus,
             form: reactive({
                 //将初始值设置为props中的数值
                 name: this.name,
@@ -87,6 +89,7 @@ export default {
                 tag: this.tag,
                 weekday: this.weekday,
                 session: this.session,
+                campus: this.campus,
             })
         }
     },
