@@ -21,7 +21,7 @@ export function reqInfo() {
     return reponse
 }
 
-export function modifyBaseInfo(data: any){
+export function modifyBaseInfo(data: FormData){
     let url = baseURL + API.USER_EDIT_INFO;
     console.log(data);
     

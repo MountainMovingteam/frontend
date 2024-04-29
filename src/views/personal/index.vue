@@ -6,9 +6,12 @@
 				<el-card shadow="hover" header="个人信息">
 					<div class="personal-user">
 						<div class="personal-user-left">
-							<el-upload class="h100 personal-user-left-upload" action="https://jsonplaceholder.typicode.com/posts/" multiple :limit="1">
-								<img src="https://img2.baidu.com/it/u=1978192862,2048448374&fm=253&fmt=auto&app=138&f=JPEG?w=504&h=500" />
-							</el-upload>
+							<div class="h100 personal-user-left-upload" >
+								<img :src="state.personalForm.avatar" />
+								<el-button type="primary" round size='small' bg style="border: none;" class='uploadButton' @click='changeAvatar'> 
+									上传头像
+								</el-button>
+							</div>
 						</div>
 						<div class="personal-user-right">
 							<el-row>
@@ -203,11 +206,12 @@
 				</el-card>
 			</el-col>
 		</el-row>
+		<Dialog ref="DialogRef" @refresh='getInfo'/>
 	</div>
 </template>
 
 <script setup lang="ts" name="personal">
-import { reactive, computed, onMounted,ref } from 'vue';
+import { reactive, computed, onMounted,ref,defineAsyncComponent } from 'vue';
 import { formatAxis } from '/@/utils/formatTime';
 import { newsInfoList, recommendList } from './mock';
 import { storeToRefs } from 'pinia';
@@ -219,6 +223,12 @@ import { ElMessage } from 'element-plus';
 const message = ref(ElMessage);
 const stores = useUserInfo();
 const { userInfos } = storeToRefs(stores);
+const DialogRef = ref();
+const Dialog = defineAsyncComponent(() => import('/@/views/personal/dialog.vue'));
+const changeAvatar = () => {
+	DialogRef.value.openDialog(state.personalForm.avatar);
+}
+
 // 定义变量内容
 const state = reactive<PersonalState>({
 	newsInfoList,
@@ -277,15 +287,12 @@ const getInfo = () => {
 }
 
 const changeInfo = () => {
-    const data = {
-		id : state.personalForm.id,
-		name : state.personalForm.name,
-		email : state.personalForm.email,
-		phone : state.personalForm.phone,
-		academy : state.personalForm.academy,
-		avatar: state.personalForm.avatar
-	}
-    const response = modifyBaseInfo(data);
+	const formData = new FormData();
+    formData.append('name',state.personalForm.name);
+    formData.append('email',state.personalForm.email);
+    formData.append('phone',state.personalForm.phone);
+    formData.append('academy',state.personalForm.academy.toString());
+    const response = modifyBaseInfo(formData);
 	response.then(response => {
 		message.value.success('修改成功');
 		Local.remove('userInfo')
@@ -344,13 +351,18 @@ const moreNotifications = () => {
 			.personal-user-left-upload {
 				img {
 					width: 100%;
-					height: 100%;
+					height: 95%;
 					border-radius: 3px;
 				}
 				&:hover {
 					img {
 						animation: logoAnimation 0.3s ease-in-out;
 					}
+				}
+				.uploadButton {
+					width:100%;
+					margin: 0 auto;
+					background-color: #409eff;
 				}
 			}
 		}
