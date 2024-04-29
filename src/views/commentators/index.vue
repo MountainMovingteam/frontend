@@ -6,7 +6,7 @@
                     <!-- 搜索框 -->
                     <el-cascader v-model="select" :options="options" :props="props" collapse-tags collapse-tags-tooltip
                         clearable style="width: 40%;" />
-                    <el-input v-model="input" style="max-width: 600px" placeholder="Please input" class="input-with-select">
+                    <el-input v-model="input" style="max-width: 600px" placeholder="请输入" class="input-with-select">
                         <template #append>
                             <el-button @click="mySearch()">
                                 <el-icon>
@@ -30,7 +30,8 @@
                     <el-row v-for="(commentators, index) in filteredCommentators" :gutter="20" :key="index">
                         <el-col v-for="(commentator, index) in commentators" :key="index" :span="8">
                             <CommentatorCard :name="commentator.name" :num="commentator.num" :tag="commentator.tag"
-                                :weekday="commentator.weekday" :session="commentator.session" />
+                                :weekday="commentator.weekday" :session="commentator.session"
+                                :campus="commentator.campus" />
                         </el-col>
                     </el-row>
                 </div>
@@ -55,11 +56,15 @@ import CommentatorCard from "../../components/4commentator/commentatorCard.vue";
 import DeleteDialog from "../../components/4commentator/deleteDialog.vue";
 import AddDialog from "../../components/4commentator/addDialog.vue";
 import Upload from "../../components/4commentator/uploadDialog.vue";
+
 import download from "../../utils/exportXLSX.ts";
+import { timeIndex2Info, select2PostData } from "../../utils/timeIndex.ts";
+
 import { Search } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import axios from 'axios'
+
 export default {
     data ()
     {
@@ -68,7 +73,7 @@ export default {
                 {
                     "name": '李四',
                     "num": 114514,
-                    "tag": 0,
+                    "tag": 2,
                     "time_index": 15
                 },
             ],
@@ -160,19 +165,14 @@ export default {
         {
             let buf = [];
             let bufCommentators = [];
-            const weekdays = [ '周一', '周二', '周三', '周四', '周五', '周六', '周日' ];
-            const sessions = [ '8:00 ~ 9:30', '10:00 ~ 11:30', '14:00 ~ 15:30', '16:00 ~ 17:30' ];
             for ( let i = 0; i < this.commentators.length; i++ )
             {
-                buf.push( {} );
-                buf[ i ].name = this.commentators[ i ].name;
-                buf[ i ].num = this.commentators[ i ].num;
-                buf[ i ].tag = this.commentators[ i ].tag ? "熟练" : "入门";
-                let time_index = this.commentators[ i ].time_index
-                buf[ i ].campus = time_index < 29 ? "学院路" : "沙河";
-                time_index = time_index < 29 ? time_index : time_index - 28;
-                buf[ i ].weekday = weekdays[ Math.ceil( time_index / 4 ) ]
-                buf[ i ].session = sessions[ time_index % 4 - 1 ]
+                buf.push( {
+                    ...this.commentators[ i ],
+                    tag: this.commentators[ i ].tag ? '熟练' : '入门',
+                    ...timeIndex2Info( this.commentators[ i ].time_index )
+                } );
+                console.log( buf )
             }
             for ( let i = 0; i < buf.length; i += 3 )
             {
@@ -206,8 +206,9 @@ export default {
         {
             //     console.log( this.select )
             //     console.log( this.input )
+            const postData = select2PostData( this.select )
             axios.post( '/api/manager/lecturer/find', {
-                "tags": this.select,
+                "tags": postData,
                 "content": this.input
             } ).then( response =>
             {
