@@ -72,10 +72,6 @@ export default {
         return {
             commentators: [
                 {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": 2,
-                    "time_index": 15
                 },
             ],
             select: [],
@@ -152,7 +148,7 @@ export default {
     },
     mounted ()
     {
-        //this.getCommentators();
+        this.getCommentators();
     },
     components: {
         CommentatorCard,
