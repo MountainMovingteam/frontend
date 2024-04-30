@@ -6,22 +6,25 @@
 				<el-card shadow="hover" header="个人信息">
 					<div class="personal-user">
 						<div class="personal-user-left">
-							<el-upload class="h100 personal-user-left-upload" action="https://jsonplaceholder.typicode.com/posts/" multiple :limit="1">
-								<img src="https://img2.baidu.com/it/u=1978192862,2048448374&fm=253&fmt=auto&app=138&f=JPEG?w=504&h=500" />
-							</el-upload>
+							<div class="h100 personal-user-left-upload" >
+								<img :src="state.personalForm.avatar" />
+								<el-button type="primary" round size='small' bg style="border: none;" class='uploadButton' @click='changeAvatar'> 
+									上传头像
+								</el-button>
+							</div>
 						</div>
 						<div class="personal-user-right">
 							<el-row>
-								<el-col :span="24" class="personal-title mb18">{{ currentTime }}，admin.Life is like a box of chocolate！ </el-col>
+								<el-col :span="24" class="personal-title mb18">{{ currentTime }}，{{state.personalForm.name}}.Life is like a box of chocolate！ </el-col>
 								<el-col :span="24">
 									<el-row>
 										<el-col :xs="24" :sm="8" class="personal-item mb6">
 											<div class="personal-item-label">学号：</div>
-											<div class="personal-item-value">22223333</div>
+											<div class="personal-item-value">{{state.personalForm.id}}</div>
 										</el-col>
 										<el-col :xs="24" :sm="16" class="personal-item mb6">
 											<div class="personal-item-label">身份：</div>
-											<div class="personal-item-value">管理员</div>
+											<div class="personal-item-value">{{ state.personalForm.role }}</div>
 										</el-col>
 									</el-row>
 								</el-col>
@@ -29,11 +32,11 @@
 									<el-row>
 										<el-col :xs="24" :sm="8" class="personal-item mb6">
 											<div class="personal-item-label">学院：</div>
-											<div class="personal-item-value">xxx学院</div>
+											<div class="personal-item-value">{{ state.personalForm.academy === 0 ? '暂无学院信息' : state.personalForm.academy }}</div>
 										</el-col>
 										<el-col :xs="24" :sm="16" class="personal-item mb6">
 											<div class="personal-item-label">登录时间：</div>
-											<div class="personal-item-value">2021-02-05 18:47:26</div>
+											<div class="personal-item-value">{{ state.personalForm.logintime }}</div>
 										</el-col>
 									</el-row>
 								</el-col>
@@ -94,6 +97,16 @@
 								</el-form-item>
 							</el-col>
 							<el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb20">
+								<el-form-item label="手机">
+									<el-input v-model="state.personalForm.phone" placeholder="请输入手机号" clearable></el-input>
+								</el-form-item>
+							</el-col>
+							<el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb20">
+								<el-form-item label="学院">
+									<el-input v-model="state.personalForm.academy" placeholder="请输入学院号" clearable></el-input>
+								</el-form-item>
+							</el-col>
+							<el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb20">
 								<el-form-item label="签名">
 									<el-input v-model="state.personalForm.autograph" placeholder="请输入签名" clearable></el-input>
 								</el-form-item>
@@ -108,7 +121,7 @@
 							</el-col>
 							<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
 								<el-form-item>
-									<el-button type="primary" style='background-color: #409eff;border-color: #409eff;'>
+									<el-button type="primary" style='background-color: #409eff;border-color: #409eff;' @click='changeInfo'>
 										<el-icon>
 											<ele-Position />
 										</el-icon>
@@ -193,25 +206,44 @@
 				</el-card>
 			</el-col>
 		</el-row>
+		<Dialog ref="DialogRef" @refresh='getInfo'/>
 	</div>
 </template>
 
 <script setup lang="ts" name="personal">
-import { reactive, computed } from 'vue';
+import { reactive, computed, onMounted,ref,defineAsyncComponent } from 'vue';
 import { formatAxis } from '/@/utils/formatTime';
 import { newsInfoList, recommendList } from './mock';
+import { storeToRefs } from 'pinia';
 import router from '/@/router';
+import {reqInfo,modifyBaseInfo} from "/@/api/user/index";
+import { useUserInfo } from '/@/stores/userInfo';
+import { Local, Session } from '/@/utils/storage';
+import { ElMessage } from 'element-plus';
+const message = ref(ElMessage);
+const stores = useUserInfo();
+const { userInfos } = storeToRefs(stores);
+const DialogRef = ref();
+const Dialog = defineAsyncComponent(() => import('/@/views/personal/dialog.vue'));
+const changeAvatar = () => {
+	DialogRef.value.openDialog(state.personalForm.avatar);
+}
+
 // 定义变量内容
 const state = reactive<PersonalState>({
 	newsInfoList,
 	recommendList,
 	personalForm: {
+		id: '',
 		name: '',
+		role: '',
+		academy: 0,
 		email: '',
 		autograph: '',
-		occupation: '',
+		avatar:'',
 		phone: '',
-		sex: ''
+		sex: '',
+		logintime: ''
 	},
 });
 
@@ -232,8 +264,53 @@ const changePassword = () => {
 	changePw.changePw = true;
 }
 
+onMounted(() => {
+	getInfo();
+})
+
+const getInfo = () => {
+  const response = reqInfo();
+  response.then(response => {
+    const data = response.data.student_info;
+	state.personalForm.id = data.id;
+    state.personalForm.name = data.name;
+    state.personalForm.email = data.email;
+	state.personalForm.phone = data.phone;
+	state.personalForm.academy = data.academy;
+	state.personalForm.logintime = Local.get('userInfo').time;
+    if (Local.get('role') == 1) {
+		state.personalForm.role = '管理员'
+	} else {
+		state.personalForm.role = '普通用户'
+	}
+  })
+}
+
+const changeInfo = () => {
+	const formData = new FormData();
+    formData.append('name',state.personalForm.name);
+    formData.append('email',state.personalForm.email);
+    formData.append('phone',state.personalForm.phone);
+    formData.append('academy',state.personalForm.academy.toString());
+    const response = modifyBaseInfo(formData);
+	response.then(response => {
+		message.value.success('修改成功');
+		Local.remove('userInfo')
+		userInfos.value.name = state.personalForm.name;
+		userInfos.value.email = state.personalForm.email;
+		userInfos.value.phone = state.personalForm.phone;
+		userInfos.value.academy = state.personalForm.academy;
+		Local.set('userInfo',userInfos.value)
+		Session.remove('userInfo')
+		Session.set('userInfo',userInfos.value)
+	}).catch(error => {
+		console.error('修改失败:', error);
+		message.value.error('修改失败');
+	})
+}
+
+
 const clearCpwInfo = () => {
-	
 	changePw.changePw = false;
 	changePw.isShowPassword = false;
 	changePw.isShowNewPassword = false;
@@ -274,13 +351,18 @@ const moreNotifications = () => {
 			.personal-user-left-upload {
 				img {
 					width: 100%;
-					height: 100%;
+					height: 95%;
 					border-radius: 3px;
 				}
 				&:hover {
 					img {
 						animation: logoAnimation 0.3s ease-in-out;
 					}
+				}
+				.uploadButton {
+					width:100%;
+					margin: 0 auto;
+					background-color: #409eff;
 				}
 			}
 		}

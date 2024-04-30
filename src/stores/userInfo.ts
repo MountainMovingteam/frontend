@@ -20,7 +20,6 @@ export const useUserInfo = defineStore('userInfo', {
 	}),
 	actions: {
 		async setUserInfos() {
-			// 存储用户信息到浏览器缓存
 			if (Session.get('userInfo')) {
 				this.userInfos = Session.get('userInfo');
 			} else {
@@ -28,8 +27,6 @@ export const useUserInfo = defineStore('userInfo', {
 				this.userInfos = userInfos;
 			}
 		},
-		// 模拟接口数据
-		// https://gitee.com/lyt-top/vue-next-admin/issues/I5F1HP
 		async getApiUserInfo() {
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
@@ -41,7 +38,7 @@ export const useUserInfo = defineStore('userInfo', {
 							let adminAuthBtnList: Array<string> = ['btn.add', 'btn.del', 'btn.edit', 'btn.link'];
 							let testRoles: Array<string> = ['user'];
 							let testAuthBtnList: Array<string> = ['btn.add', 'btn.link'];
-							if (Local.get('role') == 0) {
+							if (Local.get('role') == 1) {
 								// 默认都是管理员
 								defaultRoles = adminRoles;
 								defaultAuthBtnList = adminAuthBtnList;
@@ -70,3 +67,15 @@ export const useUserInfo = defineStore('userInfo', {
 		},
 	},
 });
+
+const getLoginTime = () => {
+	const currentDate = new Date();
+	const year = currentDate.getFullYear();
+	const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // 月份从0开始，需要+1，然后用padStart方法补齐两位
+	const date = currentDate.getDate().toString().padStart(2, '0');
+	const hours = currentDate.getHours().toString().padStart(2, '0');
+	const minutes = currentDate.getMinutes().toString().padStart(2, '0');
+	const seconds = currentDate.getSeconds().toString().padStart(2, '0');
+	const formattedTime = `${year}-${month}-${date} ${hours}:${minutes}:${seconds}`;
+	return formattedTime;
+};

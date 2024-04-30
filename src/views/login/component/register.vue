@@ -74,6 +74,8 @@ import { useLoginApi } from '/@/api/login';
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
+
+const emit = defineEmits(['refresh']);
 // 定义变量内容
 const state = reactive({
 	isShowPassword: false,
@@ -96,21 +98,12 @@ const onRegister = async () => {
 		state.loading.register = false;
 		ElMessage.warning('注册失败，两次输入的密码不一致');
  	} else {
-		/*
-		"id": "58",
-			"name": "适类列",
-			"email": "p.ywx@qq.com",
-			"phone": "19878668053",
-			"academy": 5,
-			"avatar": "http://dummyimage.com/100x100",
-			"password": "occaecat deserunt enim nostrud eiusmod",
-			"comfirmPassword": "ex cupidatat sint eu"
-		*/
 		try {
 			let data = {id: state.ruleForm.student_id, name: state.ruleForm.student_id,password: state.ruleForm.password, comfirmPassword:state.ruleForm.password_confirm,
 				email:'',phone:'',academy:0,avatar:''}
 			const response = await useLoginApi().register(data);
 			ElMessage.success('注册成功,请登录');
+			emit('refresh');
 			router.push('/home');
 		} catch (error:any) {
 			console.error('Error registerg in:', error.response);
@@ -125,7 +118,7 @@ const currentTime = computed(() => {
 	return formatAxis(new Date());
 });
 
-const registerSuccess = (isNoPower: boolean | undefined) => {
+const registerSuccess = (isNoPower: boolean | undefined) => { //注册后直接登录
 	if (isNoPower) {
 		ElMessage.warning('注册失败');
 	} else {
