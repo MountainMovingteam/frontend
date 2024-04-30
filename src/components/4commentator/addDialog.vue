@@ -62,8 +62,8 @@
 <script>
 import { Plus } from '@element-plus/icons-vue'
 import { reactive } from 'vue'
-import { info2TimeIndex } from '../../utils/timeIndex'
-import axios from "axios";
+import { info2TimeIndex } from '/@/utils/timeIndex'
+import { myPOST } from '/@/api/commentator/index'
 
 export default {
     data ()
@@ -106,7 +106,7 @@ export default {
                 ElMessage.error( '请填写完整的表单信息！' );
                 return;
             }
-            axios.post( 'api/manage/lecturer/add', {
+            myPOST( 'api/manage/lecturer/add', {
                 "name": this.form.name,
                 "num": this.form.num,
                 "tag": this.form.tag == "入门" ? 1 : 2,
@@ -117,7 +117,6 @@ export default {
                     if ( responsw.data.success )
                     {
                         ElMessage.success( '添加成功！' );
-                        this.closeDialog();
                         this.form = reactive( {
                             name: '',
                             num: '',
@@ -126,7 +125,6 @@ export default {
                             session: ''
                         } );
                         this.$emit( 'getCommentotars' )
-
                     } else
                     {
                         ElMessage.error( '添加失败' );
@@ -139,7 +137,7 @@ export default {
                     ElMessage.error( '添加失败，请重试！' );
                 } );
             // 提交表单的逻辑
-            this.addDialogVisible = false;
+            this.closeDialog();
         }
     }
 }

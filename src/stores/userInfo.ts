@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import Cookies from 'js-cookie';
-import { Session,Local } from '/@/utils/storage';
-import { reqInfo } from '/@/api/user/index'
+import { Session, Local } from '/@/utils/storage';
+import { reqInfo } from '/@/api/user/index';
 import { log } from 'console';
 
 /**
@@ -30,39 +30,38 @@ export const useUserInfo = defineStore('userInfo', {
 		async getApiUserInfo() {
 			return new Promise((resolve, reject) => {
 				setTimeout(() => {
-				reqInfo()
-				.then((result: any) => {
-					  let defaultRoles: Array<string> = [];
-					  let defaultAuthBtnList: Array<string> = [];
-					  let adminRoles: Array<string> = ['admin'];
-					  let adminAuthBtnList: Array<string> = ['btn.add', 'btn.del', 'btn.edit', 'btn.link'];
-					  let testRoles: Array<string> = ['user'];
-					  let testAuthBtnList: Array<string> = ['btn.add', 'btn.link'];
-					  if (Local.get('role') == 1) {
-						// 默认都是管理员
-						defaultRoles = adminRoles;
-						defaultAuthBtnList = adminAuthBtnList;
-					  } else {
-						defaultRoles = testRoles;
-						defaultAuthBtnList = testAuthBtnList;
-					  }
-					  const curTime = getLoginTime();
-					  const userInfos = {
-						username: result.data.username,
-						photo: result.data.avatar,
-						time: curTime,
-						roles: defaultRoles,
-						email:result.data.email,
-						authBtnList: defaultAuthBtnList,
-					  };
-					  Session.set('userInfo', userInfos);
-					  Local.set('userInfo',userInfos);
-					  resolve(userInfos);
-					})
-					.catch((error) => {
-					  console.error('发生错误：', error);
-					  reject(error);
-					});
+					reqInfo()
+						.then((result: any) => {
+							let defaultRoles: Array<string> = [];
+							let defaultAuthBtnList: Array<string> = [];
+							let adminRoles: Array<string> = ['admin'];
+							let adminAuthBtnList: Array<string> = ['btn.add', 'btn.del', 'btn.edit', 'btn.link'];
+							let testRoles: Array<string> = ['user'];
+							let testAuthBtnList: Array<string> = ['btn.add', 'btn.link'];
+							if (Local.get('role') == 1) {
+								// 默认都是管理员
+								defaultRoles = adminRoles;
+								defaultAuthBtnList = adminAuthBtnList;
+							} else {
+								defaultRoles = testRoles;
+								defaultAuthBtnList = testAuthBtnList;
+							}
+							const userInfos = {
+								username: result.data.username,
+								photo: result.data.avatar,
+								time: new Date().getTime(),
+								roles: defaultRoles,
+								email: result.data.email,
+								authBtnList: defaultAuthBtnList,
+							};
+							Session.set('userInfo', userInfos);
+							Local.set('userInfo', userInfos);
+							resolve(userInfos);
+						})
+						.catch((error) => {
+							console.error('发生错误：', error);
+							reject(error);
+						});
 				}, 0);
 			});
 		},
@@ -79,4 +78,4 @@ const getLoginTime = () => {
 	const seconds = currentDate.getSeconds().toString().padStart(2, '0');
 	const formattedTime = `${year}-${month}-${date} ${hours}:${minutes}:${seconds}`;
 	return formattedTime;
-}
+};
