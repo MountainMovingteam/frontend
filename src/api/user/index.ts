@@ -1,8 +1,8 @@
 import client from '../client';
 
 enum API {
-	USER_INFO = 'api/base/getInfo', //个人信息
-	USER_EDIT_INFO = 'api/base/editInfo',
+	USER_INFO = '/api/base/getInfo', //个人信息
+	USER_EDIT_INFO = '/api/base/editInfo',
 }
 const baseURL = 'http://47.93.19.22:8000';
 
