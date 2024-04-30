@@ -78,7 +78,9 @@ import axios from 'axios'
 import { Delete, Avatar } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus';
 import { reactive } from 'vue'
-import { info2TimeIndex } from '../../utils/timeIndex'
+import { info2TimeIndex } from '/@/utils/timeIndex'
+import { myPOST } from '/@/api/commentator/index'
+
 export default {
     data() {
         return {
@@ -112,7 +114,7 @@ export default {
     },
     methods: {
         myDelete() {
-            axios.post('api/manage/lecturer/delete', {
+            myPOST('api/manage/lecturer/delete', {
                 num: this.localNum,
             })
                 .then(res => {
@@ -128,7 +130,7 @@ export default {
                 })
         },
         fixData() {
-            axios.post('api/manage/lecturer/update', {
+            myPOST('api/manage/lecturer/update', {
                 "old_num": this.localNum,
                 "name": this.form.name,
                 "num": this.form.num,

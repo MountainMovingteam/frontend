@@ -63,8 +63,7 @@
 import { Plus } from '@element-plus/icons-vue'
 import { reactive } from 'vue'
 import { info2TimeIndex } from '/@/utils/timeIndex'
-import axios from "axios";
-import { submitAdd } from '/@/api/commentator/index.ts'
+import { myPOST } from '/@/api/commentator/index'
 
 export default {
     data ()
@@ -107,7 +106,7 @@ export default {
                 ElMessage.error( '请填写完整的表单信息！' );
                 return;
             }
-            submitAdd( {
+            myPOST( 'api/manage/lecturer/add', {
                 "name": this.form.name,
                 "num": this.form.num,
                 "tag": this.form.tag == "入门" ? 1 : 2,
