@@ -114,7 +114,7 @@ export default {
     },
     methods: {
         myDelete() {
-            myPOST('api/manage/lecturer/delete', {
+            myPOST('/api/manage/lecturer/delete', {
                 num: this.localNum,
             })
                 .then(res => {
@@ -130,7 +130,7 @@ export default {
                 })
         },
         fixData() {
-            myPOST('api/manage/lecturer/update', {
+            myPOST('/api/manage/lecturer/update', {
                 "old_num": this.localNum,
                 "name": this.form.name,
                 "num": this.form.num,

@@ -106,7 +106,7 @@ export default {
                 ElMessage.error( '请填写完整的表单信息！' );
                 return;
             }
-            myPOST( 'api/manage/lecturer/add', {
+            myPOST( '/api/manage/lecturer/add', {
                 "name": this.form.name,
                 "num": this.form.num,
                 "tag": this.form.tag == "入门" ? 1 : 2,

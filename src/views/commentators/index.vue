@@ -229,7 +229,7 @@ export default {
         // 清空按钮所需函数
         deleteAll ()
         {
-            myPOST( 'api/manage/lecturerAll' ).then( response =>
+            myPOST( '/api/manage/lecturerAll' ).then( response =>
             {
                 if ( response.status === 200 )
                 {
