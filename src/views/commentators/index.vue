@@ -57,8 +57,8 @@ import DeleteDialog from "../../components/4commentator/deleteDialog.vue";
 import AddDialog from "../../components/4commentator/addDialog.vue";
 import Upload from "../../components/4commentator/uploadDialog.vue";
 
-import download from "../../utils/exportXLSX.ts";
-import { timeIndex2Info, select2PostData } from "../../utils/timeIndex.ts";
+import download from "/@/utils/exportXLSX.ts";
+import { timeIndex2Info, select2PostData } from "/@/utils/timeIndex.ts";
 
 import { Search } from '@element-plus/icons-vue'
 import { ref } from 'vue'
