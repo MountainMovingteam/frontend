@@ -57,13 +57,14 @@ import DeleteDialog from "../../components/4commentator/deleteDialog.vue";
 import AddDialog from "../../components/4commentator/addDialog.vue";
 import Upload from "../../components/4commentator/uploadDialog.vue";
 
-import download from "../../utils/exportXLSX.ts";
-import { timeIndex2Info, select2PostData } from "../../utils/timeIndex.ts";
+import download from "/@/utils/exportXLSX.ts";
+import { timeIndex2Info, select2PostData } from "/@/utils/timeIndex.ts";
 
 import { Search } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import axios from 'axios'
+import { myPOST, myGET } from '/@/api/commentator/index'
 
 export default {
     data ()
@@ -71,10 +72,6 @@ export default {
         return {
             commentators: [
                 {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": 2,
-                    "time_index": 15
                 },
             ],
             select: [],
@@ -151,7 +148,7 @@ export default {
     },
     mounted ()
     {
-        //this.getCommentators();
+        this.getCommentators();
     },
     components: {
         CommentatorCard,
@@ -184,7 +181,7 @@ export default {
     methods: {
         getCommentators ()
         {
-            axios.get( '/api/manager/lecturer' ).then( response =>
+            myGET( '/api/manager/lecturer', {} ).then( response =>
             {
                 if ( response.status === 200 )
                 {
@@ -207,7 +204,7 @@ export default {
             //     console.log( this.select )
             //     console.log( this.input )
             const postData = select2PostData( this.select )
-            axios.post( '/api/manager/lecturer/find', {
+            myPOST( '/api/manager/lecturer/find', {
                 "tags": postData,
                 "content": this.input
             } ).then( response =>
@@ -232,7 +229,7 @@ export default {
         // 清空按钮所需函数
         deleteAll ()
         {
-            axios.post( 'api/manage/lecturerAll' ).then( response =>
+            myPOST( 'api/manage/lecturerAll' ).then( response =>
             {
                 if ( response.status === 200 )
                 {
