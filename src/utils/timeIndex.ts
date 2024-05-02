@@ -9,8 +9,8 @@ export function timeIndex2Info(num: number) {
 	const sessions = ['8:00 ~ 9:30', '10:00 ~ 11:30', '14:00 ~ 15:30', '16:00 ~ 17:30'];
 	buf.campus = time_index < 29 ? '学院路' : '沙河';
 	time_index = time_index < 29 ? time_index : time_index - 28;
-	buf.weekday = weekdays[Math.ceil(time_index / 4)];
-	buf.session = sessions[(time_index % 4) - 1];
+	buf.weekday = weekdays[Math.floor((time_index - 1) / 4)];
+	buf.session = sessions[(time_index - 1) % 4];
 	return buf;
 }
 
@@ -35,5 +35,5 @@ export function select2PostData(select: any) {
 	for (let i = 0; i < data.length; i++) {
 		postData.push(data[i][1]);
 	}
-	return data;
+	return postData;
 }

@@ -51,6 +51,7 @@
                     <el-option label="周二" value="周二" />
                     <el-option label="周三" value="周三" />
                     <el-option label="周四" value="周四" />
+                    <el-option label="周五" value="周五" />
                 </el-select>
             </el-form-item>
             <el-form-item label="场次" prop="session" :rules="[{ required: true, message: '请选择场次', trigger: 'change' }]">
@@ -74,7 +75,6 @@
 </template>
 
 <script lang="ts">
-import axios from 'axios'
 import { Delete, Avatar } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus';
 import { reactive } from 'vue'
@@ -114,7 +114,7 @@ export default {
     },
     methods: {
         myDelete() {
-            myPOST('api/manage/lecturer/delete', {
+            myPOST('/api/manage/lecturer/delete', {
                 num: this.localNum,
             })
                 .then(res => {
@@ -130,7 +130,7 @@ export default {
                 })
         },
         fixData() {
-            myPOST('api/manage/lecturer/update', {
+            myPOST('/api/manage/lecturer/edit', {
                 "old_num": this.localNum,
                 "name": this.form.name,
                 "num": this.form.num,
@@ -145,6 +145,7 @@ export default {
                         this.localTag = this.form.tag
                         this.localWeekday = this.form.weekday
                         this.localSession = this.form.session
+                        this.localCampus = this.form.campus
                     } else {
                         ElMessage.error("更新失败");
                     }
