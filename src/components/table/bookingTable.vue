@@ -22,13 +22,13 @@
       >
         <template v-slot="scope">
           <template v-if="item.key === 'event'">
-            <span style="display: flex; align-items: center; justify-content: flex-start; height: 88px;">
+            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100px;">
               {{ scope.row[item.key] }}
             </span>
           </template>
           <template v-else>
             <span :class="{ 'cell-active': isSelected(scope.$index, index) }"
-                  :style="{ backgroundColor: scope.row[item.key], display: 'inline-block', width: '100%', height: '88px', position: 'relative', textAlign: 'center' }"
+                  :style="{ backgroundColor: scope.row[item.key], display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center', overflow: 'hidden' }"
                   @click="handleCellClick(scope.$index, index, scope.row[item.key])"
                   > <i v-if="isSelected(scope.$index, index)" class="check-mark">✓</i> </span>
           </template>
@@ -294,16 +294,20 @@ defineExpose({
   flex-direction: column;
   .el-table {
     flex: 1;
-    overflow: auto;
+    overflow: hidden;
     .check-mark {
-      font-size: 45px; /* 调整对勾的大小 */
-      line-height: 88px;
+      font-size: 35px; /* 调整对勾的大小 */
+      line-height: 90px;
+      -webkit-user-select: none; /* Safari */
+      -moz-user-select: none; /* Firefox */
+      -ms-user-select: none; /* IE 10+ */
       user-select: none
     }
 
     .cell-active {
       position: relative;
       background-color: lightpink !important;
+      overflow: hidden;
     }
 
     .cell-active::after {
@@ -312,6 +316,7 @@ defineExpose({
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      overflow: hidden;
     }
   }
   .table-footer {
