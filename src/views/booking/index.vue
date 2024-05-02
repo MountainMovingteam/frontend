@@ -3,7 +3,7 @@
     <div class="table-demo-padding layout-padding-view layout-padding-auto">
       <div class="layout-pd">
         <el-alert
-            :title="'预约须知：学院路周三下午体验馆不开放对外预约，个人预约仅可预约周二晚时段，如个人预约时段人数少于10人则自动取消，请同学们关注邮箱或本平台通知'"
+            :title="'预约须知：学院路周三下午体验馆不开放对外预约。个人预约仅可预约周二时段，如个人预约时段人数少于10人则自动取消，请同学们关注邮箱或本平台通知！'"
             type="warning"
             :closable="false"
         ></el-alert>
@@ -49,6 +49,10 @@
           </el-icon>
           &nbsp;&nbsp;个人预约&nbsp;&nbsp;
         </el-button>
+      </div>
+      <div>
+        <span style="margin-left: 50px; margin-right: 10px;color: #99FF99; font-size: 30px;">■</span> 可预约
+        <span style="margin-left: 75px; margin-right: 10px;color: #f54545; font-size: 30px;">■</span> 不可约
       </div>
       <div v-if="selectedLocation === 'xueyuan' && selectedWay === 'group'">
         <Table
@@ -175,13 +179,13 @@ const stateXyGroup = reactive<TableState>({
     // 表头内容（必传，注意格式）
     header: [
       { key: 'event', colWidth: '150px', title: '场次', type: 'text', isCheck: true },
-      { key: 'day1', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(new Date()), type: 'text', isCheck: true },
-      { key: 'day2', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 1)), type: 'text', isCheck: true },
-      { key: 'day3', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 2)), type: 'text', isCheck: true },
-      { key: 'day4', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 3)), type: 'text', isCheck: true },
-      { key: 'day5', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 4)), type: 'text', isCheck: true },
-      { key: 'day6', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 5)), type: 'text', isCheck: true },
-      { key: 'day7', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 6)), type: 'text', isCheck: true },
+      { key: 'day1', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(new Date()), type: 'text', isCheck: true },
+      { key: 'day2', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 1)), type: 'text', isCheck: true },
+      { key: 'day3', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 2)), type: 'text', isCheck: true },
+      { key: 'day4', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 3)), type: 'text', isCheck: true },
+      { key: 'day5', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 4)), type: 'text', isCheck: true },
+      { key: 'day6', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 5)), type: 'text', isCheck: true },
+      { key: 'day7', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 6)), type: 'text', isCheck: true },
     ],    // 配置项
     config: {
       total: 0,
@@ -201,13 +205,13 @@ const stateShGroup = reactive<TableState>({
     // 表头内容（必传，注意格式）
     header: [
       { key: 'event', colWidth: '150px', title: '场次', type: 'text', isCheck: true },
-      { key: 'day1', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(new Date()), type: 'text', isCheck: true },
-      { key: 'day2', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 1)), type: 'text', isCheck: true },
-      { key: 'day3', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 2)), type: 'text', isCheck: true },
-      { key: 'day4', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 3)), type: 'text', isCheck: true },
-      { key: 'day5', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 4)), type: 'text', isCheck: true },
-      { key: 'day6', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 5)), type: 'text', isCheck: true },
-      { key: 'day7', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 6)), type: 'text', isCheck: true },
+      { key: 'day1', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(new Date()), type: 'text', isCheck: true },
+      { key: 'day2', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 1)), type: 'text', isCheck: true },
+      { key: 'day3', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 2)), type: 'text', isCheck: true },
+      { key: 'day4', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 3)), type: 'text', isCheck: true },
+      { key: 'day5', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 4)), type: 'text', isCheck: true },
+      { key: 'day6', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 5)), type: 'text', isCheck: true },
+      { key: 'day7', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 6)), type: 'text', isCheck: true },
     ],
     // 配置项
     config: {
@@ -228,13 +232,13 @@ const stateXySingle = reactive<TableState>({
     // 表头内容（必传，注意格式）
     header: [
       { key: 'event', colWidth: '150px', title: '场次', type: 'text', isCheck: true },
-      { key: 'day1', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(new Date()), type: 'text', isCheck: true },
-      { key: 'day2', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 1)), type: 'text', isCheck: true },
-      { key: 'day3', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 2)), type: 'text', isCheck: true },
-      { key: 'day4', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 3)), type: 'text', isCheck: true },
-      { key: 'day5', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 4)), type: 'text', isCheck: true },
-      { key: 'day6', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 5)), type: 'text', isCheck: true },
-      { key: 'day7', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 6)), type: 'text', isCheck: true },
+      { key: 'day1', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(new Date()), type: 'text', isCheck: true },
+      { key: 'day2', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 1)), type: 'text', isCheck: true },
+      { key: 'day3', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 2)), type: 'text', isCheck: true },
+      { key: 'day4', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 3)), type: 'text', isCheck: true },
+      { key: 'day5', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 4)), type: 'text', isCheck: true },
+      { key: 'day6', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 5)), type: 'text', isCheck: true },
+      { key: 'day7', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 6)), type: 'text', isCheck: true },
     ],
     // 配置项
     config: {
@@ -255,13 +259,13 @@ const stateShSingle = reactive<TableState>({
     // 表头内容（必传，注意格式）
     header: [
       { key: 'event', colWidth: '150px', title: '场次', type: 'text', isCheck: true },
-      { key: 'day1', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(new Date()), type: 'text', isCheck: true },
-      { key: 'day2', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 1)), type: 'text', isCheck: true },
-      { key: 'day3', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 2)), type: 'text', isCheck: true },
-      { key: 'day4', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 3)), type: 'text', isCheck: true },
-      { key: 'day5', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 4)), type: 'text', isCheck: true },
-      { key: 'day6', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 5)), type: 'text', isCheck: true },
-      { key: 'day7', colWidth: window.innerWidth <= 768 ? '100px' : '180px', title: formatDate(addDays(new Date(), 6)), type: 'text', isCheck: true },
+      { key: 'day1', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(new Date()), type: 'text', isCheck: true },
+      { key: 'day2', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 1)), type: 'text', isCheck: true },
+      { key: 'day3', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 2)), type: 'text', isCheck: true },
+      { key: 'day4', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 3)), type: 'text', isCheck: true },
+      { key: 'day5', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 4)), type: 'text', isCheck: true },
+      { key: 'day6', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 5)), type: 'text', isCheck: true },
+      { key: 'day7', colWidth: window.innerWidth <= 768 ? '90px' : '180px', title: formatDate(addDays(new Date(), 6)), type: 'text', isCheck: true },
     ],
     // 配置项
     config: {
