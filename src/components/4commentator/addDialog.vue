@@ -41,6 +41,7 @@
                     <el-option label="周二" value="周二" />
                     <el-option label="周三" value="周三" />
                     <el-option label="周四" value="周四" />
+                    <el-option label="周五" value="周五" />
                 </el-select>
             </el-form-item>
             <el-form-item label="场次" prop="session" :rules="[{ required: true, message: '请选择场次', trigger: 'change' }]">
@@ -59,83 +60,75 @@
     </el-dialog>
 </template>
 
-<script>
+<script lang="ts">
 import { Plus } from '@element-plus/icons-vue'
 import { reactive } from 'vue'
 import { info2TimeIndex } from '/@/utils/timeIndex'
 import { myPOST } from '/@/api/commentator/index'
+import { ElMessage } from 'element-plus'
 
 export default {
-    data ()
-    {
+    data() {
         return {
             addDialogVisible: false,
-            form: reactive( {
+            form: reactive({
                 name: '',
                 num: '',
                 tag: '',
                 campus: '',
                 weekday: '',
                 session: ''
-            } )
+            })
         }
     },
     computed: {
-        isFormValid ()
-        {
+        isFormValid() {
             return this.form.name && this.form.num && this.form.tag
-                && this.form.weekday && this.form.session && this.from.campus;
+                && this.form.weekday && this.form.session && this.form.campus;
         }
     },
     components: {
         Plus
     },
     methods: {
-        openDialog ()
-        {
+        openDialog() {
             this.addDialogVisible = true;
         },
-        closeDialog ()
-        {
+        closeDialog() {
             this.addDialogVisible = false;
         },
-        onSubmit ()
-        {
-            if ( !this.isFormValid )
-            {
-                ElMessage.error( '请填写完整的表单信息！' );
+        onSubmit() {
+            if (!this.isFormValid) {
+                ElMessage.error('请填写完整的表单信息！');
                 return;
             }
-            myPOST( '/api/manage/lecturer/add', {
+            myPOST('/api/manage/lecturer/add', {
                 "name": this.form.name,
                 "num": this.form.num,
                 "tag": this.form.tag == "入门" ? 1 : 2,
-                "time_index": info2TimeIndex( this.form )
-            } )
-                .then( ( responsw ) =>
-                {
-                    if ( responsw.data.success )
-                    {
-                        ElMessage.success( '添加成功！' );
-                        this.form = reactive( {
+                "time_index": info2TimeIndex(this.form)
+            })
+                .then((response) => {
+                    if (response.data.success) {
+                        ElMessage.success('添加成功！');
+                        this.form = reactive({
                             name: '',
                             num: '',
                             tag: '',
                             weekday: '',
-                            session: ''
-                        } );
-                        this.$emit( 'getCommentotars' )
-                    } else
-                    {
-                        ElMessage.error( '添加失败' );
+                            session: '',
+                            campus: ''
+                        });
+                        this.$emit('getCommentators')
+                    } else {
+                        ElMessage.error('添加失败');
                         return;
                     }
 
-                } )
-                .catch( () =>
-                {
-                    ElMessage.error( '添加失败，请重试！' );
-                } );
+                })
+                .catch(() => {
+                    ElMessage.error('添加失败，请重试！');
+                });
             // 提交表单的逻辑
             this.closeDialog();
         }

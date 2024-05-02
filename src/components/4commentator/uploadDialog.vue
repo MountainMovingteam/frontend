@@ -14,7 +14,7 @@
         </el-upload>
         <div class="buttonContainer">
             <el-button type="info" @click="cancel">取消</el-button>
-            <el-button type="danger" @click="uploadAll">直接上传</el-button>
+            <el-button type="danger" @click="submitUploadAll">直接上传</el-button>
             <el-button type="success" @click="exportAndUploadAll">导出并上传</el-button>
         </div>
     </el-dialog>
@@ -25,37 +25,48 @@ import { UploadFilled } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { genFileId } from 'element-plus'
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import axios from 'axios'
+import { ElMessage } from 'element-plus'
+import { myFormDataPOST } from '/@/api/commentator/index'
 
 export default {
     setup() {
         const uploadRef = ref<UploadInstance>()
         // 定义响应式变量 uploadFile
-        const uploadFile: any = [];
+        const uploadFile = ref<UploadRawFile[]>()
 
         const submitUploadAll = () => {
-            //console.log(uploadFile.value[0])
-            //console.log(uploadFile)
-            axios.post('/api/upload', uploadFile[0].raw).then(response => {
-                if (response.status === 200) {
-                    ElMessage({
-                        message: '上传成功',
-                        type: 'success'
-                    });
-                } else {
+            if (uploadFile != undefined && uploadFile.value != undefined) {
+                // console.log(uploadFile.value[0])
+                // console.log("is click upload")
+                const formData = new FormData();
+                formData.append('file', uploadFile.value[0].raw);
+                // formData.forEach((value, key) => {
+                //     if (value instanceof File) {
+                //         console.log(`${key}: ${value.name} (${value.type})`);
+                //     } else {
+                //         console.log(`${key}: ${value}`);
+                //     }
+                // });
+                myFormDataPOST('api/manage/lecturer/upload', formData).then(response => {
+                    if (response.status === 200) {
+                        ElMessage({
+                            message: '上传成功',
+                            type: 'success'
+                        });
+                    } else {
+                        ElMessage({
+                            message: '上传失败',
+                            type: 'error'
+                        });
+                    }
+                }).catch(error => {
                     ElMessage({
                         message: '上传失败',
                         type: 'error'
                     });
-                }
-            }).catch(error => {
-                ElMessage({
-                    message: '上传失败',
-                    type: 'error'
-                });
-            })
-            uploadRef.value!.submit()
+                })
+                //uploadRef.value!.submit()
+            }
         }
         const handleExceed: UploadProps['onExceed'] = (files) => {
             uploadRef.value!.clearFiles()

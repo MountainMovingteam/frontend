@@ -11,7 +11,7 @@
     </el-dialog>
 </template>
 
-<script>
+<script lang="ts">
 export default {
     props: {
         value: {
@@ -37,40 +37,32 @@ export default {
     },
     computed: {
         deleteDialogVisible: {
-            get ()
-            {
+            get() {
                 return this.value;
             },
-            set ( val )
-            {
-                this.$emit( 'update:value', val );
+            set(val: any) {
+                this.$emit('update:value', val);
             }
         }
     },
     methods: {
-        cancel ()
-        {
-            this.$emit( 'cancel' );
+        cancel() {
+            this.$emit('cancel');
         },
-        deleteAll ()
-        {
-            this.$emit( 'deleteAll' );
+        deleteAll() {
+            this.$emit('deleteAll');
         },
-        exportAndDelete ()
-        {
-            const exportPromise = new Promise( ( resolve ) =>
-            {
-                this.$emit( 'exportAll' );
-                resolve( '1' );
-            } );
+        exportAndDelete() {
+            const exportPromise = new Promise((resolve) => {
+                this.$emit('exportAll');
+                resolve('1');
+            });
 
-            exportPromise.then( async () =>
-            {
+            exportPromise.then(async () => {
                 await this.deleteAll();
-            } ).catch( error =>
-            {
-                console.error( 'Export failed:', error );
-            } );
+            }).catch(error => {
+                console.error('Export failed:', error);
+            });
 
         },
     }
