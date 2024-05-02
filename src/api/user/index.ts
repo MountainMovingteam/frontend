@@ -3,6 +3,7 @@ import client from '../client';
 enum API {
 	USER_INFO = '/api/base/getInfo', //个人信息
 	USER_EDIT_INFO = '/api/base/editInfo',
+	User_EDIT_PASSWORD = '/api/base/modify/password',
 }
 const baseURL = 'http://47.93.19.22:8000';
 
@@ -25,6 +26,13 @@ export function modifyBaseInfo(data: FormData) {
 	let url = baseURL + API.USER_EDIT_INFO;
 	console.log(data);
 
+	const reponse = client.withAuth(client.POST, url, { data: data });
+	return reponse;
+}
+
+
+export function modifyPassword(data: any) {
+	let url = baseURL + API.User_EDIT_PASSWORD;
 	const reponse = client.withAuth(client.POST, url, { data: data });
 	return reponse;
 }
