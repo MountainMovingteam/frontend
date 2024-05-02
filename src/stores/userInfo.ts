@@ -13,7 +13,7 @@ export const useUserInfo = defineStore('userInfo', {
 		userInfos: {
 			userName: '',
 			photo: '',
-			time: 0,
+			logintime: 0,
 			roles: [],
 			authBtnList: [],
 		},
@@ -38,18 +38,20 @@ export const useUserInfo = defineStore('userInfo', {
 							let adminAuthBtnList: Array<string> = ['btn.add', 'btn.del', 'btn.edit', 'btn.link'];
 							let testRoles: Array<string> = ['user'];
 							let testAuthBtnList: Array<string> = ['btn.add', 'btn.link'];
+							const logintime = getLoginTime();
 							if (Local.get('role') == 1) {
-								// 默认都是管理员
 								defaultRoles = adminRoles;
 								defaultAuthBtnList = adminAuthBtnList;
 							} else {
 								defaultRoles = testRoles;
 								defaultAuthBtnList = testAuthBtnList;
 							}
+							console.log(logintime);
+							
 							const userInfos = {
 								username: result.data.username,
 								photo: result.data.avatar,
-								time: new Date().getTime(),
+								logintime: logintime,
 								roles: defaultRoles,
 								email: result.data.email,
 								authBtnList: defaultAuthBtnList,
