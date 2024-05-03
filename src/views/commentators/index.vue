@@ -58,7 +58,7 @@ import AddDialog from "/@/components/4commentator/addDialog.vue";
 import Upload from "/@/components/4commentator/uploadDialog.vue";
 
 import download from "/@/utils/exportXLSX";
-import { timeIndex2Info, select2PostData, getData2Show } from "/@/utils/transform";
+import { select2PostData, getData2Show } from "/@/utils/transform";
 import { Commentator, ExportData } from '/@/types/commentator';
 import { myPOST, myGET } from '/@/api/commentator/index'
 
@@ -198,9 +198,9 @@ export default {
                 } else {
                     // 处理未获取到数据的情况
                     ElMessage.error('获取数据失败');
+                    ElMessage.error('获取数据失败');
                 }
             }).catch(error => {
-                // 处理请求失败的情况
                 ElMessage.error('获取数据失败');
             });
         },
