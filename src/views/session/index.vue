@@ -291,19 +291,6 @@ const shTable1 = reactive<TableState>(<TableState>{
 const selectedRow = ref(0);
 const selectedColumn = ref(0);
 const events = ['8:00-9:30', '10:00-11:30', '14:00-15:30', '16:00-17:30'];
-const data = {
-  "week_num": 0,
-  "place_details": [
-    {
-      "time_index": 0,
-      "capacity": 0,
-      "enrolled": 0,
-      "lecturer": "讲师A",
-      "type": 0
-    },
-    // ... 其他数据项
-  ]
-};
 
 function selectLocation(location: string) {
   selectedLocation.value = location;
