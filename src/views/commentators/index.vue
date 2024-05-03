@@ -6,7 +6,7 @@
                     <!-- 搜索框 -->
                     <el-cascader v-model="select" :options="options" :props="props" collapse-tags collapse-tags-tooltip
                         clearable style="width: 40%;" />
-                    <el-input v-model="input" style="max-width: 600px" placeholder="Please input" class="input-with-select">
+                    <el-input v-model="input" style="max-width: 600px" placeholder="请输入" class="input-with-select">
                         <template #append>
                             <el-button @click="mySearch()">
                                 <el-icon>
@@ -19,9 +19,9 @@
                 <!-- 功能按钮 -->
                 <div style="width: 10%;"></div>
                 <div>
-                    <el-button type="red" class="hover-lighten" @click="this.deleteDialogVisible = true">清空讲解员</el-button>
+                    <el-button type="red" class="hover-lighten" @click="deleteDialogVisible = true">清空讲解员</el-button>
                     <el-button type="success" class="hover-lighten" @click="exportAll()">导出讲解员 </el-button>
-                    <el-button type="info" class="hover-lighten" @click="this.uploadDialogVisible = true">导入讲解员 </el-button>
+                    <el-button type="info" class="hover-lighten" @click="uploadDialogVisible = true">导入讲解员 </el-button>
                 </div>
             </el-header>
             <el-main>
@@ -30,7 +30,8 @@
                     <el-row v-for="(commentators, index) in filteredCommentators" :gutter="20" :key="index">
                         <el-col v-for="(commentator, index) in commentators" :key="index" :span="8">
                             <CommentatorCard :name="commentator.name" :num="commentator.num" :tag="commentator.tag"
-                                :weekday="commentator.weekday" :session="commentator.session" />
+                                :weekday="commentator.weekday" :session="commentator.session" :campus="commentator.campus"
+                                @getCommentators="getCommentators" />
                         </el-col>
                     </el-row>
                 </div>
@@ -50,31 +51,27 @@
     </div>
 </template>
 
-<script>
-import CommentatorCard from "./commentatorCard.vue";
-import DeleteDialog from "./deleteDialog.vue";
-import AddDialog from "./addDialog.vue";
-import Upload from "./upload.vue";
-import download from "./exportXLSX.js";
+<script lang="ts">
+import CommentatorCard from "/@/components/4commentator/commentatorCard.vue";
+import DeleteDialog from "/@/components/4commentator/deleteDialog.vue";
+import AddDialog from "/@/components/4commentator/addDialog.vue";
+import Upload from "/@/components/4commentator/uploadDialog.vue";
+
+import download from "/@/utils/exportXLSX";
+import { timeIndex2Info, select2PostData } from "/@/utils/timeIndex";
+import { Commentator, ExportData } from '/@/types/commentator';
+
 import { Search } from '@element-plus/icons-vue'
-import { ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import axios from 'axios'
+import { ElMessage } from 'element-plus'
+import { myPOST, myGET } from '/@/api/commentator/index'
+
 export default {
-    data ()
-    {
+    data() {
         return {
-            commentators: [
-                {
-                    "name": '李四',
-                    "num": 114514,
-                    "tag": "熟练",
-                    "weekday": "周一",
-                    "session": "8:00 ~ 9:30"
-                },
-            ],
+            commentators: [] as Array<Commentator>,
+            exportData: [] as Array<ExportData>,
             select: [],
-            input: ref( '' ),
+            input: '',
             deleteDialogVisible: false,
             uploadDialogVisible: false,
             options: [
@@ -83,11 +80,11 @@ export default {
                     label: "熟练度",
                     children: [
                         {
-                            value: "入门",
+                            value: 11,
                             label: "入门"
                         },
                         {
-                            value: "熟练",
+                            value: 12,
                             label: "熟练"
                         },
                     ]
@@ -97,23 +94,23 @@ export default {
                     label: "工作日",
                     children: [
                         {
-                            value: "周一",
+                            value: 21,
                             label: "周一"
                         },
                         {
-                            value: "周二",
+                            value: 22,
                             label: "周二"
                         },
                         {
-                            value: "周三",
+                            value: 23,
                             label: "周三"
                         },
                         {
-                            value: "周四",
+                            value: 24,
                             label: "周四"
                         },
                         {
-                            value: "周五",
+                            value: 25,
                             label: "周五"
                         },
                     ]
@@ -124,19 +121,19 @@ export default {
                     label: "场次",
                     children: [
                         {
-                            value: "8:00 ~ 9:30",
+                            value: 31,
                             label: "8:00 ~ 9:30"
                         },
                         {
-                            value: "10:00 ~ 11:30",
+                            value: 32,
                             label: "10:00 ~ 11:30"
                         },
                         {
-                            value: "14:00 ~ 15:30",
+                            value: 33,
                             label: "14:00 ~ 15:30"
                         },
                         {
-                            value: "16:00 ~ 17:30",
+                            value: 34,
                             label: "16:00 ~ 17:30"
                         },
                     ]
@@ -145,8 +142,7 @@ export default {
             props: { multiple: true }
         }
     },
-    mounted ()
-    {
+    mounted() {
         this.getCommentators();
     },
     components: {
@@ -157,135 +153,132 @@ export default {
         Search,
     },
     computed: {
-        filteredCommentators ()
-        {
-            let bufCommentators = [];
-            for ( let i = 0; i < this.commentators.length; i += 3 )
-            {
-                bufCommentators.push( this.commentators.slice( i, i + 3 ) )
+        filteredCommentators() {
+            let buf: Array<any> = [];
+            let bufCommentators: Array<Array<any>> = [];
+            for (let i = 0; i < this.commentators.length; i++) {
+                buf.push({
+                    ...this.commentators[i],
+                    tag: this.commentators[i].tag == 2 ? '熟练' : '入门',
+                    ...timeIndex2Info(this.commentators[i].time_index)
+                });
+            }
+            this.exportData = buf;
+            for (let i = 0; i < buf.length; i += 3) {
+                bufCommentators.push(buf.slice(i, i + 3))
             }
             return bufCommentators;
         },
     },
     methods: {
-        getCommentators ()
-        {
-            axios.get( '/api/manager/lecturer' ).then( response =>
-            {
-                if ( response.status === 200 )
-                {
+        getCommentators() {
+            myGET('/api/manage/lecturer', {}).then(response => {
+                if (response.status === 200) {
                     this.commentators = response.data.list;
-                } else
-                {
+                } else {
                     // 处理未获取到数据的情况
-                    ElMessage.error( '获取数据失败' );
+                    ElMessage.error('获取数据失败');
                 }
-            } ).catch( error =>
-            {
+            }).catch(error => {
                 // 处理请求失败的情况
-                ElMessage.error( '获取数据失败' );
-            } );
+                ElMessage.error('获取数据失败');
+            });
         },
 
 
-        mySearch ()
-        {
-            //     console.log( this.select )
+        mySearch() {
+            //console.log(this.select)
             //     console.log( this.input )
-            axios.post( '/api/manager/lecturer/find', {
-                "tags": this.select,
+            const postData = select2PostData(this.select)
+            console.log(postData)
+            myPOST('/api/manage/lecturer/find', {
+                "tags": postData,
                 "content": this.input
-            } ).then( response =>
-            {
-                if ( response.status === 200 )
-                {
+            }).then(response => {
+                if (response.status === 200) {
                     this.commentators = response.data.list;
                     this.select = []
-                    this.input = ref( '' )
-                } else
-                {
+                    this.input = ''
+                    this.filteredCommentators
+                } else {
                     // 处理未获取到数据的情况
-                    ElMessage.error( '获取数据失败' );
+                    ElMessage.error('获取数据失败');
                 }
-            } ).catch( error =>
-            {
+            }).catch(error => {
                 // 处理请求失败的情况
-                ElMessage.error( '获取数据失败' );
-            } );
+                ElMessage.error('获取数据失败');
+            });
         },
 
         // 清空按钮所需函数
-        deleteAll ()
-        {
-            axios.delete( 'api/manage/lecturerAll' ).then( response =>
-            {
-                if ( response.status === 200 )
-                {
+        deleteAll() {
+            myPOST('/api/manage/lecturerAll', {}).then(response => {
+                if (response.status === 200) {
                     this.commentators = [];
-                    ElMessage( {
+                    ElMessage({
                         type: 'success',
                         message: '删除成功'
-                    } );
-                } else
-                {
+                    });
+                } else {
                     // 处理未获取到数据的情况
-                    ElMessage.error( '删除失败' );
+                    ElMessage.error('删除失败');
                 }
-            } ).catch( error =>
-            {
+            }).catch(error => {
                 // 处理请求失败的情况
-                ElMessage.error( '删除失败' );
-            } );
+                ElMessage.error('删除失败');
+            });
             this.deleteDialogVisible = false;
             //this.filteredCommentators;
             //console.log( this.deleteDialogVisible )
         },
-        cancelDelete ()
-        {
+        cancelDelete() {
             // 用户点击直接清空按钮后的操作
             this.deleteDialogVisible = false;
-            ElMessage( {
+            ElMessage({
                 type: 'info',
                 message: '已取消操作'
-            } );
+            });
 
         },
 
         //上传按钮所需函数
-        cancelUpload ()
-        {
+        cancelUpload() {
             this.uploadDialogVisible = false;
-            ElMessage( {
+            ElMessage({
                 type: 'info',
                 message: '已取消操作'
-            } );
+            });
         },
 
 
-        async exportAll ()
-        {
-            //console.log( this.commentators )
-            const buf = JSON.parse( JSON.stringify( this.commentators ) );
-            try
-            {
+        async exportAll() {
+            try {
+                let buf = JSON.parse(JSON.stringify(this.exportData));
+                let json: Array<ExportData> = buf.map((item: ExportData) => {
+                    return {
+                        '姓名': item.name,
+                        '学号': item.num,
+                        '熟练度': item.tag,
+                        '校区': item.campus,
+                        '工作日': item.weekday,
+                        '场次': item.session,
+                    }
+                });
+
                 // 模拟异步下载操作
-                const downloadPromise = new Promise( ( resolve, reject ) =>
-                {
-                    download( buf, '讲解员.xlsx', () =>
-                    {
-                        resolve();
-                    } );
-                } );
+                const downloadPromise = new Promise((resolve, reject) => {
+                    download(json, '讲解员.xlsx');
+                });
 
                 await downloadPromise; // 等待下载完成
 
                 return Promise.resolve();
-            } catch ( error )
-            {
-                console.error( 'Export failed:', error );
-                return Promise.reject( error );
+            } catch (error) {
+                console.error('Export failed:', error);
+                return Promise.reject(error);
             }
         }
+
 
     }
 }

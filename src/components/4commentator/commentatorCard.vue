@@ -13,6 +13,7 @@
         </div>
 
         <div class="text">学号：{{ localNum }}</div>
+        <div class="text">校区：{{ localCampus }}</div>
         <div class="text">工作日：{{ localWeekday }}</div>
         <div class="text">场次：{{ localSession }}</div>
         <div class="buttonContainer">
@@ -33,17 +34,24 @@
                 <el-input v-model="form.num" />
             </el-form-item>
             <el-form-item label="熟练度" prop="tag" :rules="[{ required: true, message: '请选择熟练度', trigger: 'change' }]">
-                <el-select v-model="form.tag">
-                    <el-option label="入门" value="入门" />
-                    <el-option label="熟练" value="熟练" />
-                </el-select>
+                <el-radio-group v-model="form.tag">
+                    <el-radio value="入门">入门</el-radio>
+                    <el-radio value="熟练">熟练</el-radio>
+                </el-radio-group>
             </el-form-item>
-            <el-form-item label="工作日" prop="tag" :rules="[{ required: true, message: '请选择工作日', trigger: 'change' }]">
+            <el-form-item label="校区" prop="campus" :rules="[{ required: true, message: '请选择校区', trigger: 'change' }]">
+                <el-radio-group v-model="form.campus">
+                    <el-radio value="学院路">学院路</el-radio>
+                    <el-radio value="沙河">沙河</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="工作日" prop="weekday" :rules="[{ required: true, message: '请选择工作日', trigger: 'change' }]">
                 <el-select v-model="form.weekday">
                     <el-option label="周一" value="周一" />
                     <el-option label="周二" value="周二" />
                     <el-option label="周三" value="周三" />
                     <el-option label="周四" value="周四" />
+                    <el-option label="周五" value="周五" />
                 </el-select>
             </el-form-item>
             <el-form-item label="场次" prop="session" :rules="[{ required: true, message: '请选择场次', trigger: 'change' }]">
@@ -67,10 +75,12 @@
 </template>
 
 <script lang="ts">
-import axios from 'axios'
 import { Delete, Avatar } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus';
 import { reactive } from 'vue'
+import { info2TimeIndex } from '/@/utils/timeIndex'
+import { myPOST } from '/@/api/commentator/index'
+
 export default {
     data() {
         return {
@@ -80,6 +90,7 @@ export default {
             localTag: this.tag,
             localWeekday: this.weekday,
             localSession: this.session,
+            localCampus: this.campus,
             form: reactive({
                 //将初始值设置为props中的数值
                 name: this.name,
@@ -87,12 +98,14 @@ export default {
                 tag: this.tag,
                 weekday: this.weekday,
                 session: this.session,
+                campus: this.campus,
             })
         }
     },
     computed: {
         isFormValid() {
-            return this.form.name && this.form.num && this.form.tag && this.form.weekday && this.form.session;
+            return this.form.name && this.form.num && this.form.tag
+                && this.form.weekday && this.form.session && this.form.campus;
         }
     },
     components: {
@@ -101,7 +114,7 @@ export default {
     },
     methods: {
         myDelete() {
-            axios.post('api/manage/lecturer/delete', {
+            myPOST('/api/manage/lecturer/delete', {
                 num: this.localNum,
             })
                 .then(res => {
@@ -117,13 +130,12 @@ export default {
                 })
         },
         fixData() {
-            axios.post('api/manage/lecturer/update', {
+            myPOST('/api/manage/lecturer/edit', {
                 "old_num": this.localNum,
                 "name": this.form.name,
                 "num": this.form.num,
                 "tag": this.form.tag == "入门" ? 1 : 2,
-                "weekday": this.form.weekday,
-                "session": this.form.session
+                "time_index": info2TimeIndex(this.form)
             })
                 .then(res => {
                     if (res.status == 200) {
@@ -133,6 +145,7 @@ export default {
                         this.localTag = this.form.tag
                         this.localWeekday = this.form.weekday
                         this.localSession = this.form.session
+                        this.localCampus = this.form.campus
                     } else {
                         ElMessage.error("更新失败");
                     }
@@ -143,7 +156,7 @@ export default {
             this.dialogVisible = false
         },
     },
-    props: ["name", "num", "tag", "weekday", "session"]
+    props: ["name", "num", "tag", "weekday", "session", "campus"]
 }
 </script>
 

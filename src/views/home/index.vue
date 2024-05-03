@@ -1,7 +1,7 @@
 <template>
 	<div class="home-container layout-pd">
 		<el-row :gutter="15" class="home-card-three mb15" >
-			<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
+			<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" v-if='isCollapse'>
 				<div 
 					:xs="24"
 					:sm="12"
@@ -9,14 +9,14 @@
 					:lg="12"
 					:xl="12"
 				>
-					<div class="el-hide-xs-only home-card-item " style=';height: 325px; margin-top: auto' v-if='isCollapse'>
+					<div class="home-card-change-item " style='margin-top: auto' >
 						<el-carousel :interval="5000" arrow="always">
 							<el-carousel-item v-for="item in 4" :key="item">
 							<h3 text="2xl" justify="center">{{ item }}</h3>
 							</el-carousel-item>
 						</el-carousel>
 					</div>
-					<div class="home-card-item" style='height: 325px;margin-top: 0px;'>
+					<div class="home-card-change-item" style='margin-top: 0px;'>
 						<img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" style="height: 100%;width:100%"/>
 					</div>
 				</div>
@@ -30,6 +30,11 @@
 			>
 			<div class='home-card-item' >
 				<ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto">
+					<el-carousel :interval="5000" arrow="always" v-if='!isCollapse'>
+							<el-carousel-item v-for="item in 4" :key="item" >
+							<h3 text="2xl" justify="center">{{ item }}</h3>
+							</el-carousel-item>
+						</el-carousel>
 					<li v-for="i in count" :key="i" class="infinite-list-item">
 						<div class="left-content">
 							<div class="text-line-title">Title {{ i }}</div>
@@ -229,10 +234,61 @@ $homeNavLengh: 8;
 				background-color: #d3dce6;
 				}
 		}
+
+		.home-card-change-item {
+			width: 100%;
+			@media only screen and (max-width: 768px) {height:350px;};
+			@media only screen and (min-width: 768px) {height:325px;};
+			border-radius: 4px;
+			transition: all ease 0.3s;
+			padding: 20px;
+			overflow: hidden;
+			background: var(--el-color-white);
+			color: var(--el-text-color-primary);
+			border: 1px solid var(--next-border-color-light);
+			&:hover {
+				box-shadow: 0 2px 12px var(--next-color-dark-hover);
+				transition: all ease 0.3s;
+			}
+			&-icon {
+				width: 70px;
+				height: 70px;
+				border-radius: 100%;
+				flex-shrink: 1;
+				i {
+					color: var(--el-text-color-placeholder);
+				}
+			}
+			&-title {
+				font-size: 15px;
+				font-weight: bold;
+				height: 30px;
+			}
+			.el-carousel__item h3 {
+				color: #475669;
+				opacity: 0.75;
+				line-height: 300px;
+				margin: 0;
+				text-align: center;
+				}
+
+				.el-carousel__item:nth-child(2n) {
+				background-color: #99a9bf;
+				}
+
+				.el-carousel__item:nth-child(2n + 1) {
+				background-color: #d3dce6;
+				}
+		}
 	}
 	.home-card-three {
 		.home-card-item {
-			height:650px;
+			@media only screen and (max-width: 768px) {
+				height:700px;
+			}
+			@media only screen and (min-width: 768px) {
+				height:650px;
+			}
 			width: 100%;
 			overflow: hidden;
 			.home-monitor {

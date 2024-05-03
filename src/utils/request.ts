@@ -5,7 +5,7 @@ import qs from 'qs';
 
 // 配置新建一个 axios 实例
 const service: AxiosInstance = axios.create({
-	baseURL: import.meta.env.VITE_API_URL,
+	baseURL: 'http://47.93.19.22:8000',
 	//baseURL: ,
 	timeout: 50000,
 	headers: { 'Content-Type': 'application/json' },

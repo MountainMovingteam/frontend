@@ -1,7 +1,7 @@
 <template>
 	<el-form size="large" class="login-content-form">
 		<el-form-item class="login-animation1">
-			<el-input text :placeholder="$t('message.account.accountPlaceholder1')" v-model="state.ruleForm.userName" clearable autocomplete="off">
+			<el-input text :placeholder="$t('message.account.accountPlaceholder1')" v-model="state.ruleForm.id" clearable autocomplete="off">
 				<template #prefix>
 					<el-icon class="el-input__icon"><ele-User /></el-icon>
 				</template>
@@ -27,26 +27,6 @@
 				</template>
 			</el-input>
 		</el-form-item>
-		<el-form-item class="login-animation3">
-			<el-col :span="15">
-				<el-input
-					text
-					maxlength="4"
-					:placeholder="$t('message.account.accountPlaceholder3')"
-					v-model="state.ruleForm.code"
-					clearable
-					autocomplete="off"
-				>
-					<template #prefix>
-						<el-icon class="el-input__icon"><ele-Position /></el-icon>
-					</template>
-				</el-input>
-			</el-col>
-			<el-col :span="1"></el-col>
-			<el-col :span="8">
-				<el-button class="login-content-code" v-waves>1234</el-button>
-			</el-col>
-		</el-form-item>
 		<el-form-item class="login-animation4">
 			<el-button type="primary" class="login-content-submit" round v-waves @click="onSignIn" :loading="state.loading.signIn">
 				<span>{{ $t('message.account.accountBtnText') }}</span>
@@ -65,9 +45,10 @@ import { storeToRefs } from 'pinia';
 import { useThemeConfig } from '/@/stores/themeConfig';
 import { initFrontEndControlRoutes } from '/@/router/frontEnd';
 import { initBackEndControlRoutes } from '/@/router/backEnd';
-import { Session } from '/@/utils/storage';
+import { Session,Local } from '/@/utils/storage';
 import { formatAxis } from '/@/utils/formatTime';
 import { NextLoading } from '/@/utils/loading';
+import { useLoginApi } from '/@/api/login';
 
 // 定义变量内容
 const { t } = useI18n();
@@ -78,9 +59,8 @@ const router = useRouter();
 const state = reactive({
 	isShowPassword: false,
 	ruleForm: {
-		userName: 'admin',
-		password: '123456',
-		code: '1234',
+		id: '70',
+		password: '1234',
 	},
 	loading: {
 		signIn: false,
@@ -95,22 +75,32 @@ const currentTime = computed(() => {
 const onSignIn = async () => {
 	state.loading.signIn = true;
 	// 存储 token 到浏览器缓存
-	Session.set('token', Math.random().toString(36).substr(0));
+	//Session.set('token', Math.random().toString(36).substr(0));
 	// 模拟数据，对接接口时，记得删除多余代码及对应依赖的引入。用于 `/src/stores/userInfo.ts` 中不同用户登录判断（模拟数据）
-	Cookies.set('userName', state.ruleForm.userName);
-
-	//调用登录
-	if (!themeConfig.value.isRequestRoutes) {
-		// 前端控制路由，2、请注意执行顺序
+	//Cookies.set('userName', state.ruleForm.userName);
+	try {
+    // Call the signIn method from the useLoginApi function
+		const response = await useLoginApi().signIn(state.ruleForm);
+		Session.set('token', response.token)
+		Local.set('access',response.token) //access 本地持久化存储
+		Session.set('role',response.role)
+		Local.set('role',response.role)
+		console.log(Local.get('access'))
 		const isNoPower = await initFrontEndControlRoutes();
+		console.log(isNoPower);
 		signInSuccess(isNoPower);
-	} else {
-		const isNoPower = await initBackEndControlRoutes();
-		signInSuccess(isNoPower);
+	} catch (error) {
+		console.error('Error signing in:', error);
+		ElMessage.error('用户名或密码错误')
+		// Handle the error as needed, e.g., show an error message to the user
+	} finally {
+		state.loading.signIn = false;
 	}
 };
 // 登录成功后的跳转
 const signInSuccess = (isNoPower: boolean | undefined) => {
+	console.log(isNoPower);
+	
 	if (isNoPower) {
 		ElMessage.warning('抱歉，您没有登录权限');
 		Session.clear();
@@ -125,7 +115,7 @@ const signInSuccess = (isNoPower: boolean | undefined) => {
 				query: Object.keys(<string>route.query?.params).length > 0 ? JSON.parse(<string>route.query?.params) : '',
 			});
 		} else {
-			router.push('/');
+			router.push('/home');
 		}
 		// 登录成功提示
 		const signInText = t('message.signInText');
