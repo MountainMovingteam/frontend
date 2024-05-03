@@ -82,7 +82,9 @@
 <script setup lang="ts">
 import {defineAsyncComponent, onMounted, reactive, ref} from "vue";
 import '/@/types/session.d.ts'
+import {getPlaceDetails} from "/@/api/session/index.ts";
 import {ElMessage} from "element-plus";
+import assert from "assert";
 
 const selectedTime = ref(0);
 
@@ -290,6 +292,19 @@ const shTable1 = reactive<TableState>(<TableState>{
 });
 const selectedRow = ref(0);
 const selectedColumn = ref(0);
+const state = reactive<any>({
+  place_details: [
+    {
+      week_num: 0,
+      time_index: 0,
+      capacity: 0,
+      enrolled: 0,
+      lecturer: [
+        "string"
+      ],
+      type: 0
+    }
+  ]});
 const events = ['8:00-9:30', '10:00-11:30', '14:00-15:30', '16:00-17:30'];
 
 function selectLocation(location: string) {
@@ -305,6 +320,22 @@ const getTableData = () => {
   shTable0.tableData.config.loading = true;
   xyTable1.tableData.config.loading = true;
   shTable1.tableData.config.loading = true;
+  const response = getPlaceDetails();
+  let colors = [];
+  colors.push(null);
+  response.then(response => {
+    const data = response.data;
+    console.log(data);
+    state.place_details = data.place_details;
+  });
+  for (let i = 1; i < state.place_details.length; i++) {
+    const place_detail = state.place_details[i];
+    if (place_detail.enrolled > 0) {
+      colors[i] = "#f54545";
+    } else {
+      colors[i] = "#99FF99";
+    }
+  }
   for (let i = 0; i < 4; i++) {
     xyTable0.tableData.data.push({
       event: `第${i + 1}场 ${events[i]}`,
@@ -350,63 +381,6 @@ const getTableData = () => {
       day7: "#99FF99",
     });
   }
-
-  //修改后data有了更多元素
-  // for (let i = 0; i < 4; i++) {
-  //   const xycellTime0: CellDataType = ({
-  //     text: `第${i + 1}场 ${events[i]}`,
-  //     color: 'white'
-  //   })
-  //   xyTable0.tableData.data.push(xycellTime0);
-  //   const xycellData0: CellDataType[] = Array.from({length: 7}, (_, index) => ({
-  //     text: `1`, // 根据日期生成不同的文本
-  //     color: index % 2 === 0 ? 'yellow' : 'white' // 根据某种逻辑设置颜色，这里简单地交替颜色
-  //   }));
-  //   for (i = 0; i < 7; i++) {
-  //     xyTable0.tableData.data.push(xycellData0[i]);
-  //   }
-  //
-  //   const xycellTime1: CellDataType = ({
-  //     text: `第${i + 1}场 ${events[i]}`,
-  //     color: 'white'
-  //   })
-  //   xyTable1.tableData.data.push(xycellTime1);
-  //   const xycellData1: CellDataType[] = Array.from({length: 7}, (_, index) => ({
-  //     text: `1`, // 根据日期生成不同的文本
-  //     color: index % 2 === 0 ? 'yellow' : 'white' // 根据某种逻辑设置颜色，这里简单地交替颜色
-  //   }));
-  //   for (i = 0; i < 7; i++) {
-  //     xyTable1.tableData.data.push(xycellData1[i]);
-  //   }
-  //
-  //   const shcellTime0: CellDataType = ({
-  //     text: `第${i + 1}场 ${events[i]}`,
-  //     color: 'white'
-  //   })
-  //   shTable0.tableData.data.push(shcellTime0);
-  //   const shcellData0: CellDataType[] = Array.from({length: 7}, (_, index) => ({
-  //     text: `第${i + 1}场 ${events[i]}`, // 根据日期生成不同的文本
-  //     color: index % 2 === 0 ? 'yellow' : 'white' // 根据某种逻辑设置颜色，这里简单地交替颜色
-  //   }));
-  //   for (i = 0; i < 7; i++) {
-  //     shTable0.tableData.data.push(shcellData0[i]);
-  //   }
-  //
-  //   const shcellTime1: CellDataType = ({
-  //     text: `第${i + 1}场 ${events[i]}`,
-  //     color: 'white'
-  //   })
-  //   shTable1.tableData.data.push(shcellTime1);
-  //   const shcellData1: CellDataType[] = Array.from({length: 7}, (_, index) => ({
-  //     text: `第${i + 1}场 ${events[i]}`, // 根据日期生成不同的文本
-  //     color: index % 2 === 0 ? 'yellow' : 'white' // 根据某种逻辑设置颜色，这里简单地交替颜色
-  //   }));
-  //   for (i = 0; i < 7; i++) {
-  //     shTable1.tableData.data.push(shcellData1[i]);
-  //   }
-  // }
-
-
   xyTable0.tableData.config.total = xyTable0.tableData.data.length;
   shTable0.tableData.config.total = shTable0.tableData.data.length;
   xyTable1.tableData.config.total = xyTable1.tableData.data.length;
