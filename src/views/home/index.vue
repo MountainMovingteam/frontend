@@ -11,8 +11,8 @@
 				>
 					<div class="home-card-change-item " style='margin-top: auto' >
 						<el-carousel :interval="5000" arrow="always">
-							<el-carousel-item v-for="item in 4" :key="item">
-							<h3 text="2xl" justify="center">{{ item }}</h3>
+							<el-carousel-item v-for="(src, index) in pictureArray" :key="index">
+								<img :src="src" style="height: 100%;width:100%"/>
 							</el-carousel-item>
 						</el-carousel>
 					</div>
@@ -29,15 +29,15 @@
 				:xl="12"
 			>
 			<div class='home-card-item' >
-				<ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto">
+				<ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto" >
 					<el-carousel :interval="5000" arrow="always" v-if='!isCollapse'>
 							<el-carousel-item v-for="item in 4" :key="item" >
 							<h3 text="2xl" justify="center">{{ item }}</h3>
 							</el-carousel-item>
 						</el-carousel>
-					<li v-for="i in count" :key="i" class="infinite-list-item">
+					<li v-for="(item, index) in infoArray" :key="index" class="infinite-list-item">
 						<div class="left-content">
-							<div class="text-line-title">Title {{ i }}</div>
+							<div class="text-line-title">Title {{ index }}</div>
 							<div class="text-line-content">Text Line 2</div>
 						</div>
 						<div class="right-content">
@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts" name="home">
-import { reactive, onMounted, ref, watch, nextTick, onActivated, markRaw } from 'vue';
+import { reactive, onMounted, ref, watch, nextTick, onActivated, markRaw,computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useThemeConfig } from '/@/stores/themeConfig';
 import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
@@ -64,14 +64,19 @@ const storesTagsViewRoutes = useTagsViewRoutes();
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
 const { isTagsViewCurrenFull } = storeToRefs(storesTagsViewRoutes);
+
 const count = ref(0)
+const loading = ref(false)
 const screenWidth = ref(window.innerWidth)
 const isCollapse = ref(screenWidth.value >= 768)
+
+const pictureArray = ref<string[]>([]); 
+const infoArray = ref<string[]>([]);
 const handleResize = () => {
   screenWidth.value = window.innerWidth
 }
 const load = () => {
-  count.value += 2
+  count.value += 1
 }
 const state = reactive({
 	global: {
@@ -104,8 +109,22 @@ const initEchartsResize = () => {
 	window.addEventListener('resize', initEchartsResizeFun);
 };
 // 页面加载时
+
+const getGraph = () => {
+	pictureArray.value.push('https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png');
+	pictureArray.value.push('https://pic3.zhimg.com/v2-0d6b112e85988cd334bdc19893b2de62_b.jpg');
+}
+
+const getInfo = ()  => {
+	for (let i = 1; i <= 30; i++) {
+		infoArray.value.push(`Element ${i}`);
+	}
+}
+
 onMounted(() => {
 	initEchartsResize();
+	getGraph();
+	getInfo();
 });
 // 由于页面缓存原因，keep-alive
 onActivated(() => {
@@ -135,6 +154,8 @@ watch(
 	}
 );
 
+
+
 watch(screenWidth, (newValue, oldValue) => {
   if (newValue < 768) {
     isCollapse.value = false
@@ -154,7 +175,8 @@ $homeNavLengh: 8;
 
 		.infinite-list {
 			overflow-y: hidden;
-			height: 650px;
+			@media only screen and (max-width: 768px) {height:650px;};
+			@media only screen and (min-width: 768px) {height:600px;};
 			width: 100%;
 			padding: 0;
 			margin: 0;
