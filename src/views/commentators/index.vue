@@ -58,22 +58,25 @@ import AddDialog from "/@/components/4commentator/addDialog.vue";
 import Upload from "/@/components/4commentator/uploadDialog.vue";
 
 import download from "/@/utils/exportXLSX";
-import { timeIndex2Info, select2PostData } from "/@/utils/timeIndex";
+import { select2PostData, getData2Show } from "/@/utils/transform";
 import { Commentator, ExportData } from '/@/types/commentator';
+import { myPOST, myGET } from '/@/api/commentator/index'
 
 import { Search } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { myPOST, myGET } from '/@/api/commentator/index'
+
+import { ref } from 'vue';
+
 
 export default {
     data() {
         return {
-            commentators: [] as Array<Commentator>,
-            exportData: [] as Array<ExportData>,
-            select: [],
-            input: '',
-            deleteDialogVisible: false,
-            uploadDialogVisible: false,
+            commentators: ref([] as Array<Commentator>),
+            exportData: ref([] as Array<ExportData>),
+            select: ref([]),
+            input: ref(''),
+            deleteDialogVisible: ref(false),
+            uploadDialogVisible: ref(false),
             options: [
                 {
                     value: 1,
@@ -154,16 +157,8 @@ export default {
     },
     computed: {
         filteredCommentators() {
-            let buf: Array<any> = [];
+            let buf: Array<any> = getData2Show(this.commentators);
             let bufCommentators: Array<Array<any>> = [];
-            for (let i = 0; i < this.commentators.length; i++) {
-                buf.push({
-                    ...this.commentators[i],
-                    tag: this.commentators[i].tag == 2 ? '熟练' : '入门',
-                    ...timeIndex2Info(this.commentators[i].time_index)
-                });
-            }
-            this.exportData = buf;
             for (let i = 0; i < buf.length; i += 3) {
                 bufCommentators.push(buf.slice(i, i + 3))
             }
@@ -188,24 +183,24 @@ export default {
 
         mySearch() {
             //console.log(this.select)
-            //     console.log( this.input )
-            const postData = select2PostData(this.select)
-            console.log(postData)
-            myPOST('/api/manage/lecturer/find', {
-                "tags": postData,
-                "content": this.input
-            }).then(response => {
+            //console.log( this.input )
+            let postData: { "tags": Number[], "content"?: string } = {
+                "tags": select2PostData(this.select),
+            }
+            if (this.input !== "") {
+                postData["content"] = this.input
+            }
+            myPOST('/api/manage/lecturer/find', postData).then(response => {
                 if (response.status === 200) {
-                    this.commentators = response.data.list;
+                    this.commentators = [...response.data.list]
                     this.select = []
                     this.input = ''
-                    this.filteredCommentators
                 } else {
                     // 处理未获取到数据的情况
                     ElMessage.error('获取数据失败');
+                    ElMessage.error('获取数据失败');
                 }
             }).catch(error => {
-                // 处理请求失败的情况
                 ElMessage.error('获取数据失败');
             });
         },
@@ -252,6 +247,17 @@ export default {
 
 
         async exportAll() {
+            await myGET('/api/manage/lecturer', {}).then(response => {
+                if (response.status === 200) {
+                    this.exportData = getData2Show(response.data.list);
+                } else {
+                    // 处理未获取到数据的情况
+                    ElMessage.error('获取数据失败');
+                }
+            }).catch(error => {
+                // 处理请求失败的情况
+                ElMessage.error('获取数据失败');
+            });
             try {
                 let buf = JSON.parse(JSON.stringify(this.exportData));
                 let json: Array<ExportData> = buf.map((item: ExportData) => {

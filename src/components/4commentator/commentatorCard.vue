@@ -78,7 +78,7 @@
 import { Delete, Avatar } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus';
 import { reactive } from 'vue'
-import { info2TimeIndex } from '/@/utils/timeIndex'
+import { info2TimeIndex } from '/@/utils/transform'
 import { myPOST } from '/@/api/commentator/index'
 
 export default {
@@ -134,7 +134,7 @@ export default {
                 "old_num": this.localNum,
                 "name": this.form.name,
                 "num": this.form.num,
-                "tag": this.form.tag == "入门" ? 1 : 2,
+                "tag": this.form.tag == "入门" ? 0 : 1,
                 "time_index": info2TimeIndex(this.form)
             })
                 .then(res => {

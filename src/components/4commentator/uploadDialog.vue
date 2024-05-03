@@ -32,7 +32,7 @@ export default {
     setup() {
         const uploadRef = ref<UploadInstance>()
         // 定义响应式变量 uploadFile
-        const uploadFile = ref<UploadRawFile[]>()
+        const uploadFile = ref<any[]>()
 
         const submitUploadAll = () => {
             if (uploadFile != undefined && uploadFile.value != undefined) {
@@ -40,14 +40,7 @@ export default {
                 // console.log("is click upload")
                 const formData = new FormData();
                 formData.append('file', uploadFile.value[0].raw);
-                // formData.forEach((value, key) => {
-                //     if (value instanceof File) {
-                //         console.log(`${key}: ${value.name} (${value.type})`);
-                //     } else {
-                //         console.log(`${key}: ${value}`);
-                //     }
-                // });
-                myFormDataPOST('api/manage/lecturer/upload', formData).then(response => {
+                myFormDataPOST('/api/manage/lecturer/upload', formData).then(response => {
                     if (response.status === 200) {
                         ElMessage({
                             message: '上传成功',

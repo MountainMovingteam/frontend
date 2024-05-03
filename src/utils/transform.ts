@@ -1,3 +1,5 @@
+import { Commentator, ExportData } from '/@/types/commentator';
+
 export function timeIndex2Info(num: number) {
 	let time_index = num;
 	let buf = {
@@ -36,4 +38,16 @@ export function select2PostData(select: any) {
 		postData.push(data[i][1]);
 	}
 	return postData;
+}
+
+export function getData2Show(commentators: Array<Commentator>) {
+	let buf: Array<ExportData> = [];
+	for (let i = 0; i < commentators.length; i++) {
+		buf.push({
+			...commentators[i],
+			tag: commentators[i].tag == 1 ? '熟练' : '入门',
+			...timeIndex2Info(commentators[i].time_index),
+		});
+	}
+	return buf;
 }
