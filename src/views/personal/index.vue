@@ -101,7 +101,7 @@
 									<el-input v-model="state.personalForm.phone" placeholder="请输入手机号" clearable></el-input>
 								</el-form-item>
 							</el-col>
-							<el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb20" :style="{ display: state.personalForm.academy === 0 ? 'none' : 'block' }">
+							<el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb20" v-if='state.personalForm.academy != 0'>
 								<el-form-item label="学院">
 									<el-input v-model="state.personalForm.academy" placeholder="请输入学院号" clearable></el-input>
 								</el-form-item>
@@ -225,18 +225,17 @@ import { formatAxis } from '/@/utils/formatTime';
 import { newsInfoList, recommendList } from './mock';
 import { storeToRefs } from 'pinia';
 import router from '/@/router';
-import {reqInfo,modifyBaseInfo,modifyPassword} from "/@/api/user/index";
+import {reqInfo,modifyBaseInfo,modifyPassword,reqAvatar} from "/@/api/user/index";
 import { useUserInfo } from '/@/stores/userInfo';
 import { Local, Session } from '/@/utils/storage';
 import { ElMessage } from 'element-plus';
-import { fa } from 'element-plus/es/locale';
 const message = ref(ElMessage);
 const stores = useUserInfo();
 const { userInfos } = storeToRefs(stores);
 const DialogRef = ref();
 const Dialog = defineAsyncComponent(() => import('/@/views/personal/dialog.vue'));
 const changeAvatar = () => {
-	DialogRef.value.openDialog(state.personalForm.avatar);
+	DialogRef.value.openDialog(state.personalForm.avatar,assemblyFormData());
 }
 
 // 定义变量内容
@@ -289,7 +288,7 @@ const getInfo = () => {
     state.personalForm.name = data.name;
     state.personalForm.email = data.email;
 	state.personalForm.phone = data.phone;
-	state.personalForm.academy = data.academy === null ? '无' : data.academys;
+	state.personalForm.academy = data.academy === null ? 0 : data.academys;
 	state.personalForm.logintime = Local.get('userInfo').logintime;
     if (Local.get('role') == 1) {
 		state.personalForm.role = '管理员'
@@ -299,22 +298,41 @@ const getInfo = () => {
 		state.roleIdent = '学号'
 	}
   })
+  const ava = reqAvatar();
+  ava.then(response => {
+	state.personalForm.avatar = "http://47.93.19.22:8000" + response.data.avatar_url
+	Local.remove('userInfo')
+	userInfos.value.photo = state.personalForm.avatar;
+	Local.set('userInfo',userInfos.value)
+	Session.remove('userInfo')
+	Session.set('userInfo',userInfos.value)
+  })
 }
 
-const changeInfo = () => {
+const assemblyFormData = () =>{
 	const formData = new FormData();
+	formData.append('id',"");
     formData.append('name',state.personalForm.name);
     formData.append('email',state.personalForm.email);
     formData.append('phone',state.personalForm.phone);
-    formData.append('academy',state.personalForm.academy.toString());
+	if (Local.get('role') == 0) {
+		formData.append('academy',state.personalForm.academy.toString());
+	} else {
+		formData.append('academy',"0");
+	}
+	return formData;
+}
+
+const changeInfo = () => {
+	const formData = assemblyFormData();
+    
     const response = modifyBaseInfo(formData);
+	console.log(formData);
+	
 	response.then(response => {
 		message.value.success('修改成功');
 		Local.remove('userInfo')
 		userInfos.value.name = state.personalForm.name;
-		userInfos.value.email = state.personalForm.email;
-		userInfos.value.phone = state.personalForm.phone;
-		userInfos.value.academy = state.personalForm.academy;
 		Local.set('userInfo',userInfos.value)
 		Session.remove('userInfo')
 		Session.set('userInfo',userInfos.value)
@@ -344,14 +362,6 @@ const onConfirmChange= () => {
 	const response = modifyPassword(data);
 	response.then(response => {
 		message.value.success('修改成功');
-		Local.remove('userInfo')
-		userInfos.value.name = state.personalForm.name;
-		userInfos.value.email = state.personalForm.email;
-		userInfos.value.phone = state.personalForm.phone;
-		userInfos.value.academy = state.personalForm.academy;
-		Local.set('userInfo',userInfos.value)
-		Session.remove('userInfo')
-		Session.set('userInfo',userInfos.value)
 		changePw.loading = false;
 		clearCpwInfo();
 	}).catch(error => {

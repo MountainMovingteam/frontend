@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import Cookies from 'js-cookie';
 import { Session, Local } from '/@/utils/storage';
-import { reqInfo } from '/@/api/user/index';
+import { reqInfo,reqAvatar } from '/@/api/user/index';
 import { log } from 'console';
 
 /**
@@ -46,19 +46,25 @@ export const useUserInfo = defineStore('userInfo', {
 								defaultRoles = testRoles;
 								defaultAuthBtnList = testAuthBtnList;
 							}
-							console.log(logintime);
-							
-							const userInfos = {
-								username: result.data.username,
-								photo: result.data.avatar,
+							let userInfos = {
+								userName: result.data.username,
+								photo: '',
 								logintime: logintime,
 								roles: defaultRoles,
 								email: result.data.email,
 								authBtnList: defaultAuthBtnList,
 							};
-							Session.set('userInfo', userInfos);
-							Local.set('userInfo', userInfos);
-							resolve(userInfos);
+							reqAvatar().then((avatar) => {
+								const ava = "http://47.93.19.22:8000" + avatar.data.avatar_url
+								userInfos.photo = ava;
+								console.log(userInfos);
+								Session.set('userInfo', userInfos);
+								Local.set('userInfo', userInfos);
+								resolve(userInfos);
+							}).catch((error) => {
+								console.error('发生错误：', error);
+								reject(error);
+							})
 						})
 						.catch((error) => {
 							console.error('发生错误：', error);
