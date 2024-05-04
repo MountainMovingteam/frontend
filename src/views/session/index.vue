@@ -44,7 +44,7 @@
             ref="tableRef"
             v-bind="xyTable0.tableData"
             class="booking-table-demo"
-            @cellClick = "onCellClick"
+            @cellClick="onCellClick"
         />
       </div>
       <div v-else-if="selectedLocation === 'shahe'&& selectedTime=== 0">
@@ -52,7 +52,7 @@
             ref="tableRef"
             v-bind="shTable0.tableData"
             class="booking-table-demo"
-            @cellClick = "onCellClick"
+            @cellClick="onCellClick"
         />
       </div>
       <div v-else-if="selectedLocation === 'xueyuan'&& selectedTime === 1">
@@ -60,7 +60,7 @@
             ref="tableRef"
             v-bind="xyTable1.tableData"
             class="booking-table-demo"
-            @cellClick = "onCellClick"
+            @cellClick="onCellClick"
         />
       </div>
       <div v-else-if="selectedLocation === 'shahe'&& selectedTime === 1">
@@ -68,7 +68,7 @@
             ref="tableRef"
             v-bind="shTable1.tableData"
             class="booking-table-demo"
-            @cellClick = "onCellClick"
+            @cellClick="onCellClick"
         />
       </div>
     </div>
@@ -82,9 +82,9 @@
 <script setup lang="ts">
 import {defineAsyncComponent, onMounted, reactive, ref} from "vue";
 import '/@/types/session.d.ts'
-import {getPlaceDetails} from "/@/api/session/index.ts";
+import {getPlaceDetails} from "/@/api/session";
+import {getCommentators} from "/@/api/session";
 import {ElMessage} from "element-plus";
-import assert from "assert";
 
 const selectedTime = ref(0);
 
@@ -305,7 +305,21 @@ const state = reactive<any>({
       ],
       type: 0
     }
-  ]});
+  ]
+});
+
+const commentatorState = reactive<any>({
+  list: [
+    {
+      num: "string",
+      name: "string",
+      tag: 0,
+      time_index: [
+        0
+      ]
+    }
+  ]
+});
 const events = ['8:00-9:30', '10:00-11:30', '14:00-15:30', '16:00-17:30'];
 
 function selectLocation(location: string) {
@@ -322,31 +336,42 @@ const getTableData = () => {
   xyTable1.tableData.config.loading = true;
   shTable1.tableData.config.loading = true;
   const response = getPlaceDetails();
+  const commentatorRes = getCommentators();
   let colors = [];
-  colors.push(null);
+  let texts = [];
   response.then(response => {
     const data = response.data;
     console.log(data);
     state.place_details = data.place_details;
   });
-  for (let i = 1; i < state.place_details.length; i++) {
+  commentatorRes.then(commentatorRes => {
+    const data = commentatorRes.data;
+    console.log(data);
+    commentatorState.list = data.list;
+  });
+  for (let i = 0; i < state.place_details.length; i++) {
     const place_detail = state.place_details[i];
     if (place_detail.enrolled > 0) {
-      colors[i] = "#f54545";
+      colors[i] = "#ffff00";
     } else {
-      colors[i] = "#99FF99";
+      colors[i] = "#ffffff";
     }
+  }
+  for (let i = 0; i < commentatorState.list.length; i++) {
+    const time=commentatorState.list[i].num;
+    //texts[time] =texts[time]+ commentatorState.list[i].name;
+    texts[0]=commentatorState.list.length;
   }
   for (let i = 0; i < 4; i++) {
     xyTable0.tableData.data.push({
       event: `第${i + 1}场 ${events[i]}`,
-      day1: {text:"wangda",color:"#ffffff"}, // 使用颜色名称
-      day2: {text:"qianer",color:"#ffff00"}, // 使用十六进制颜色码
-      day3: {text:"zhangsan",color:"#ffffff"}, // 使用 RGB 颜色值
-      day4: {text:"lisi",color:"#ffff00"},
-      day5: {text:"wangwu",color:"#ffffff"},
-      day6: {text:"dingliu",color:"#ffffff"},
-      day7: {text:"heqi",color:"#ffff00"},
+      day1: {text: texts[i], color: colors[i]}, // 使用颜色名称
+      day2: {text: texts[i + 4], color: colors[i + 4]}, // 使用十六进制颜色码
+      day3: {text: texts[i + 8], color: colors[i + 8]}, // 使用 RGB 颜色值
+      day4: {text: texts[i + 12], color: colors[i + 12]},
+      day5: {text: texts[i + 16], color: colors[i + 16]},
+      day6: {text: texts[i + 20], color: colors[i + 20]},
+      day7: {text: texts[i + 24], color: colors[i + 24]},
     });
 
     shTable0.tableData.data.push({
@@ -436,7 +461,8 @@ const onOpenSubmit = (type: string) => {
 onMounted(() => {
   getScreenSize();
   getTableData();
-
+  getCommentators();
+  getPlaceDetails();
 });
 </script>
 

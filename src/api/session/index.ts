@@ -6,3 +6,10 @@ export function getPlaceDetails() {
     let url = baseURL + '/api/manage/search'
     return client.withAuth(client.GET, url, {});
 }
+
+export function getCommentators() {
+    let url = baseURL + '/api/manage/lecturer'
+    return client.withAuth(client.GET, url, {});
+}
+
+
