@@ -55,10 +55,10 @@ $homeNavLengh: 8;
 	
 		.infinite-list {
 			@media only screen and (max-width: 768px) {
-				height: 800px;
+				height: 680px;
 			}
 			@media only screen and (min-width: 768px) {
-				height:500px;
+				height:600px;
 			}
 			list-style: none;
 			}
@@ -100,6 +100,7 @@ $homeNavLengh: 8;
 			@media only screen and (min-width: 768px) {
 				width:60%;
 			}
+			margin-top: 5px;
 			margin-left: auto;
 			margin-right: auto;
 			border-radius: 4px;
