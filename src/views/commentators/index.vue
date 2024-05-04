@@ -43,7 +43,8 @@
                     @cancel="cancelDelete" @deleteAll="deleteAll" @getCommentators="getCommentators"></DeleteDialog>
                 <!-- 上传按钮dialog -->
 
-                <Upload v-model="uploadDialogVisible" @exportAll="exportAll" @cancel="cancelUpload"></Upload>
+                <Upload v-model="uploadDialogVisible" @exportAll="exportAll" @cancel="cancelUpload"
+                    @getCommentators="getCommentators"></Upload>
                 <!-- 添加按钮dialog -->
                 <AddDialog @getCommentators="getCommentators"></AddDialog>
             </div>
@@ -182,8 +183,6 @@ export default {
 
 
         mySearch() {
-            //console.log(this.select)
-            //console.log( this.input )
             let postData: { "tags": Number[], "content"?: string } = {
                 "tags": select2PostData(this.select),
             }
@@ -192,12 +191,15 @@ export default {
             }
             myPOST('/api/manage/lecturer/find', postData).then(response => {
                 if (response.status === 200) {
+                    this.commentators = []
                     this.commentators = [...response.data.list]
+                    for (let i = 0; i < this.commentators.length; i++) {
+                        console.log(String(this.commentators[i].name) + ":" + Number(this.commentators[i].time_index))
+                    }
                     this.select = []
                     this.input = ''
                 } else {
                     // 处理未获取到数据的情况
-                    ElMessage.error('获取数据失败');
                     ElMessage.error('获取数据失败');
                 }
             }).catch(error => {

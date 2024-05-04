@@ -14,7 +14,7 @@
         </el-upload>
         <div class="buttonContainer">
             <el-button type="info" @click="cancel">取消</el-button>
-            <el-button type="danger" @click="submitUploadAll">直接上传</el-button>
+            <el-button type="danger" @click="uploadAll">直接上传</el-button>
             <el-button type="success" @click="exportAndUploadAll">导出并上传</el-button>
         </div>
     </el-dialog>
@@ -40,26 +40,10 @@ export default {
                 // console.log("is click upload")
                 const formData = new FormData();
                 formData.append('file', uploadFile.value[0].raw);
-                myFormDataPOST('/api/manage/lecturer/upload', formData).then(response => {
-                    if (response.status === 200) {
-                        ElMessage({
-                            message: '上传成功',
-                            type: 'success'
-                        });
-                    } else {
-                        ElMessage({
-                            message: '上传失败',
-                            type: 'error'
-                        });
-                    }
-                }).catch(error => {
-                    ElMessage({
-                        message: '上传失败',
-                        type: 'error'
-                    });
-                })
+                return myFormDataPOST('/api/manage/lecturer/upload', formData)
                 //uploadRef.value!.submit()
             }
+            return null
         }
         const handleExceed: UploadProps['onExceed'] = (files) => {
             uploadRef.value!.clearFiles()
@@ -104,7 +88,28 @@ export default {
             this.$emit('cancel')
         },
         uploadAll() {
-            this.submitUploadAll()
+            let status: any = this.submitUploadAll();
+            if (status != null) {
+                status.then((response: Response) => {
+                    if (response.status === 200) {
+                        ElMessage({
+                            message: '上传成功',
+                            type: 'success'
+                        });
+                        this.$emit("getCommentators")
+                    } else {
+                        ElMessage({
+                            message: '上传失败',
+                            type: 'error'
+                        });
+                    }
+                }).catch((error: Error) => {
+                    ElMessage({
+                        message: '上传失败',
+                        type: 'error'
+                    });
+                })
+            }
         },
         exportAndUploadAll() {
             const exportPromise = new Promise((resolve) => {
