@@ -27,8 +27,8 @@
             <el-main>
                 <!-- 讲解员列表 -->
                 <div>
-                    <el-row v-for="(commentators, index) in filteredCommentators" :gutter="20" :key="index">
-                        <el-col v-for="(commentator, index) in commentators" :key="index" :span="8">
+                    <el-row v-for="(rowCommentators, index) in filteredCommentators" :gutter="20" :key="index">
+                        <el-col v-for="(commentator, index) in rowCommentators" :key="index" :span="8">
                             <CommentatorCard :name="commentator.name" :num="commentator.num" :tag="commentator.tag"
                                 :weekday="commentator.weekday" :session="commentator.session" :campus="commentator.campus"
                                 @getCommentators="getCommentators" />
@@ -200,6 +200,7 @@ export default {
                     this.input = ''
                 } else {
                     // 处理未获取到数据的情况
+                    ElMessage.error('获取数据失败');
                     ElMessage.error('获取数据失败');
                 }
             }).catch(error => {

@@ -17,7 +17,8 @@
         <div class="text">工作日：{{ local.localWeekday }}</div>
         <div class="text">场次：{{ local.localSession }}</div>
         <div class="buttonContainer">
-            <el-button type="blue" @click="dialogVisible = true" class="hover-lighten">修改信息 </el-button>
+            <el-button type="blue" @click="closeDialog()" class="hover-lighten">修改信息
+            </el-button>
             <el-button type="danger" @click="myDelete()">
                 <el-icon>
                     <Delete />
@@ -77,7 +78,7 @@
 <script lang="ts">
 import { Delete, Avatar } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus';
-import { reactive, ref } from 'vue'
+import { reactive } from 'vue'
 import { info2TimeIndex } from '/@/utils/transform'
 import { myPOST } from '/@/api/commentator/index'
 
@@ -104,10 +105,39 @@ export default {
             })
         }
     },
+    watch: {
+        name(newVal) {
+            this.local.localName = newVal
+        },
+        num(newVal) {
+            this.local.localNum = newVal
+        },
+        tag(newVal) {
+            this.local.localTag = newVal
+        },
+        weekday(newVal) {
+            this.local.localWeekday = newVal
+        },
+        session(newVal) {
+            this.local.localSession = newVal
+        },
+        campus(newVal) {
+            this.local.localCampus = newVal
+        },
+    },
     computed: {
         isFormValid() {
             return this.form.name && this.form.num && this.form.tag
                 && this.form.weekday && this.form.session && this.form.campus;
+        },
+        assignLocal() {
+            this.local.localName = this.name
+            this.local.localNum = this.num
+            this.local.localTag = this.tag
+            this.local.localWeekday = this.weekday
+            this.local.localSession = this.session
+            this.local.localCampus = this.campus
+            console.log(this.local)
         }
     },
     components: {
@@ -115,6 +145,10 @@ export default {
         Avatar
     },
     methods: {
+        closeDialog() {
+            this.dialogVisible = true
+            console.log(this.name)
+        },
         myDelete() {
             myPOST('/api/manage/lecturer/delete', {
                 num: this.local.localNum,
@@ -132,7 +166,6 @@ export default {
                 })
         },
         fixData() {
-            console.log(this.local)
             myPOST('/api/manage/lecturer/edit', {
                 "old_num": this.local.localNum,
                 "name": this.form.name,

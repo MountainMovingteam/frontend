@@ -16,6 +16,7 @@ type Recommend = {
 declare type PersonalState = {
 	newsInfoList: NewInfo[];
 	recommendList: Recommend[];
+	roleIdent: string;
 	personalForm: {
 		id: string;
 		name: string;

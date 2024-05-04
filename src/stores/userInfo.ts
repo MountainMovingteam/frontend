@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import Cookies from 'js-cookie';
 import { Session, Local } from '/@/utils/storage';
-import { reqInfo } from '/@/api/user/index';
+import { reqInfo,reqAvatar } from '/@/api/user/index';
 import { log } from 'console';
 
 /**
@@ -13,7 +13,7 @@ export const useUserInfo = defineStore('userInfo', {
 		userInfos: {
 			userName: '',
 			photo: '',
-			time: 0,
+			logintime: 0,
 			roles: [],
 			authBtnList: [],
 		},
@@ -38,25 +38,33 @@ export const useUserInfo = defineStore('userInfo', {
 							let adminAuthBtnList: Array<string> = ['btn.add', 'btn.del', 'btn.edit', 'btn.link'];
 							let testRoles: Array<string> = ['user'];
 							let testAuthBtnList: Array<string> = ['btn.add', 'btn.link'];
+							const logintime = getLoginTime();
 							if (Local.get('role') == 1) {
-								// 默认都是管理员
 								defaultRoles = adminRoles;
 								defaultAuthBtnList = adminAuthBtnList;
 							} else {
 								defaultRoles = testRoles;
 								defaultAuthBtnList = testAuthBtnList;
 							}
-							const userInfos = {
-								username: result.data.username,
-								photo: result.data.avatar,
-								time: new Date().getTime(),
+							let userInfos = {
+								userName: result.data.username,
+								photo: '',
+								logintime: logintime,
 								roles: defaultRoles,
 								email: result.data.email,
 								authBtnList: defaultAuthBtnList,
 							};
-							Session.set('userInfo', userInfos);
-							Local.set('userInfo', userInfos);
-							resolve(userInfos);
+							reqAvatar().then((avatar) => {
+								const ava = "http://47.93.19.22:8000" + avatar.data.avatar_url
+								userInfos.photo = ava;
+								console.log(userInfos);
+								Session.set('userInfo', userInfos);
+								Local.set('userInfo', userInfos);
+								resolve(userInfos);
+							}).catch((error) => {
+								console.error('发生错误：', error);
+								reject(error);
+							})
 						})
 						.catch((error) => {
 							console.error('发生错误：', error);

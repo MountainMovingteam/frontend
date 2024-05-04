@@ -19,7 +19,7 @@
 								<el-col :span="24">
 									<el-row>
 										<el-col :xs="24" :sm="8" class="personal-item mb6">
-											<div class="personal-item-label">学号：</div>
+											<div class="personal-item-label">{{state.roleIdent}}：</div>
 											<div class="personal-item-value">{{state.personalForm.id}}</div>
 										</el-col>
 										<el-col :xs="24" :sm="16" class="personal-item mb6">
@@ -101,22 +101,9 @@
 									<el-input v-model="state.personalForm.phone" placeholder="请输入手机号" clearable></el-input>
 								</el-form-item>
 							</el-col>
-							<el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb20">
+							<el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb20" v-if='state.personalForm.academy != 0'>
 								<el-form-item label="学院">
 									<el-input v-model="state.personalForm.academy" placeholder="请输入学院号" clearable></el-input>
-								</el-form-item>
-							</el-col>
-							<el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb20">
-								<el-form-item label="签名">
-									<el-input v-model="state.personalForm.autograph" placeholder="请输入签名" clearable></el-input>
-								</el-form-item>
-							</el-col>
-							<el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb20">
-								<el-form-item label="性别">
-									<el-select v-model="state.personalForm.sex" placeholder="请选择性别" clearable class="w100">
-										<el-option label="男" value="1"></el-option>
-										<el-option label="女" value="2"></el-option>
-									</el-select>
 								</el-form-item>
 							</el-col>
 							<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
@@ -189,6 +176,28 @@
 										</template>
 									</el-input>
 								</el-form-item>
+
+								<el-form-item label="重复新密码：">
+									<el-input
+										:type="changePw.isShowConfirmNewPassword ? 'text' : 'password'"
+										:placeholder="'请再次输入新密码'"
+										v-model="changePw.newConfirmPassword"
+										autocomplete="off"
+										size="medium"
+									>
+										<template #prefix>
+											<el-icon class="el-input__icon"><ele-Unlock /></el-icon>
+										</template>
+										<template #suffix>
+											<i
+												class="iconfont el-input__icon login-content-password"
+												:class="changePw.isShowConfirmNewPassword ? 'icon-yincangmima' : 'icon-xianshimima'"
+												@click="changePw.isShowConfirmNewPassword = !changePw.isShowConfirmNewPassword"
+											>
+											</i>
+										</template>
+									</el-input>
+								</el-form-item>
 								
 								<div style="display: flex; justify-content: right; margin-top: 10px;">
 									<el-form-item>
@@ -216,7 +225,7 @@ import { formatAxis } from '/@/utils/formatTime';
 import { newsInfoList, recommendList } from './mock';
 import { storeToRefs } from 'pinia';
 import router from '/@/router';
-import {reqInfo,modifyBaseInfo} from "/@/api/user/index";
+import {reqInfo,modifyBaseInfo,modifyPassword,reqAvatar} from "/@/api/user/index";
 import { useUserInfo } from '/@/stores/userInfo';
 import { Local, Session } from '/@/utils/storage';
 import { ElMessage } from 'element-plus';
@@ -226,13 +235,14 @@ const { userInfos } = storeToRefs(stores);
 const DialogRef = ref();
 const Dialog = defineAsyncComponent(() => import('/@/views/personal/dialog.vue'));
 const changeAvatar = () => {
-	DialogRef.value.openDialog(state.personalForm.avatar);
+	DialogRef.value.openDialog(state.personalForm.avatar,assemblyFormData());
 }
 
 // 定义变量内容
 const state = reactive<PersonalState>({
 	newsInfoList,
 	recommendList,
+	roleIdent: '',
 	personalForm: {
 		id: '',
 		name: '',
@@ -252,8 +262,10 @@ const changePw = reactive({
   changePw: false,
   isShowPassword: false,
   isShowNewPassword: false,
+  isShowConfirmNewPassword: false,
   originPassword: '',
-  newPassword: ''
+  newPassword: '',
+  newConfirmPassword: ''
 });
 // 当前时间提示语
 const currentTime = computed(() => {
@@ -276,30 +288,51 @@ const getInfo = () => {
     state.personalForm.name = data.name;
     state.personalForm.email = data.email;
 	state.personalForm.phone = data.phone;
-	state.personalForm.academy = data.academy;
-	state.personalForm.logintime = Local.get('userInfo').time;
+	state.personalForm.academy = data.academy === null ? 0 : data.academys;
+	state.personalForm.logintime = Local.get('userInfo').logintime;
     if (Local.get('role') == 1) {
 		state.personalForm.role = '管理员'
+		state.roleIdent = '工号'
 	} else {
 		state.personalForm.role = '普通用户'
+		state.roleIdent = '学号'
 	}
+  })
+  const ava = reqAvatar();
+  ava.then(response => {
+	state.personalForm.avatar = "http://47.93.19.22:8000" + response.data.avatar_url
+	Local.remove('userInfo')
+	userInfos.value.photo = state.personalForm.avatar;
+	Local.set('userInfo',userInfos.value)
+	Session.remove('userInfo')
+	Session.set('userInfo',userInfos.value)
   })
 }
 
-const changeInfo = () => {
+const assemblyFormData = () =>{
 	const formData = new FormData();
+	formData.append('id',"");
     formData.append('name',state.personalForm.name);
     formData.append('email',state.personalForm.email);
     formData.append('phone',state.personalForm.phone);
-    formData.append('academy',state.personalForm.academy.toString());
+	if (Local.get('role') == 0) {
+		formData.append('academy',state.personalForm.academy.toString());
+	} else {
+		formData.append('academy',"0");
+	}
+	return formData;
+}
+
+const changeInfo = () => {
+	const formData = assemblyFormData();
+    
     const response = modifyBaseInfo(formData);
+	console.log(formData);
+	
 	response.then(response => {
 		message.value.success('修改成功');
 		Local.remove('userInfo')
 		userInfos.value.name = state.personalForm.name;
-		userInfos.value.email = state.personalForm.email;
-		userInfos.value.phone = state.personalForm.phone;
-		userInfos.value.academy = state.personalForm.academy;
 		Local.set('userInfo',userInfos.value)
 		Session.remove('userInfo')
 		Session.set('userInfo',userInfos.value)
@@ -314,15 +347,26 @@ const clearCpwInfo = () => {
 	changePw.changePw = false;
 	changePw.isShowPassword = false;
 	changePw.isShowNewPassword = false;
+	changePw.isShowConfirmNewPassword = false;
 	changePw.originPassword = '';
 	changePw.newPassword = '';
+	changePw.newConfirmPassword = '';
 }
 
 const onConfirmChange= () => {
 	changePw.loading = true;
-	//todo
-	changePw.loading = false;
-	clearCpwInfo();
+	const data = {
+		password: changePw.newPassword,
+		confirmPassword:changePw.newConfirmPassword
+	}
+	const response = modifyPassword(data);
+	response.then(response => {
+		message.value.success('修改成功');
+		changePw.loading = false;
+		clearCpwInfo();
+	}).catch(error => {
+		message.value.error('修改失败');
+	})
 }
 
 const onCancelChange = () => {
