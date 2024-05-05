@@ -109,6 +109,42 @@
             </el-form-item>
           </el-col>
 
+          <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
+            <el-form-item label="团队信息" :span="24">
+              <el-col class="mb10">
+                姓名：{{state.leaderInfo.name}}
+              </el-col>
+              <el-col class="mb10">
+                学号：{{state.leaderInfo.studentId}}
+              </el-col>
+              <el-col class="mb10">
+                电话号码：{{state.leaderInfo.phone}}
+              </el-col>
+            </el-form-item>
+          </el-col>
+
+          <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
+            <el-form-item label="个人信息" :span="24">
+              <el-form>
+                <div v-for="(member, index) in state.otherMembers" :key="member.name">
+                  <el-col class="mb10" style="margin-bottom: 5px;font-weight: bold;">
+                    <hr>
+                    预约人 {{index + 1}}
+                  </el-col>
+                  <el-col class="mb10">
+                    姓名：{{member.name}}
+                  </el-col>
+                  <el-col class="mb10">
+                    学号：{{member.studentId}}
+                  </el-col>
+                  <el-col class="mb10">
+                    电话号码：{{member.phone}}
+                  </el-col>
+                </div>
+              </el-form>
+            </el-form-item>
+          </el-col>
+
         </el-row>
       </el-form>
       <template #footer>
@@ -132,6 +168,7 @@ import { storeToRefs } from 'pinia';
 import { useRoutesList } from '/@/stores/routesList';
 import { i18n } from '/@/i18n/index';
 import {ElMessage} from "element-plus";
+import {getSearchDetails} from "/@/api/session";
 // import { setBackEndControlRefreshRoutes } from "/@/router/backEnd";
 
 const props = defineProps({
@@ -151,6 +188,14 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  week_num: {
+    type: Number,
+    default: 0,
+  },
+  time_index: {
+    type: Number,
+    default: 0,
+  }
 });
 
 // 定义子组件向父组件传值/事件
@@ -169,7 +214,10 @@ const state = reactive({
     bookingWay: '',
     row: 0,
     column: 0,
+    week_num: 0,
+    time_index: 0,
   },
+  list: [],
   selectedDay: '',
   days: initializeDays(),
   selectedEvent: '',
@@ -179,6 +227,10 @@ const state = reactive({
     { name: '', studentId: '', phone: '' }
   ],
   personalInfo: { name: '', studentId: '', phone: '' }, // 初始个人信息
+  leaderInfo: { name: '', studentId: '', phone: '' },
+  otherMembers: [
+    { name: '', studentId: '', phone: '' }
+  ],
   ruleForm: {
     menuSuperior: [],
     menuType: 'menu',
@@ -220,6 +272,8 @@ const refreshData = () => {
   state.personalInfo.name = '';
   state.personalInfo.studentId = '';
   state.personalInfo.phone = '';
+  state.leaderInfo = { name: '', studentId: '', phone: '' };
+  state.otherMembers = [];
 }
 
 const addTeamMember = () => {
@@ -257,6 +311,31 @@ function initializeDays(): string[] {
   return days;
 }
 
+const getTableData = () => {
+  refreshData();
+  const response = getSearchDetails(state.data.week_num, state.data.time_index);
+  //const response = getSearchDetails(1, 1);
+  response.then(response => {
+    const data = response.data;
+    state.list = data.list;
+    console.log(state.list);
+    state.list.forEach(function(item){
+      if (item.order_type === 'team') {
+        state.leaderInfo.name = item.name;
+        state.leaderInfo.studentId = item.id;
+        state.leaderInfo.phone = item.phone;
+      } else {
+        let info = {
+          id: item.id,
+          name: item.name,
+          phone: item.phone
+        }
+        state.otherMembers.push(info);
+      }
+    });
+  })
+}
+
 // 获取 pinia 中的路由
 const getMenuData = (routes: RouteItems) => {
   const arr: RouteItems = [];
@@ -269,12 +348,15 @@ const getMenuData = (routes: RouteItems) => {
 };
 // 打开弹窗
 const openDialog = (type: string, row?: any) => {
+  getTableData();
   state.data.campus = props.campus;
   state.data.bookingWay = props.bookingWay;
   state.data.row = props.row;
   state.selectedEvent = state.events[state.data.row];
   state.data.column = props.column;
   state.selectedDay = state.days[state.data.column - 1];
+  state.data.week_num = props.week_num;
+  state.data.time_index = props.time_index;
 
   if (type === 'edit') {
     // 模拟数据，实际请走接口
@@ -284,7 +366,7 @@ const openDialog = (type: string, row?: any) => {
     state.dialog.title = '修改菜单';
     state.dialog.submitTxt = '修 改';
   } else {
-    state.dialog.title = '新增菜单';
+    state.dialog.title = '预约信息';
     state.dialog.submitTxt = '新 增';
     // 清空表单，此项需加表单验证才能使用
     // nextTick(() => {
@@ -398,3 +480,11 @@ defineExpose({
   openDialog,
 });
 </script>
+
+<style>
+hr {
+  border-top: 1px solid #ccc;
+  margin: 3px 0;
+  width: 95%;
+}
+</style>

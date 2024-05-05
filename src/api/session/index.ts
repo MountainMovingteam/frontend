@@ -12,4 +12,14 @@ export function getCommentators() {
     return client.withAuth(client.GET, url, {});
 }
 
+export function getSearchDetails(week_num: number, time_index: number) {
+    let url = baseURL + '/api/manage/search/details';
+    return client.withAuth(client.POST, url, {
+        data: {
+            week_num: week_num,
+            time_index: time_index
+        },
+    });
+}
+
 
