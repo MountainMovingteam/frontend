@@ -101,6 +101,7 @@
                   :column="selectedColumn"
                   :groupColors="selectedGroupColors"
                   :singleColors="selectedSingleColors"
+                  :capacity="capacity"
                   ref="submitDialogRef"
                   @refresh="getTableData()"
                   @updateCampus="updateCampus"
@@ -125,6 +126,7 @@ const selectedRow = ref(0);
 const selectedColumn = ref(0);
 const selectedGroupColors = ref();
 const selectedSingleColors = ref();
+const capacity = ref();
 
 const updateCampus = (campus: string) => {
   console.log('hiiiiiiiiiiiiiiiiiiiiiiiiii')
@@ -361,6 +363,12 @@ const getTableData = () => {
         }
       }
     }
+    let rest_capacity = [];
+    rest_capacity.push(null);
+    for (let i = 0;i < 56;i++) {
+      rest_capacity.push(state.place_details[i].capacity - state.place_details[i].enrolled);
+    }
+    capacity.value = rest_capacity;
     stateXyGroup.tableData.config.loading = true;
     stateShGroup.tableData.config.loading = true;
     stateXySingle.tableData.config.loading = true;
@@ -449,16 +457,16 @@ const getTableData = () => {
     stateShSingle.tableData.config.total = stateShSingle.tableData.data.length;
     setTimeout(() => {
       stateXyGroup.tableData.config.loading = false;
-    }, 500);
+    }, 300);
     setTimeout(() => {
       stateShGroup.tableData.config.loading = false;
-    }, 500);
+    }, 300);
     setTimeout(() => {
       stateXySingle.tableData.config.loading = false;
-    }, 500);
+    }, 300);
     setTimeout(() => {
       stateShSingle.tableData.config.loading = false;
-    }, 500);
+    }, 300);
   });
 };
 
