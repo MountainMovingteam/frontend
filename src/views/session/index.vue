@@ -73,7 +73,10 @@
       </div>
     </div>
     <!--    预约按钮-->
-    <SubmitDialog :time="selectTime" :campus="selectedLocation" :row="selectedRow" :column="selectedColumn"
+    <SubmitDialog :week_num="selectTime" :time_index="selectedColumn*selectedColumn+(selectedLocation=='shahe' ? 28:0)"
+                  :campus="selectedLocation"
+                  :row="selectedRow"
+                  :column="selectedColumn"
                   ref="submitDialogRef"
                   @refresh="getTableData()"/>
   </div>
@@ -332,7 +335,7 @@ const getTableData = () => {
       const place_detail = state.place_details[i];
       let lectures=[];
       lectures=state.place_details[i].lecturer;
-      const time=place_detail.time_index
+      const time=place_detail.time_index+place_detail.week_num*56
       texts[time]=' '
       for(let j=0;j<lectures.length;j++)
       {
@@ -359,57 +362,55 @@ const getTableData = () => {
 
         shTable0.tableData.data.push({
           event: `第${i + 1}场 ${events[i]}`,
-          day1: "#f54545", // 使用颜色名称
-          day2: "#99FF99", // 使用十六进制颜色码
-          day3: "#99FF99", // 使用 RGB 颜色值
-          day4: "#90EE90",
-          day5: "#90EE90",
-          day6: "#90EE90",
-          day7: "#90EE90",
+          day1: {text: texts[i+28], color: colors[i+28]}, // 使用颜色名称
+          day2: {text: texts[i + 32], color: colors[i + 32]}, // 使用十六进制颜色码
+          day3: {text: texts[i + 36], color: colors[i + 36]}, // 使用 RGB 颜色值
+          day4: {text: texts[i + 40], color: colors[i + 40]},
+          day5: {text: texts[i + 44], color: colors[i + 44]},
+          day6: {text: texts[i + 48], color: colors[i + 48]},
+          day7: {text: texts[i + 52], color: colors[i + 52]},
         });
 
         xyTable1.tableData.data.push({
           event: `第${i + 1}场 ${events[i]}`,
-          day1: "#f54545", // 使用颜色名称
-          day2: "#f54545", // 使用十六进制颜色码
-          day3: "#f54545", // 使用 RGB 颜色值
-          day4: "#99FF99",
-          day5: "#f54545",
-          day6: "#f54545",
-          day7: "#99FF99",
+          day1: {text: texts[i+56], color: colors[i+56]}, // 使用颜色名称
+          day2: {text: texts[i +60], color: colors[i + 60]}, // 使用十六进制颜色码
+          day3: {text: texts[i + 64], color: colors[i + 64]}, // 使用 RGB 颜色值
+          day4: {text: texts[i + 68], color: colors[i + 68]},
+          day5: {text: texts[i + 72], color: colors[i + 72]},
+          day6: {text: texts[i + 76], color: colors[i + 76]},
+          day7: {text: texts[i + 80], color: colors[i + 80]},
         });
 
         shTable1.tableData.data.push({
           event: `第${i + 1}场 \n\n ${events[i]}`,
-          day1: "#f54545", // 使用颜色名称
-          day2: "#f54545", // 使用十六进制颜色码
-          day3: "#f54545", // 使用 RGB 颜色值
-          day4: "#99FF99",
-          day5: "#f54545",
-          day6: "#99FF99",
-          day7: "#99FF99",
+          day1: {text: texts[i+84], color: colors[i+84]}, // 使用颜色名称
+          day2: {text: texts[i + 88], color: colors[i + 88]}, // 使用十六进制颜色码
+          day3: {text: texts[i + 92], color: colors[i + 92]}, // 使用 RGB 颜色值
+          day4: {text: texts[i + 96], color: colors[i + 96]},
+          day5: {text: texts[i + 100], color: colors[i + 100]},
+          day6: {text: texts[i + 104], color: colors[i + 104]},
+          day7: {text: texts[i + 108], color: colors[i + 108]},
         });
       }
-
+    xyTable0.tableData.config.total = xyTable0.tableData.data.length;
+    shTable0.tableData.config.total = shTable0.tableData.data.length;
+    xyTable1.tableData.config.total = xyTable1.tableData.data.length;
+    shTable1.tableData.config.total = shTable1.tableData.data.length;
+    setTimeout(() => {
+      xyTable0.tableData.config.loading = false;
+    }, 500);
+    setTimeout(() => {
+      shTable0.tableData.config.loading = false;
+    }, 500);
+    setTimeout(() => {
+      xyTable1.tableData.config.loading = false;
+    }, 500);
+    setTimeout(() => {
+      shTable1.tableData.config.loading = false;
+    }, 500);
   });
 
-
-  xyTable0.tableData.config.total = xyTable0.tableData.data.length;
-  shTable0.tableData.config.total = shTable0.tableData.data.length;
-  xyTable1.tableData.config.total = xyTable1.tableData.data.length;
-  shTable1.tableData.config.total = shTable1.tableData.data.length;
-  setTimeout(() => {
-    xyTable0.tableData.config.loading = false;
-  }, 500);
-  setTimeout(() => {
-    shTable0.tableData.config.loading = false;
-  }, 500);
-  setTimeout(() => {
-    xyTable1.tableData.config.loading = false;
-  }, 500);
-  setTimeout(() => {
-    shTable1.tableData.config.loading = false;
-  }, 500);
 };
 const windowWidth = ref(window.innerWidth);
 const windowHeight = ref(window.innerHeight)
