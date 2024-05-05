@@ -44,7 +44,7 @@
             ref="tableRef"
             v-bind="xyTable0.tableData"
             class="booking-table-demo"
-            @cellClick = "onCellClick"
+            @cellClick="onCellClick"
         />
       </div>
       <div v-else-if="selectedLocation === 'shahe'&& selectedTime=== 0">
@@ -52,7 +52,7 @@
             ref="tableRef"
             v-bind="shTable0.tableData"
             class="booking-table-demo"
-            @cellClick = "onCellClick"
+            @cellClick="onCellClick"
         />
       </div>
       <div v-else-if="selectedLocation === 'xueyuan'&& selectedTime === 1">
@@ -60,7 +60,7 @@
             ref="tableRef"
             v-bind="xyTable1.tableData"
             class="booking-table-demo"
-            @cellClick = "onCellClick"
+            @cellClick="onCellClick"
         />
       </div>
       <div v-else-if="selectedLocation === 'shahe'&& selectedTime === 1">
@@ -68,7 +68,7 @@
             ref="tableRef"
             v-bind="shTable1.tableData"
             class="booking-table-demo"
-            @cellClick = "onCellClick"
+            @cellClick="onCellClick"
         />
       </div>
     </div>
@@ -82,9 +82,11 @@
 <script setup lang="ts">
 import {defineAsyncComponent, onMounted, reactive, ref} from "vue";
 import '/@/types/session.d.ts'
+import {getPlaceDetails} from "/@/api/session";
 import {ElMessage} from "element-plus";
 
 const selectedTime = ref(0);
+
 
 const selectedLocation = ref('xueyuan');
 const submitDialogRef = ref();
@@ -290,20 +292,22 @@ const shTable1 = reactive<TableState>(<TableState>{
 });
 const selectedRow = ref(0);
 const selectedColumn = ref(0);
-const events = ['8:00-9:30', '10:00-11:30', '14:00-15:30', '16:00-17:30'];
-const data = {
-  "week_num": 0,
-  "place_details": [
+let state = reactive<any>({
+  place_details: [
     {
-      "time_index": 0,
-      "capacity": 0,
-      "enrolled": 0,
-      "lecturer": "讲师A",
-      "type": 0
-    },
-    // ... 其他数据项
+      week_num: 0,
+      time_index: 0,
+      capacity: 0,
+      enrolled: 0,
+      lecturer: [
+        "string"
+      ],
+      type: 0
+    }
   ]
-};
+});
+
+const events = ['8:00-9:30', '10:00-11:30', '14:00-15:30', '16:00-17:30'];
 
 function selectLocation(location: string) {
   selectedLocation.value = location;
@@ -318,106 +322,76 @@ const getTableData = () => {
   shTable0.tableData.config.loading = true;
   xyTable1.tableData.config.loading = true;
   shTable1.tableData.config.loading = true;
-  for (let i = 0; i < 4; i++) {
-    xyTable0.tableData.data.push({
-      event: `第${i + 1}场 ${events[i]}`,
-      day1: {text:"day1",color:"#ffffff"}, // 使用颜色名称
-      day2: {text:"day2",color:"#ffff00"}, // 使用十六进制颜色码
-      day3: {text:"day3",color:"#ffffff"}, // 使用 RGB 颜色值
-      day4: {text:"day4",color:"#ffff00"},
-      day5: {text:"day5",color:"#ffffff"},
-      day6: {text:"day6",color:"#ffffff"},
-      day7: {text:"day7",color:"#ffff00"},
-    });
+  const response = getPlaceDetails();
+  let colors = [];
+  let texts = [];
+  response.then(response => {
+    const data = response.data;
+    state.place_details = data.place_details;
+    for (let i = 0; i < state.place_details.length; i++) {
+      const place_detail = state.place_details[i];
+      let lectures=[];
+      lectures=state.place_details[i].lecturer;
+      const time=place_detail.time_index
+      texts[time]=' '
+      for(let j=0;j<lectures.length;j++)
+      {
+        texts[time]+=' '+lectures[j]+'\n';
+      }
+      if (place_detail.enrolled > 0) {
+        colors[i] = "#ffff00";
+      } else {
+        colors[i] = "#ffffff";
+      }
+    }
 
-    shTable0.tableData.data.push({
-      event: `第${i + 1}场 ${events[i]}`,
-      day1: "#f54545", // 使用颜色名称
-      day2: "#99FF99", // 使用十六进制颜色码
-      day3: "#99FF99", // 使用 RGB 颜色值
-      day4: "#90EE90",
-      day5: "#90EE90",
-      day6: "#90EE90",
-      day7: "#90EE90",
-    });
+      for (let i = 0; i < 4; i++) {
+        xyTable0.tableData.data.push({
+          event: `第${i + 1}场 ${events[i]}`,
+          day1: {text: texts[i], color: colors[i]}, // 使用颜色名称
+          day2: {text: texts[i + 4], color: colors[i + 4]}, // 使用十六进制颜色码
+          day3: {text: texts[i + 8], color: colors[i + 8]}, // 使用 RGB 颜色值
+          day4: {text: texts[i + 12], color: colors[i + 12]},
+          day5: {text: texts[i + 16], color: colors[i + 16]},
+          day6: {text: texts[i + 20], color: colors[i + 20]},
+          day7: {text: texts[i + 24], color: colors[i + 24]},
+        });
 
-    xyTable1.tableData.data.push({
-      event: `第${i + 1}场 ${events[i]}`,
-      day1: "#f54545", // 使用颜色名称
-      day2: "#f54545", // 使用十六进制颜色码
-      day3: "#f54545", // 使用 RGB 颜色值
-      day4: "#99FF99",
-      day5: "#f54545",
-      day6: "#f54545",
-      day7: "#99FF99",
-    });
+        shTable0.tableData.data.push({
+          event: `第${i + 1}场 ${events[i]}`,
+          day1: "#f54545", // 使用颜色名称
+          day2: "#99FF99", // 使用十六进制颜色码
+          day3: "#99FF99", // 使用 RGB 颜色值
+          day4: "#90EE90",
+          day5: "#90EE90",
+          day6: "#90EE90",
+          day7: "#90EE90",
+        });
 
-    shTable1.tableData.data.push({
-      event: `第${i + 1}场 \n\n ${events[i]}`,
-      day1: "#f54545", // 使用颜色名称
-      day2: "#f54545", // 使用十六进制颜色码
-      day3: "#f54545", // 使用 RGB 颜色值
-      day4: "#99FF99",
-      day5: "#f54545",
-      day6: "#99FF99",
-      day7: "#99FF99",
-    });
-  }
+        xyTable1.tableData.data.push({
+          event: `第${i + 1}场 ${events[i]}`,
+          day1: "#f54545", // 使用颜色名称
+          day2: "#f54545", // 使用十六进制颜色码
+          day3: "#f54545", // 使用 RGB 颜色值
+          day4: "#99FF99",
+          day5: "#f54545",
+          day6: "#f54545",
+          day7: "#99FF99",
+        });
 
-  //修改后data有了更多元素
-  // for (let i = 0; i < 4; i++) {
-  //   const xycellTime0: CellDataType = ({
-  //     text: `第${i + 1}场 ${events[i]}`,
-  //     color: 'white'
-  //   })
-  //   xyTable0.tableData.data.push(xycellTime0);
-  //   const xycellData0: CellDataType[] = Array.from({length: 7}, (_, index) => ({
-  //     text: `1`, // 根据日期生成不同的文本
-  //     color: index % 2 === 0 ? 'yellow' : 'white' // 根据某种逻辑设置颜色，这里简单地交替颜色
-  //   }));
-  //   for (i = 0; i < 7; i++) {
-  //     xyTable0.tableData.data.push(xycellData0[i]);
-  //   }
-  //
-  //   const xycellTime1: CellDataType = ({
-  //     text: `第${i + 1}场 ${events[i]}`,
-  //     color: 'white'
-  //   })
-  //   xyTable1.tableData.data.push(xycellTime1);
-  //   const xycellData1: CellDataType[] = Array.from({length: 7}, (_, index) => ({
-  //     text: `1`, // 根据日期生成不同的文本
-  //     color: index % 2 === 0 ? 'yellow' : 'white' // 根据某种逻辑设置颜色，这里简单地交替颜色
-  //   }));
-  //   for (i = 0; i < 7; i++) {
-  //     xyTable1.tableData.data.push(xycellData1[i]);
-  //   }
-  //
-  //   const shcellTime0: CellDataType = ({
-  //     text: `第${i + 1}场 ${events[i]}`,
-  //     color: 'white'
-  //   })
-  //   shTable0.tableData.data.push(shcellTime0);
-  //   const shcellData0: CellDataType[] = Array.from({length: 7}, (_, index) => ({
-  //     text: `第${i + 1}场 ${events[i]}`, // 根据日期生成不同的文本
-  //     color: index % 2 === 0 ? 'yellow' : 'white' // 根据某种逻辑设置颜色，这里简单地交替颜色
-  //   }));
-  //   for (i = 0; i < 7; i++) {
-  //     shTable0.tableData.data.push(shcellData0[i]);
-  //   }
-  //
-  //   const shcellTime1: CellDataType = ({
-  //     text: `第${i + 1}场 ${events[i]}`,
-  //     color: 'white'
-  //   })
-  //   shTable1.tableData.data.push(shcellTime1);
-  //   const shcellData1: CellDataType[] = Array.from({length: 7}, (_, index) => ({
-  //     text: `第${i + 1}场 ${events[i]}`, // 根据日期生成不同的文本
-  //     color: index % 2 === 0 ? 'yellow' : 'white' // 根据某种逻辑设置颜色，这里简单地交替颜色
-  //   }));
-  //   for (i = 0; i < 7; i++) {
-  //     shTable1.tableData.data.push(shcellData1[i]);
-  //   }
-  // }
+        shTable1.tableData.data.push({
+          event: `第${i + 1}场 \n\n ${events[i]}`,
+          day1: "#f54545", // 使用颜色名称
+          day2: "#f54545", // 使用十六进制颜色码
+          day3: "#f54545", // 使用 RGB 颜色值
+          day4: "#99FF99",
+          day5: "#f54545",
+          day6: "#99FF99",
+          day7: "#99FF99",
+        });
+      }
+
+  });
 
 
   xyTable0.tableData.config.total = xyTable0.tableData.data.length;
@@ -474,7 +448,7 @@ const onOpenSubmit = (type: string) => {
 onMounted(() => {
   getScreenSize();
   getTableData();
-
+  getPlaceDetails();
 });
 </script>
 
