@@ -1,4 +1,4 @@
-<template>
+<template >
     <div class="common-layout">
         <el-container class="centered-content">
             <el-header class="header">
@@ -34,7 +34,6 @@
                         </el-col>
                     </el-row>
                 </div>
-
             </el-main>
             <div class="'dialogContainer'">
                 <!-- 清空按钮dioloag -->
@@ -47,6 +46,8 @@
                 <!-- 添加按钮dialog -->
                 <AddDialog @getCommentators="getCommentators"></AddDialog>
             </div>
+            <!-- 让下述div背景透明 -->
+            <div style="height: 500px;" v-loading="loading"></div>
         </el-container>
     </div>
 </template>
@@ -143,7 +144,8 @@ export default {
                     ]
                 }
             ],
-            props: { multiple: true }
+            props: { multiple: true },
+            loading: ref(false)
         }
     },
     mounted() {
@@ -171,6 +173,7 @@ export default {
     },
     methods: {
         getCommentators() {
+            this.loading = true;
             myGET('/api/manage/lecturer', {}).then(response => {
                 if (response.status === 200) {
                     this.commentators = response.data.list;
@@ -181,6 +184,8 @@ export default {
             }).catch(error => {
                 // 处理请求失败的情况
                 ElMessage.error('获取数据失败');
+            }).finally(() => {
+                this.loading = false;
             });
         },
 
