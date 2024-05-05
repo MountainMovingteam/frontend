@@ -177,6 +177,10 @@ const props = defineProps({
   singleColors: {
     type: Array as PropType<string[]>,
     default: () => [],
+  },
+  capacity: {
+    type: Array as PropType<number[]>,
+    default: () => [],
   }
 });
 
@@ -205,6 +209,8 @@ const state = reactive({
   accessibleEvents: [] as number[],
   groupColors: [] as string[],
   singleColors: [] as string[],
+  capacity: [] as number[],
+  selectedCapacity: [] as number[],
   teamMembers: [
     { name: '', studentId: '', phone: '', college: ''}
   ],
@@ -313,7 +319,7 @@ const labelText = (index: number, event: string) => {
   if (!state.accessibleEvents.includes(index)) {
     return event + "（该时间段不可预约）";
   } else {
-    return event;
+    return event + `（剩余可预约人数${state.selectedCapacity[index]}人）`;
   }
 }
 
@@ -356,11 +362,17 @@ const openDialog = (type: string, row?: any) => {
   state.selectedDay = state.days[state.data.column - 1];
   state.groupColors = props.groupColors;
   state.singleColors = props.singleColors;
+  state.capacity = props.capacity;
   let start = 4 * (state.data.column - 1) + 1;
   if (state.data.campus === 'shahe') {
     start += 28;
   }
   console.log("start" + start);
+  state.selectedCapacity = [];
+  for (let i = start;i < start + 4;i++) {
+    state.selectedCapacity.push(state.capacity[i]);
+  }
+  console.log(state.selectedCapacity);
   state.accessibleEvents = [];
   for(let i = start; i < start + 4;i++) {
     if (state.data.bookingWay === 'group') {
@@ -373,6 +385,7 @@ const openDialog = (type: string, row?: any) => {
       }
     }
   }
+  console.log("capacity" + state.capacity)
   console.log("groupcolors" + state.groupColors)
   console.log("singlecolors" + state.singleColors)
   console.log("accessibleEvents" + state.accessibleEvents)
