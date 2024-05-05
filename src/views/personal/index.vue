@@ -51,14 +51,17 @@
 				<el-card shadow="hover">
 					<template #header>
 						<span>消息通知</span>
-						<span class="personal-info-more" @click='moreNotifications'>更多</span>
+						<span class="personal-info-more" @click='moreNotifications' v-if='!state.isAdmin'>更多</span>
 					</template>
-					<div class="personal-info-box">
-						<ul class="personal-info-ul">
-							<li v-for="(v, k) in state.newsInfoList" :key="k" class="personal-info-li">
-								<a :href="v.link" target="_block" class="personal-info-li-title">{{ v.title }}</a>
+					<div class="personal-info-box" >
+						<ul class="personal-info-ul" v-if='notice.total > 0'>
+							<li v-for="(v, k) in notice.noticeArray" :key="k" class="personal-info-li" @click='openDetailDialog(k)'>
+								<p style='font-size: large;'>驳回申请</p>
+								<div  target="_block" class="personal-info-li-title">{{ v.key_words }}</div>
+								<div> {{ v.time }} </div>
 							</li>
 						</ul>
+						<el-empty :description="$t('message.user.newDesc')" style='height: 50%;' v-else></el-empty>
 					</div>
 				</el-card>
 			</el-col>
@@ -216,6 +219,7 @@
 			</el-col>
 		</el-row>
 		<Dialog ref="DialogRef" @refresh='getInfo'/>
+		<DetailDialog ref="DetailDialogRef" />
 	</div>
 </template>
 
@@ -229,6 +233,9 @@ import {reqInfo,modifyBaseInfo,modifyPassword,reqAvatar} from "/@/api/user/index
 import { useUserInfo } from '/@/stores/userInfo';
 import { Local, Session } from '/@/utils/storage';
 import { ElMessage } from 'element-plus';
+import { reqNotice } from '/@/api/notification/index';
+const DetailDialog = defineAsyncComponent(() => import('/@/views/notification/dialog.vue'));
+const DetailDialogRef = ref();
 const message = ref(ElMessage);
 const stores = useUserInfo();
 const { userInfos } = storeToRefs(stores);
@@ -240,6 +247,7 @@ const changeAvatar = () => {
 
 // 定义变量内容
 const state = reactive<PersonalState>({
+	isAdmin: false,
 	newsInfoList,
 	recommendList,
 	roleIdent: '',
@@ -256,6 +264,11 @@ const state = reactive<PersonalState>({
 		logintime: ''
 	},
 });
+
+const notice = reactive<any>({
+	total:0,
+	noticeArray:[],
+})
 
 const changePw = reactive({
   loading: false,
@@ -278,7 +291,28 @@ const changePassword = () => {
 
 onMounted(() => {
 	getInfo();
+	getNotice();
 })
+
+const getNotice = () => {
+	if (Local.get('role') == 1) {
+		return;
+	}
+	const response = reqNotice();
+	response.then(response => {
+		notice.total = response.data.num;
+		if (notice.total > 0) {
+			const reversedList = response.data.notice_list.slice().reverse();
+			if (notice.total > 1) {
+				notice.noticeArray = reversedList.slice(0, 2);
+			} else {
+				notice.noticeArray = reversedList;
+			}
+		}
+	}).catch(error => {
+		message.value.error('通知加载失败');
+	})
+}
 
 const getInfo = () => {
   const response = reqInfo();
@@ -293,9 +327,11 @@ const getInfo = () => {
     if (Local.get('role') == 1) {
 		state.personalForm.role = '管理员'
 		state.roleIdent = '工号'
+		state.isAdmin = true;
 	} else {
 		state.personalForm.role = '普通用户'
 		state.roleIdent = '学号'
+		state.isAdmin = false;
 	}
   })
   const ava = reqAvatar();
@@ -375,6 +411,10 @@ const onCancelChange = () => {
 
 const moreNotifications = () => {
 	router.push('/notification');
+}
+
+const openDetailDialog = (i:any) => {
+	DetailDialogRef.value.openDialog(notice.noticeArray[i].notice_id);
 }
 </script>
 

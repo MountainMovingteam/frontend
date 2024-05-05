@@ -5,11 +5,11 @@
 				<ele-Search />
 			</el-icon>
 		</div>
-		<div class="layout-navbars-breadcrumb-user-icon" @click="onLayoutSetingClick">
+		<!--<div class="layout-navbars-breadcrumb-user-icon" @click="onLayoutSetingClick">
 			<i class="icon-skin iconfont" :title="$t('message.user.title3')"></i>
-		</div>
-		<div class="layout-navbars-breadcrumb-user-icon" ref="userNewsBadgeRef" v-click-outside="onUserNewsClick">
-			<el-badge :is-dot="true">
+		</div>-->
+		<div class="layout-navbars-breadcrumb-user-icon" ref="userNewsBadgeRef" v-click-outside="onUserNewsClick" v-if='showNotice'>
+			<el-badge >
 				<el-icon :title="$t('message.user.title4')">
 					<ele-Bell />
 				</el-icon>
@@ -24,6 +24,7 @@
 			virtual-triggering
 			:width="300"
 			:persistent="false"
+			v-if='showNotice'
 		>
 			<UserNews />
 		</el-popover>
@@ -85,7 +86,7 @@ const state = reactive({
 	disabledI18n: 'zh-cn',
 	disabledSize: 'large',
 });
-
+const showNotice = ref<boolean>(true);
 // 设置分割样式
 const layoutUserFlexNum = computed(() => {
 	let num: string | number = '';
@@ -172,6 +173,9 @@ onMounted(() => {
 	if (Local.get('themeConfig')) {
 		initI18nOrSize('globalComponentSize', 'disabledSize');
 		initI18nOrSize('globalI18n', 'disabledI18n');
+	}
+	if (Local.get('role') == 1) {
+		showNotice.value = false;
 	}
 });
 </script>

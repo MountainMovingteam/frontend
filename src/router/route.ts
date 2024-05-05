@@ -133,7 +133,7 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isKeepAlive: true,
 					isAffix: false,
 					isIframe: false,
-					roles: ['admin', 'user'],
+					roles: ['user'],
 					icon: 'iconfont icon-gerenzhongxin',
 				},
 			},

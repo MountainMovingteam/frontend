@@ -27,7 +27,7 @@
                 <!-- 讲解员列表 -->
                 <div>
                     <el-row v-for="(rowCommentators, index) in filteredCommentators" :gutter="20" :key="index">
-                        <el-col v-for="(commentator, index) in rowCommentators" :key="index" :span="getCardSpan">
+                        <el-col v-for="(commentator, index) in rowCommentators" :key="index" :span="8">
                             <CommentatorCard :name="commentator.name" :num="commentator.num" :tag="commentator.tag"
                                 :weekday="commentator.weekday" :session="commentator.session" :campus="commentator.campus"
                                 @deleteCommentator="deleteCommentator" />
