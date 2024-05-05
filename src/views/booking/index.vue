@@ -297,158 +297,169 @@ function addDays(date: any, days: any) {
 const getTableData = () => {
   const response = getPlaceDetails();
   response.then(response => {
-    const data = response.data;
-    console.log(data);
-    state.place_details = data.place_details;
-  });
-  const daysOfWeek = getDaysOfWeek();
-  let tuesdayColor = [];
-  let colors = [];
-  colors.push(null);
-  if (state.place_details.length <= 1) {
-    for (let i = 1; i <= 56;i++) {
-      colors[i] = "#99FF99";
-    }
-    for (let i = 0;i < 4;i++) {
-      tuesdayColor[i] = "#99FF99";
-    }
-  } else {
-    for (let i = 1; i < state.place_details.length; i++) {
-      const place_detail = state.place_details[i];
-      if (place_detail.enrolled > 0) {
-        colors[i] = "#f54545";
-      } else {
+    state.place_details = response.data;
+    console.log(state.place_details[0])
+    console.log(state.place_details[0].time_index)
+    console.log(state.place_details.__v_raw)
+    console.log(state.place_details);
+    const daysOfWeek = getDaysOfWeek();
+    let tuesdayColor = [];
+    let colors = [];
+    colors.push(null);
+    if (state.place_details.length <= 1) {
+      for (let i = 1; i <= 56;i++) {
         colors[i] = "#99FF99";
       }
-    }
-    for (let i = 0;i < 7;i++) {
-      if (daysOfWeek[i] === '二') {
-        let index = 4 * i + 3;
-        let place_detail = state.place_details[index];
-        if (place_detail.enrolled < place_detail.capacity) {
-          tuesdayColor.push("#99FF99");
-        } else {
-          tuesdayColor.push("#f54545");
+      for (let i = 0;i < 4;i++) {
+        tuesdayColor[i] = "#99FF99";
+      }
+    } else {
+      for (let i = 0; i < state.place_details.length; i++) {
+        const place_detail = state.place_details[i];
+        if (i == 10 || i == 11 || i == 38 || i == 39) {
+          if (place_detail.enrolled >= 10) {
+            colors[i + 1] = "#f54545";
+          } else {
+            colors[i + 1] = "#99FF99";
+          }
+          continue;
         }
-        place_detail = state.place_details[index + 1];
-        if (place_detail.enrolled < place_detail.capacity) {
-          tuesdayColor.push("#99FF99");
+        if (place_detail.enrolled > 0) {
+          colors[i + 1] = "#f54545";
         } else {
-          tuesdayColor.push("#f54545");
+          colors[i + 1] = "#99FF99";
         }
-        place_detail = state.place_details[index + 28];
-        if (place_detail.enrolled < place_detail.capacity) {
-          tuesdayColor.push("#99FF99");
-        } else {
-          tuesdayColor.push("#f54545");
-        }
-        place_detail = state.place_details[index + 1 + 28];
-        if (place_detail.enrolled < place_detail.capacity) {
-          tuesdayColor.push("#99FF99");
-        } else {
-          tuesdayColor.push("#f54545");
+      }
+      for (let i = 0;i < 7;i++) {
+        if (daysOfWeek[i] === '二') {
+          let index = 4 * i + 2;
+          console.log(index)
+          let place_detail = state.place_details[index];
+          if (place_detail.enrolled < place_detail.capacity) {
+            tuesdayColor.push("#99FF99");
+          } else {
+            tuesdayColor.push("#f54545");
+          }
+          place_detail = state.place_details[index + 1];
+          if (place_detail.enrolled < place_detail.capacity) {
+            tuesdayColor.push("#99FF99");
+          } else {
+            tuesdayColor.push("#f54545");
+          }
+          place_detail = state.place_details[index + 28];
+          if (place_detail.enrolled < place_detail.capacity) {
+            tuesdayColor.push("#99FF99");
+          } else {
+            tuesdayColor.push("#f54545");
+          }
+          place_detail = state.place_details[index + 1 + 28];
+          if (place_detail.enrolled < place_detail.capacity) {
+            tuesdayColor.push("#99FF99");
+          } else {
+            tuesdayColor.push("#f54545");
+          }
         }
       }
     }
-  }
-  stateXyGroup.tableData.config.loading = true;
-  stateShGroup.tableData.config.loading = true;
-  stateXySingle.tableData.config.loading = true;
-  stateShSingle.tableData.config.loading = true;
+    stateXyGroup.tableData.config.loading = true;
+    stateShGroup.tableData.config.loading = true;
+    stateXySingle.tableData.config.loading = true;
+    stateShSingle.tableData.config.loading = true;
 
-  for (let i = 0; i < 4; i++) {
-    stateXyGroup.tableData.data.splice(i, 1, {
-      event: `第${i + 1}场 ${events[i]}`,
-      day1: daysOfWeek[0] === '六' || daysOfWeek[0] === '日'? "#f54545": colors[i + 1],
-      day2: daysOfWeek[1] === '六' || daysOfWeek[1] === '日'? "#f54545": colors[i + 1 + 4],
-      day3: daysOfWeek[2] === '六' || daysOfWeek[2] === '日'? "#f54545": colors[i + 1 + 8],
-      day4: daysOfWeek[3] === '六' || daysOfWeek[3] === '日'? "#f54545": colors[i + 1 + 12],
-      day5: daysOfWeek[4] === '六' || daysOfWeek[4] === '日'? "#f54545": colors[i + 1 + 16],
-      day6: daysOfWeek[5] === '六' || daysOfWeek[5] === '日'? "#f54545": colors[i + 1 + 20],
-      day7: daysOfWeek[6] === '六' || daysOfWeek[6] === '日'? "#f54545": colors[i + 1 + 24],
-    });
+    for (let i = 0; i < 4; i++) {
+      stateXyGroup.tableData.data.splice(i, 1, {
+        event: `第${i + 1}场 ${events[i]}`,
+        day1: daysOfWeek[0] === '六' || daysOfWeek[0] === '日'? "#f54545": colors[i + 1],
+        day2: daysOfWeek[1] === '六' || daysOfWeek[1] === '日'? "#f54545": colors[i + 1 + 4],
+        day3: daysOfWeek[2] === '六' || daysOfWeek[2] === '日'? "#f54545": colors[i + 1 + 8],
+        day4: daysOfWeek[3] === '六' || daysOfWeek[3] === '日'? "#f54545": colors[i + 1 + 12],
+        day5: daysOfWeek[4] === '六' || daysOfWeek[4] === '日'? "#f54545": colors[i + 1 + 16],
+        day6: daysOfWeek[5] === '六' || daysOfWeek[5] === '日'? "#f54545": colors[i + 1 + 20],
+        day7: daysOfWeek[6] === '六' || daysOfWeek[6] === '日'? "#f54545": colors[i + 1 + 24],
+      });
 
-    stateShGroup.tableData.data.splice(i, 1, {
-      event: `第${i + 1}场 ${events[i]}`,
-      day1: daysOfWeek[0] === '六' || daysOfWeek[0] === '日'? "#f54545": colors[28 + i + 1],
-      day2: daysOfWeek[1] === '六' || daysOfWeek[1] === '日'? "#f54545": colors[28 + i + 1 + 4],
-      day3: daysOfWeek[2] === '六' || daysOfWeek[2] === '日'? "#f54545": colors[28 + i + 1 + 8],
-      day4: daysOfWeek[3] === '六' || daysOfWeek[3] === '日'? "#f54545": colors[28 + i + 1 + 12],
-      day5: daysOfWeek[4] === '六' || daysOfWeek[4] === '日'? "#f54545": colors[28 + i + 1 + 16],
-      day6: daysOfWeek[5] === '六' || daysOfWeek[5] === '日'? "#f54545": colors[28 + i + 1 + 20],
-      day7: daysOfWeek[6] === '六' || daysOfWeek[6] === '日'? "#f54545": colors[28 + i + 1 + 24],
-    });
+      stateShGroup.tableData.data.splice(i, 1, {
+        event: `第${i + 1}场 ${events[i]}`,
+        day1: daysOfWeek[0] === '六' || daysOfWeek[0] === '日'? "#f54545": colors[28 + i + 1],
+        day2: daysOfWeek[1] === '六' || daysOfWeek[1] === '日'? "#f54545": colors[28 + i + 1 + 4],
+        day3: daysOfWeek[2] === '六' || daysOfWeek[2] === '日'? "#f54545": colors[28 + i + 1 + 8],
+        day4: daysOfWeek[3] === '六' || daysOfWeek[3] === '日'? "#f54545": colors[28 + i + 1 + 12],
+        day5: daysOfWeek[4] === '六' || daysOfWeek[4] === '日'? "#f54545": colors[28 + i + 1 + 16],
+        day6: daysOfWeek[5] === '六' || daysOfWeek[5] === '日'? "#f54545": colors[28 + i + 1 + 20],
+        day7: daysOfWeek[6] === '六' || daysOfWeek[6] === '日'? "#f54545": colors[28 + i + 1 + 24],
+      });
 
-    stateXySingle.tableData.data.splice(i, 1, {
-      event: `第${i + 1}场 ${events[i]}`,
-      day1: daysOfWeek[0] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
-      day2: daysOfWeek[1] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
-      day3: daysOfWeek[2] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
-      day4: daysOfWeek[3] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
-      day5: daysOfWeek[4] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
-      day6: daysOfWeek[5] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
-      day7: daysOfWeek[6] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
-    });
+      stateXySingle.tableData.data.splice(i, 1, {
+        event: `第${i + 1}场 ${events[i]}`,
+        day1: daysOfWeek[0] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+        day2: daysOfWeek[1] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+        day3: daysOfWeek[2] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+        day4: daysOfWeek[3] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+        day5: daysOfWeek[4] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+        day6: daysOfWeek[5] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+        day7: daysOfWeek[6] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
+      });
 
-    stateShSingle.tableData.data.splice(i, 1, {
-      event: `第${i + 1}场 \n\n ${events[i]}`,
-      day1: daysOfWeek[0] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
-      day2: daysOfWeek[1] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
-      day3: daysOfWeek[2] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
-      day4: daysOfWeek[3] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
-      day5: daysOfWeek[4] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
-      day6: daysOfWeek[5] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
-      day7: daysOfWeek[6] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
-    });
-  }
-  const days = ['day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7'];
+      stateShSingle.tableData.data.splice(i, 1, {
+        event: `第${i + 1}场 \n\n ${events[i]}`,
+        day1: daysOfWeek[0] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+        day2: daysOfWeek[1] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+        day3: daysOfWeek[2] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+        day4: daysOfWeek[3] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+        day5: daysOfWeek[4] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+        day6: daysOfWeek[5] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+        day7: daysOfWeek[6] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
+      });
+    }
+    const days = ['day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7'];
 
-  let selectedgroupcolors = [];
-  selectedgroupcolors.push(null);
-  let tableData = [
-    stateXyGroup.tableData.data,
-    stateShGroup.tableData.data
-  ];
-  for (let data of tableData) {
-    for (let day of days) {
-      for (let j = 0; j < 4; j++) {
-        selectedgroupcolors.push(data[j][day]);
+    let selectedgroupcolors = [];
+    selectedgroupcolors.push(null);
+    let tableData = [
+      stateXyGroup.tableData.data,
+      stateShGroup.tableData.data
+    ];
+    for (let data of tableData) {
+      for (let day of days) {
+        for (let j = 0; j < 4; j++) {
+          selectedgroupcolors.push(data[j][day]);
+        }
       }
     }
-  }
-  selectedGroupColors.value = selectedgroupcolors;
+    selectedGroupColors.value = selectedgroupcolors;
 
-  let selectedsinglecolors = [];
-  selectedsinglecolors.push(null);
-  tableData = [
-    stateXySingle.tableData.data,
-    stateShSingle.tableData.data
-  ];
-  for (let data of tableData) {
-    for (let day of days) {
-      for (let j = 0; j < 4; j++) {
-        selectedsinglecolors.push(data[j][day]);
+    let selectedsinglecolors = [];
+    selectedsinglecolors.push(null);
+    tableData = [
+      stateXySingle.tableData.data,
+      stateShSingle.tableData.data
+    ];
+    for (let data of tableData) {
+      for (let day of days) {
+        for (let j = 0; j < 4; j++) {
+          selectedsinglecolors.push(data[j][day]);
+        }
       }
     }
-  }
-  selectedSingleColors.value = selectedsinglecolors;
+    selectedSingleColors.value = selectedsinglecolors;
 
-  stateXyGroup.tableData.config.total = stateXyGroup.tableData.data.length;
-  stateShGroup.tableData.config.total = stateShGroup.tableData.data.length;
-  stateXySingle.tableData.config.total = stateXySingle.tableData.data.length;
-  stateShSingle.tableData.config.total = stateShSingle.tableData.data.length;
-  setTimeout(() => {
-    stateXyGroup.tableData.config.loading = false;
-  }, 500);
-  setTimeout(() => {
-    stateShGroup.tableData.config.loading = false;
-  }, 500);
-  setTimeout(() => {
-    stateXySingle.tableData.config.loading = false;
-  }, 500);
-  setTimeout(() => {
-    stateShSingle.tableData.config.loading = false;
-  }, 500);
+    stateXyGroup.tableData.config.total = stateXyGroup.tableData.data.length;
+    stateShGroup.tableData.config.total = stateShGroup.tableData.data.length;
+    stateXySingle.tableData.config.total = stateXySingle.tableData.data.length;
+    stateShSingle.tableData.config.total = stateShSingle.tableData.data.length;
+    setTimeout(() => {
+      stateXyGroup.tableData.config.loading = false;
+    }, 500);
+    setTimeout(() => {
+      stateShGroup.tableData.config.loading = false;
+    }, 500);
+    setTimeout(() => {
+      stateXySingle.tableData.config.loading = false;
+    }, 500);
+    setTimeout(() => {
+      stateShSingle.tableData.config.loading = false;
+    }, 500);
+  });
 };
 
 function getScreenSize() {
