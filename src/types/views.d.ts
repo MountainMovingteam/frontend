@@ -14,6 +14,7 @@ type Recommend = {
 	iconColor: string;
 };
 declare type PersonalState = {
+	isAdmin: boolean,
 	newsInfoList: NewInfo[];
 	recommendList: Recommend[];
 	roleIdent: string;
