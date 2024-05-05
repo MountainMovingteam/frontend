@@ -23,7 +23,7 @@
 
           <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form-item label="预约日期">
-              <el-select v-model="state.selectedDay" placeholder="请选择预约日期" class="w100">
+              <el-select v-model="state.selectedDay" placeholder="请选择预约日期" class="w100" @change="updateDate">
                 <el-option
                     v-for="(day, index) in state.days"
                     :key="index"
@@ -39,7 +39,7 @@
 
           <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form-item label="预约场次">
-              <el-select v-model="state.selectedEvent" placeholder="请选择预约场次" class="w100">
+              <el-select v-model="state.selectedEvent" placeholder="请选择预约场次" class="w100" @change="updateSession">
                 <el-option
                     v-for="(event, index) in state.events"
                     :key="index"
@@ -90,7 +90,7 @@
                   </el-col>
                 </el-form-item>
                 <div style="margin-top: 20px;"></div>
-                <el-button style="margin-top: 20px;" v-if="index === state.teamMembers.length - 1 && state.teamMembers.length < 20"
+                <el-button style="margin-top: 20px;" v-if="index === state.teamMembers.length - 1 && state.teamMembers.length < state.selectedCapacity[state.events.indexOf(state.selectedEvent)]"
                            @click="addTeamMember">增加成员</el-button>
               </template>
             </el-form>
@@ -416,12 +416,49 @@ const onCancel = () => {
   closeDialog();
 };
 
+const changeState = (campus: string, selectedDay: string) => {
+  let start = 4 * (state.data.column - 1) + 1;
+  if (selectedDay != null) {
+    start = 4 * state.days.indexOf(selectedDay) + 1;
+  }
+  if (campus != null && campus =='shahe') {
+    start += 28;
+  }
+  state.selectedCapacity = [];
+  for (let i = start;i < start + 4;i++) {
+    state.selectedCapacity.push(state.capacity[i]);
+  }
+  state.accessibleEvents = [];
+  for(let i = start; i < start + 4;i++) {
+    if (state.data.bookingWay === 'group') {
+      if (state.groupColors[i] == "#99FF99") {
+        state.accessibleEvents.push(i - start);
+      }
+    } else {
+      if (state.singleColors[i] == "#99FF99") {
+        state.accessibleEvents.push(i - start);
+      }
+    }
+  }
+}
+
 const updateCampus = (campus: string) => {
+  changeState(campus, null);
   emit('updateCampus', campus)
 }
 
+const updateDate = (selectedDay: string) => {
+  refreshData();
+  changeState(null, selectedDay);
+}
+
 const updateBookingWay = (way: string) => {
+  refreshData();
   emit('updateBookingWay', way)
+}
+
+const updateSession = () => {
+  refreshData();
 }
 
 const validateSeletion = () => {
