@@ -17,8 +17,7 @@
                     </el-input>
                 </div>
                 <!-- 功能按钮 -->
-                <div style="width: 10%;"></div>
-                <div>
+                <div class="button-container">
                     <el-button type="red" class="hover-lighten" @click="deleteDialogVisible = true">清空讲解员</el-button>
                     <el-button type="success" class="hover-lighten" @click="exportAll()">导出讲解员 </el-button>
                     <el-button type="info" class="hover-lighten" @click="uploadDialogVisible = true">导入讲解员 </el-button>
@@ -76,6 +75,7 @@ export default {
             exportData: ref([] as Array<ExportData>),
             select: ref([]),
             input: ref(''),
+            cardSpan: ref(8),
             deleteDialogVisible: ref(false),
             uploadDialogVisible: ref(false),
             options: [
@@ -165,6 +165,9 @@ export default {
             }
             return bufCommentators;
         },
+        getCardSpan() {
+            return window.innerWidth < 768 ? 24 : 8;
+        }
     },
     methods: {
         getCommentators() {
@@ -279,29 +282,56 @@ export default {
         deleteCommentator(num: any) {
             console.log(num)
             this.commentators = this.commentators.filter(item => item.num != num);
-        }
+        },
+
+
     }
 }
 </script>
 
 <style scoped lang="scss">
 .centered-content {
-    padding: 0 100px;
+    padding: 0 8%;
     /* 左右空间 */
 
 }
 
 .header {
     margin-top: 35px;
-    //横向排列所有模块
-    display: flex;
+
+    @media only screen and (min-width: 1270px) {
+        display: flex
+    }
+
     justify-content: space-between;
 }
 
 .input-container {
+    @media only screen and (min-width: 1270px) {
+        width: 50%;
+    }
+
+    @media only screen and (max-width: 1270px) {
+        width: 80%;
+    }
+
     height: 66%;
     display: flex;
     justify-content: space-between;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+
+    @media only screen and (min-width: 1270px) {
+        width: 30%;
+    }
+
+    @media only screen and (max-width: 1270px) {
+        margin-top: 1%;
+        width: 80%;
+    }
 }
 
 .input-with-select .el-input-group__prepend {

@@ -73,8 +73,8 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isKeepAlive: true,
 					isAffix: false,
 					isIframe: false,
-					roles: ['admin','user'],
-					icon: '',
+					roles: ['admin', 'user'],
+					icon: 'ele-Calendar',
 				},
 			},
 			{
@@ -89,7 +89,7 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isAffix: false,
 					isIframe: false,
 					roles: ['admin'],
-					icon: '',
+					icon: 'ele-Location',
 				},
 			},
 			{
@@ -104,7 +104,7 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isAffix: false,
 					isIframe: false,
 					roles: ['admin'],
-					icon: '',
+					icon: 'ele-Microphone',
 				},
 			},
 			{
