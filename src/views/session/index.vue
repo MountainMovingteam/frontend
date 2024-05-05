@@ -390,26 +390,24 @@ const getTableData = () => {
           day7: "#99FF99",
         });
       }
-
+    xyTable0.tableData.config.total = xyTable0.tableData.data.length;
+    shTable0.tableData.config.total = shTable0.tableData.data.length;
+    xyTable1.tableData.config.total = xyTable1.tableData.data.length;
+    shTable1.tableData.config.total = shTable1.tableData.data.length;
+    setTimeout(() => {
+      xyTable0.tableData.config.loading = false;
+    }, 500);
+    setTimeout(() => {
+      shTable0.tableData.config.loading = false;
+    }, 500);
+    setTimeout(() => {
+      xyTable1.tableData.config.loading = false;
+    }, 500);
+    setTimeout(() => {
+      shTable1.tableData.config.loading = false;
+    }, 500);
   });
 
-
-  xyTable0.tableData.config.total = xyTable0.tableData.data.length;
-  shTable0.tableData.config.total = shTable0.tableData.data.length;
-  xyTable1.tableData.config.total = xyTable1.tableData.data.length;
-  shTable1.tableData.config.total = shTable1.tableData.data.length;
-  setTimeout(() => {
-    xyTable0.tableData.config.loading = false;
-  }, 500);
-  setTimeout(() => {
-    shTable0.tableData.config.loading = false;
-  }, 500);
-  setTimeout(() => {
-    xyTable1.tableData.config.loading = false;
-  }, 500);
-  setTimeout(() => {
-    shTable1.tableData.config.loading = false;
-  }, 500);
 };
 const windowWidth = ref(window.innerWidth);
 const windowHeight = ref(window.innerHeight)
