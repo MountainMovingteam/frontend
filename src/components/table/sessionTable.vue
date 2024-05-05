@@ -22,7 +22,7 @@
       >
         <template v-slot="scope">
           <template v-if="item.key === 'event'">
-            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100px;">
+            <span  style="display: flex; align-items: center; justify-content: flex-start; height: 100px;">
               {{ scope.row[item.key] }}
             </span>
           </template>
@@ -31,7 +31,7 @@
 <!--                  :style="{ backgroundColor: scope.row[item.key], display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center' }"-->
 <!--                  @click="handleCellClick(scope.$index, index, scope.row[item.key] )"-->
 <!--            > <i v-if="isSelected(scope.$index, index)" class="check-mark">✓</i> </span>-->
-            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100px;":style="{ backgroundColor: scope.row[item.key].color, display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center' }" @click="handleCellClick(scope.$index, index, scope.row[item.key] )">
+            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100px;white-space: pre-wrap;":style="{ backgroundColor: scope.row[item.key].color, display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center' }" @click="handleCellClick(scope.$index, index, scope.row[item.key] )">
               {{ scope.row[item.key].text }}
               </span>
           </template>

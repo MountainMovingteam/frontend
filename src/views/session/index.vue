@@ -83,7 +83,6 @@
 import {defineAsyncComponent, onMounted, reactive, ref} from "vue";
 import '/@/types/session.d.ts'
 import {getPlaceDetails} from "/@/api/session";
-import {getCommentators} from "/@/api/session";
 import {ElMessage} from "element-plus";
 
 const selectedTime = ref(0);
@@ -293,7 +292,7 @@ const shTable1 = reactive<TableState>(<TableState>{
 });
 const selectedRow = ref(0);
 const selectedColumn = ref(0);
-const state = reactive<any>({
+let state = reactive<any>({
   place_details: [
     {
       week_num: 0,
@@ -308,18 +307,6 @@ const state = reactive<any>({
   ]
 });
 
-const commentatorState = reactive<any>({
-  list: [
-    {
-      num: "string",
-      name: "string",
-      tag: 0,
-      time_index: [
-        0
-      ]
-    }
-  ]
-});
 const events = ['8:00-9:30', '10:00-11:30', '14:00-15:30', '16:00-17:30'];
 
 function selectLocation(location: string) {
@@ -336,77 +323,77 @@ const getTableData = () => {
   xyTable1.tableData.config.loading = true;
   shTable1.tableData.config.loading = true;
   const response = getPlaceDetails();
-  const commentatorRes = getCommentators();
   let colors = [];
   let texts = [];
   response.then(response => {
     const data = response.data;
-    console.log(data);
     state.place_details = data.place_details;
-  });
-  commentatorRes.then(commentatorRes => {
-    const data = commentatorRes.data;
-    console.log(data);
-    commentatorState.list = data.list;
-  });
-  for (let i = 0; i < state.place_details.length; i++) {
-    const place_detail = state.place_details[i];
-    if (place_detail.enrolled > 0) {
-      colors[i] = "#ffff00";
-    } else {
-      colors[i] = "#ffffff";
+    for (let i = 0; i < state.place_details.length; i++) {
+      const place_detail = state.place_details[i];
+      let lectures=[];
+      lectures=state.place_details[i].lecturer;
+      const time=place_detail.time_index
+      texts[time]=' '
+      for(let j=0;j<lectures.length;j++)
+      {
+        texts[time]+=' '+lectures[j]+'\n';
+      }
+      if (place_detail.enrolled > 0) {
+        colors[i] = "#ffff00";
+      } else {
+        colors[i] = "#ffffff";
+      }
     }
-  }
-  for (let i = 0; i < commentatorState.list.length; i++) {
-    const time=commentatorState.list[i].num;
-    //texts[time] =texts[time]+ commentatorState.list[i].name;
-    texts[0]=commentatorState.list.length;
-  }
-  for (let i = 0; i < 4; i++) {
-    xyTable0.tableData.data.push({
-      event: `第${i + 1}场 ${events[i]}`,
-      day1: {text: texts[i], color: colors[i]}, // 使用颜色名称
-      day2: {text: texts[i + 4], color: colors[i + 4]}, // 使用十六进制颜色码
-      day3: {text: texts[i + 8], color: colors[i + 8]}, // 使用 RGB 颜色值
-      day4: {text: texts[i + 12], color: colors[i + 12]},
-      day5: {text: texts[i + 16], color: colors[i + 16]},
-      day6: {text: texts[i + 20], color: colors[i + 20]},
-      day7: {text: texts[i + 24], color: colors[i + 24]},
-    });
 
-    shTable0.tableData.data.push({
-      event: `第${i + 1}场 ${events[i]}`,
-      day1: "#f54545", // 使用颜色名称
-      day2: "#99FF99", // 使用十六进制颜色码
-      day3: "#99FF99", // 使用 RGB 颜色值
-      day4: "#90EE90",
-      day5: "#90EE90",
-      day6: "#90EE90",
-      day7: "#90EE90",
-    });
+      for (let i = 0; i < 4; i++) {
+        xyTable0.tableData.data.push({
+          event: `第${i + 1}场 ${events[i]}`,
+          day1: {text: texts[i], color: colors[i]}, // 使用颜色名称
+          day2: {text: texts[i + 4], color: colors[i + 4]}, // 使用十六进制颜色码
+          day3: {text: texts[i + 8], color: colors[i + 8]}, // 使用 RGB 颜色值
+          day4: {text: texts[i + 12], color: colors[i + 12]},
+          day5: {text: texts[i + 16], color: colors[i + 16]},
+          day6: {text: texts[i + 20], color: colors[i + 20]},
+          day7: {text: texts[i + 24], color: colors[i + 24]},
+        });
 
-    xyTable1.tableData.data.push({
-      event: `第${i + 1}场 ${events[i]}`,
-      day1: "#f54545", // 使用颜色名称
-      day2: "#f54545", // 使用十六进制颜色码
-      day3: "#f54545", // 使用 RGB 颜色值
-      day4: "#99FF99",
-      day5: "#f54545",
-      day6: "#f54545",
-      day7: "#99FF99",
-    });
+        shTable0.tableData.data.push({
+          event: `第${i + 1}场 ${events[i]}`,
+          day1: "#f54545", // 使用颜色名称
+          day2: "#99FF99", // 使用十六进制颜色码
+          day3: "#99FF99", // 使用 RGB 颜色值
+          day4: "#90EE90",
+          day5: "#90EE90",
+          day6: "#90EE90",
+          day7: "#90EE90",
+        });
 
-    shTable1.tableData.data.push({
-      event: `第${i + 1}场 \n\n ${events[i]}`,
-      day1: "#f54545", // 使用颜色名称
-      day2: "#f54545", // 使用十六进制颜色码
-      day3: "#f54545", // 使用 RGB 颜色值
-      day4: "#99FF99",
-      day5: "#f54545",
-      day6: "#99FF99",
-      day7: "#99FF99",
-    });
-  }
+        xyTable1.tableData.data.push({
+          event: `第${i + 1}场 ${events[i]}`,
+          day1: "#f54545", // 使用颜色名称
+          day2: "#f54545", // 使用十六进制颜色码
+          day3: "#f54545", // 使用 RGB 颜色值
+          day4: "#99FF99",
+          day5: "#f54545",
+          day6: "#f54545",
+          day7: "#99FF99",
+        });
+
+        shTable1.tableData.data.push({
+          event: `第${i + 1}场 \n\n ${events[i]}`,
+          day1: "#f54545", // 使用颜色名称
+          day2: "#f54545", // 使用十六进制颜色码
+          day3: "#f54545", // 使用 RGB 颜色值
+          day4: "#99FF99",
+          day5: "#f54545",
+          day6: "#99FF99",
+          day7: "#99FF99",
+        });
+      }
+
+  });
+
+
   xyTable0.tableData.config.total = xyTable0.tableData.data.length;
   shTable0.tableData.config.total = shTable0.tableData.data.length;
   xyTable1.tableData.config.total = xyTable1.tableData.data.length;
@@ -461,7 +448,6 @@ const onOpenSubmit = (type: string) => {
 onMounted(() => {
   getScreenSize();
   getTableData();
-  getCommentators();
   getPlaceDetails();
 });
 </script>
