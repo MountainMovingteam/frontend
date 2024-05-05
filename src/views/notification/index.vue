@@ -1,48 +1,89 @@
 <template>
 	<div class="home-container " >
 		<div class='home-card-item'>
-			<div class="home-card-item-title">通知中心</div>
-			<ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto;margin-left: auto;margin-right: auto;">
-				<li v-for="i in count" :key="i" class="infinite-list-item" @click='openDialog(i)'>
+			<div class="home-card-item-title" style='font-size: large;'>通知中心</div>
+			<ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto;margin-left: auto;margin-right: auto;" v-if='notice.maxNotices > 0'>
+				<li v-for="(item, index) in notice.noticeArray" :key="index" class="infinite-list-item" @click='openDialog(index)'>
 					<div class="left-content">
-						<div class="text-line-title">Title {{ i }}</div>
-						<div class="text-line-content">Text Line 2</div>
+						<div class="text-line-title">驳回通知</div>
+						<div class="text-line-content">{{ item.key_words }}</div>
 					</div>
 					<div class="right-content">
-						<div class="text-line-content" style='margin-top: 100%;'> time </div>
+						<div class="text-line-content" style='margin-top: 30px;'>{{ item.time }} </div>
 					</div>
 				</li>
 			</ul>
+			<el-empty :description="$t('message.user.newDesc')"  class='empty' v-else></el-empty>
 		</div>
-		<DetailDialog ref="DetailDialogRef" @refresh="getInfoData" />
+		<DetailDialog ref="DetailDialogRef" />
 	</div>
 </template>
 
 <script setup lang="ts" name="notification">
-import { defineAsyncComponent,reactive, computed,ref } from 'vue';
+import { defineAsyncComponent,reactive, computed,ref,onMounted } from 'vue';
+import { staticRoutes } from '/@/router/route';
+import { reqNotice } from '/@/api/notification/index';
+import { ElMessage } from 'element-plus';
+
+const message = ref(ElMessage);
 const DetailDialog = defineAsyncComponent(() => import('/@/views/notification/dialog.vue'));
 const DetailDialogRef = ref();
 const count = ref(0)
-const load = () => {
-  count.value += 2
-}
-// 定义变量内容
-const state = reactive<any>({
+const noticeList = ref([]);
+const notice = reactive<any>({
+	maxNotices : 0,
+	noticeArray : [],
+	start: 1,
+	end:10,
+})
 
+
+const load = () => {
+	if (notice.noticeArray.length >= notice.maxNotices) {
+		return;
+	} else {
+		notice.start = notice.end + 1;
+		if (notice.start + 9 < notice.maxNotices) {
+			notice.end = notice.start + 9;
+		} else {
+			notice.end = notice.maxNotices;
+		}
+		getInfo(notice.start,notice.end);
+	}
+}
+
+
+const getInfo = (start:number,end:number)  => {
+	const data = {
+		start:start,
+		end:end
+	}
+	
+	const slicedNoticeList = noticeList.value.slice(start - 1, end);
+	notice.noticeArray = notice.noticeArray.concat(slicedNoticeList);	
+}
+
+onMounted(() => {
+	const response = reqNotice();
+	response.then(response => {
+		notice.maxNotices = response.data.num;
+		if (notice.maxNotices == 0) {
+			return;
+		}
+		noticeList.value = response.data.notice_list.slice().reverse();;
+		if (notice.maxNotices <= 10) {
+			getInfo(1,notice.maxNotices);
+		} else {
+			getInfo(1,10);
+		}
+	}).catch(error => {
+		message.value.error('通知加载失败');
+	})
+	
 });
 
-const getInfoData = () => {
-
-}
-
 const openDialog = (i:any) => {
-	console.log(i);
-	const data = {
-		title: 'Hello',
-		content: 'Some content here',
-		time: '2024-04-30'
-	};
-	DetailDialogRef.value.openDialog(i,data);
+	DetailDialogRef.value.openDialog(notice.noticeArray[i].notice_id);
 }
 </script>
 
@@ -110,6 +151,14 @@ $homeNavLengh: 8;
 			background: var(--el-color-white);
 			color: var(--el-text-color-primary);
 			border: 1px solid var(--next-border-color-light);
+			.empty {
+				@media only screen and (max-width: 768px) {
+				height: 680px;
+			}
+				@media only screen and (min-width: 768px) {
+					height:600px;
+			}
+			}
 			&:hover {
 				box-shadow: 0 2px 12px var(--next-color-dark-hover);
 				transition: all ease 0.3s;

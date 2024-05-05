@@ -2,14 +2,14 @@
 	<div class="layout-navbars-breadcrumb-user-news">
 		<div class="head-box">
 			<div class="head-box-title">{{ $t('message.user.newTitle') }}</div>
-			<div class="head-box-btn" v-if="state.newsList.length > 0" @click="onAllReadClick">{{ $t('message.user.newBtn') }}</div>
+			<!--<div class="head-box-btn" v-if="state.total > 0" @click="onAllReadClick">{{ $t('message.user.newBtn') }}</div>-->
 		</div>
 		<div class="content-box">
 			<template v-if="state.newsList.length > 0">
 				<div class="content-box-item" v-for="(v, k) in state.newsList" :key="k">
-					<div>{{ v.label }}</div>
+					<div>驳回申请</div>
 					<div class="content-box-msg">
-						{{ v.value }}
+						{{ v.key_words}}
 					</div>
 					<div class="content-box-time">{{ v.time }}</div>
 				</div>
@@ -21,23 +21,16 @@
 </template>
 
 <script setup lang="ts" name="layoutBreadcrumbUserNews">
-import { reactive } from 'vue';
+import { reactive,ref } from 'vue';
 import router from '/@/router';
+import { reqNotice } from '/@/api/notification/index';
+import { ElMessage } from 'element-plus';
 
+const message = ref(ElMessage);
 // 定义变量内容
-const state = reactive({
-	newsList: [
-		{
-			label: 'Info 1',
-			value: 'world',
-			time: '2024-4-16',
-		},
-		{
-			label: 'Info 2',
-			value: 'world',
-			time: '2024-4-16',
-		},
-	],
+const state = reactive<any>({
+	total:0,
+	newsList: [],
 });
 
 // 全部已读点击
@@ -48,6 +41,21 @@ const onAllReadClick = () => {
 const onGoToGiteeClick = () => {
 	router.push('/notification');
 };
+
+const response = reqNotice();
+	response.then(response => {
+		state.total = response.data.num;
+		if (state.total > 0) {
+			const reversedList = response.data.notice_list.slice().reverse();
+			if (state.total > 1) {
+				state.newsList = reversedList.slice(0, 2);
+			} else {
+				state.newsList = reversedList;
+			}
+		}
+	}).catch(error => {
+		message.value.error('通知加载失败');
+	}) 
 </script>
 
 <style scoped lang="scss">
