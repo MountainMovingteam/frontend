@@ -187,7 +187,7 @@ export default {
                     }
                 })
                 .catch(err => {
-                    ElMessage.error("服务器错误");
+                    ElMessage.error("更新失败");
                 })
             this.dialogVisible = false
         },
