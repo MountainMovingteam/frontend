@@ -74,12 +74,7 @@ const currentTime = computed(() => {
 // 登录
 const onSignIn = async () => {
 	state.loading.signIn = true;
-	// 存储 token 到浏览器缓存
-	//Session.set('token', Math.random().toString(36).substr(0));
-	// 模拟数据，对接接口时，记得删除多余代码及对应依赖的引入。用于 `/src/stores/userInfo.ts` 中不同用户登录判断（模拟数据）
-	//Cookies.set('userName', state.ruleForm.userName);
 	try {
-    // Call the signIn method from the useLoginApi function
 		const response = await useLoginApi().signIn(state.ruleForm);
 		Session.set('token', response.token)
 		Local.set('access',response.token) //access 本地持久化存储
@@ -92,7 +87,6 @@ const onSignIn = async () => {
 	} catch (error) {
 		console.error('Error signing in:', error);
 		ElMessage.error('用户名或密码错误')
-		// Handle the error as needed, e.g., show an error message to the user
 	} finally {
 		state.loading.signIn = false;
 	}
@@ -105,10 +99,7 @@ const signInSuccess = (isNoPower: boolean | undefined) => {
 		ElMessage.warning('抱歉，您没有登录权限');
 		Session.clear();
 	} else {
-		// 初始化登录成功时间问候语
 		let currentTimeInfo = currentTime.value;
-		// 登录成功，跳到转首页
-		// 如果是复制粘贴的路径，非首页/登录页，那么登录成功后重定向到对应的路径中
 		if (route.query?.redirect) {
 			router.push({
 				path: <string>route.query?.redirect,
