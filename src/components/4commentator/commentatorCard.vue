@@ -156,7 +156,7 @@ export default {
                 .then(res => {
                     if (res.status == 200) {
                         ElMessage.success("删除成功");
-                        this.$emit("getCommentators")
+                        this.$emit("deleteCommentator", this.local.localNum)
                     } else {
                         ElMessage.error("删除失败");
                     }

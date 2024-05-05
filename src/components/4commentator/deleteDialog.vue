@@ -52,18 +52,23 @@ export default {
         deleteAll() {
             this.$emit('deleteAll');
         },
-        exportAndDelete() {
-            const exportPromise = new Promise((resolve) => {
-                this.$emit('exportAll');
-                resolve('1');
+        exportAll() {
+            return new Promise((resolve, reject) => {
+                try {
+                    this.$emit('exportAll');
+                    resolve('导出完成');
+                } catch (error) {
+                    reject(error);
+                }
             });
-
-            exportPromise.then(async () => {
+        },
+        async exportAndDelete() {
+            try {
+                await this.exportAll();
                 await this.deleteAll();
-            }).catch(error => {
-                console.error('Export failed:', error);
-            });
-
+            } catch (error) {
+                console.error('Export or delete failed:', error);
+            }
         },
     }
 };

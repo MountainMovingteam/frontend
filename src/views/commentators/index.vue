@@ -31,7 +31,7 @@
                         <el-col v-for="(commentator, index) in rowCommentators" :key="index" :span="8">
                             <CommentatorCard :name="commentator.name" :num="commentator.num" :tag="commentator.tag"
                                 :weekday="commentator.weekday" :session="commentator.session" :campus="commentator.campus"
-                                @getCommentators="getCommentators" />
+                                @deleteCommentator="deleteCommentator" />
                         </el-col>
                     </el-row>
                 </div>
@@ -44,7 +44,7 @@
                 <!-- 上传按钮dialog -->
 
                 <Upload v-model="uploadDialogVisible" @exportAll="exportAll" @cancel="cancelUpload"
-                    @getCommentators="getCommentators"></Upload>
+                    @Commentators="getCommentators" @closeDialog="uploadDialogVisible = false"></Upload>
                 <!-- 添加按钮dialog -->
                 <AddDialog @getCommentators="getCommentators"></AddDialog>
             </div>
@@ -191,16 +191,11 @@ export default {
             }
             myPOST('/api/manage/lecturer/find', postData).then(response => {
                 if (response.status === 200) {
-                    this.commentators = []
                     this.commentators = [...response.data.list]
-                    for (let i = 0; i < this.commentators.length; i++) {
-                        console.log(String(this.commentators[i].name) + ":" + Number(this.commentators[i].time_index))
-                    }
                     this.select = []
                     this.input = ''
                 } else {
                     // 处理未获取到数据的情况
-                    ElMessage.error('获取数据失败');
                     ElMessage.error('获取数据失败');
                 }
             }).catch(error => {
@@ -250,17 +245,7 @@ export default {
 
 
         async exportAll() {
-            await myGET('/api/manage/lecturer', {}).then(response => {
-                if (response.status === 200) {
-                    this.exportData = getData2Show(response.data.list);
-                } else {
-                    // 处理未获取到数据的情况
-                    ElMessage.error('获取数据失败');
-                }
-            }).catch(error => {
-                // 处理请求失败的情况
-                ElMessage.error('获取数据失败');
-            });
+            this.exportData = getData2Show(this.commentators);
             try {
                 let buf = JSON.parse(JSON.stringify(this.exportData));
                 let json: Array<ExportData> = buf.map((item: ExportData) => {
@@ -283,12 +268,18 @@ export default {
 
                 return Promise.resolve();
             } catch (error) {
-                console.error('Export failed:', error);
+                ElMessage.error('导出失败');
                 return Promise.reject(error);
             }
+        },
+
+        // addCommentator(commentator: Commentator) {
+        //     this.commentators.unshift(commentator);
+        // }
+        deleteCommentator(num: any) {
+            console.log(num)
+            this.commentators = this.commentators.filter(item => item.num != num);
         }
-
-
     }
 }
 </script>
