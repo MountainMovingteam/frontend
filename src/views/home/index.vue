@@ -48,7 +48,7 @@
 								<img :src="`${pics.base}${src}`" style="height: 100%;width:100%"/>
 							</el-carousel-item>
 						</el-carousel>
-					<li v-for="(item, index) in info.infoArray" :key="index" class="infinite-list-item">
+					<li v-for="(item, index) in info.infoArray" :key="index" class="infinite-list-item" @click="openUrl(item.address)">
 						<div class="left-content">
 							<div class="text-line-title">{{ item.title }}</div>
 							<div class="text-line-content">{{item.pre_content}}</div>
@@ -72,7 +72,7 @@ import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
 import { getInfoList,getPicList } from '/@/api/mainpage/index'
 import { ElMessage } from 'element-plus';
 // 定义变量内容
-
+import router from '/@/router';
 const storesTagsViewRoutes = useTagsViewRoutes();
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
@@ -200,6 +200,10 @@ const load = () => {
 		getInfo(info.start,info.end);
 	}
 }
+
+const openUrl = (address:string) => {
+        window.open(address);
+    }
 
 onMounted(() => {
 	initEchartsResize();
