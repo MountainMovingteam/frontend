@@ -20,8 +20,11 @@
 
 <script setup lang="ts" name="systemUserDialog">
 import { reactive, ref } from 'vue';
+import { reqNoticeDetail } from '/@/api/notification/index';
+import { ElMessage } from 'element-plus';
 
-// 定义子组件向父组件传值/事件
+const message = ref(ElMessage);
+
 const emit = defineEmits(['refresh']);
 
 // 定义变量内容
@@ -41,12 +44,17 @@ const state = reactive({
 });
 
 // 打开弹窗
-const openDialog = (row: any,data:any) => {
-	state.dialog.isShowDialog = true;
-    state.dialog.title = data.title;
-    state.notice.content = data.content;
-    state.notice.time = data.time;
-    state.notice.index = row;
+const openDialog = (id:number) => {
+	  state.dialog.isShowDialog = true;
+    const data = {notice_id : id}
+    const response = reqNoticeDetail(data);
+    response.then(response => {
+      state.notice.content = response.data.content;
+      state.notice.time = response.data.time;
+      state.dialog.title = '驳回申请'
+    }).catch(error => {
+      message.value.error('通知加载失败');
+    })
 };
 // 关闭弹窗
 const closeDialog = () => {
