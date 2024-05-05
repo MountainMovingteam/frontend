@@ -69,7 +69,7 @@
 			<!-- 参与过的活动 -->
 			<el-col :span="24">
 				<el-card shadow="hover" class="mt15" header="活动记录">
-					<el-row :gutter="15" class="personal-recommend-row">
+					<!--<el-row :gutter="15" class="personal-recommend-row">
 						<el-col :sm="6" v-for="(v, k) in state.recommendList" :key="k" class="personal-recommend-col">
 							<div class="personal-recommend" :style="{ 'background-color': v.bg }">
 								<SvgIcon :name="v.icon" :size="70" :style="{ color: v.iconColor }" />
@@ -79,7 +79,9 @@
 								</div>
 							</div>
 						</el-col>
-					</el-row>
+					
+					</el-row>-->
+					<div style='text-align: center;min-height: 40px;margin-top: auto;margin-bottom: auto;'>暂无活动记录</div>
 				</el-card>
 			</el-col>
 
