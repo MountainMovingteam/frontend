@@ -6,18 +6,19 @@
                     <Avatar />
                 </el-icon>
                 <div class="topic">
-                    {{ localName }}
+                    {{ local.localName }}
                 </div>
             </div>
-            <el-tag type="danger" effect="light">{{ localTag }}</el-tag>
+            <el-tag type="danger" effect="light">{{ local.localTag }}</el-tag>
         </div>
 
-        <div class="text">学号：{{ localNum }}</div>
-        <div class="text">校区：{{ localCampus }}</div>
-        <div class="text">工作日：{{ localWeekday }}</div>
-        <div class="text">场次：{{ localSession }}</div>
+        <div class="text">学号：{{ local.localNum }}</div>
+        <div class="text">校区：{{ local.localCampus }}</div>
+        <div class="text">工作日：{{ local.localWeekday }}</div>
+        <div class="text">场次：{{ local.localSession }}</div>
         <div class="buttonContainer">
-            <el-button type="blue" @click="dialogVisible = true" class="hover-lighten">修改信息 </el-button>
+            <el-button type="blue" @click="closeDialog()" class="hover-lighten">修改信息
+            </el-button>
             <el-button type="danger" @click="myDelete()">
                 <el-icon>
                     <Delete />
@@ -85,12 +86,14 @@ export default {
     data() {
         return {
             dialogVisible: false,
-            localName: this.name,
-            localNum: this.num,
-            localTag: this.tag,
-            localWeekday: this.weekday,
-            localSession: this.session,
-            localCampus: this.campus,
+            local: reactive({
+                localName: this.name,
+                localNum: this.num,
+                localTag: this.tag,
+                localWeekday: this.weekday,
+                localSession: this.session,
+                localCampus: this.campus,
+            }),
             form: reactive({
                 //将初始值设置为props中的数值
                 name: this.name,
@@ -102,10 +105,39 @@ export default {
             })
         }
     },
+    watch: {
+        name(newVal) {
+            this.local.localName = newVal
+        },
+        num(newVal) {
+            this.local.localNum = newVal
+        },
+        tag(newVal) {
+            this.local.localTag = newVal
+        },
+        weekday(newVal) {
+            this.local.localWeekday = newVal
+        },
+        session(newVal) {
+            this.local.localSession = newVal
+        },
+        campus(newVal) {
+            this.local.localCampus = newVal
+        },
+    },
     computed: {
         isFormValid() {
             return this.form.name && this.form.num && this.form.tag
                 && this.form.weekday && this.form.session && this.form.campus;
+        },
+        assignLocal() {
+            this.local.localName = this.name
+            this.local.localNum = this.num
+            this.local.localTag = this.tag
+            this.local.localWeekday = this.weekday
+            this.local.localSession = this.session
+            this.local.localCampus = this.campus
+            console.log(this.local)
         }
     },
     components: {
@@ -113,14 +145,18 @@ export default {
         Avatar
     },
     methods: {
+        closeDialog() {
+            this.dialogVisible = true
+            console.log(this.name)
+        },
         myDelete() {
             myPOST('/api/manage/lecturer/delete', {
-                num: this.localNum,
+                num: this.local.localNum,
             })
                 .then(res => {
                     if (res.status == 200) {
                         ElMessage.success("删除成功");
-                        this.$emit("getCommentators")
+                        this.$emit("deleteCommentator", this.local.localNum)
                     } else {
                         ElMessage.error("删除失败");
                     }
@@ -131,7 +167,7 @@ export default {
         },
         fixData() {
             myPOST('/api/manage/lecturer/edit', {
-                "old_num": this.localNum,
+                "old_num": this.local.localNum,
                 "name": this.form.name,
                 "num": this.form.num,
                 "tag": this.form.tag == "入门" ? 0 : 1,
@@ -140,12 +176,12 @@ export default {
                 .then(res => {
                     if (res.status == 200) {
                         ElMessage.success("更新成功");
-                        this.localName = this.form.name
-                        this.localNum = this.form.num
-                        this.localTag = this.form.tag
-                        this.localWeekday = this.form.weekday
-                        this.localSession = this.form.session
-                        this.localCampus = this.form.campus
+                        this.local.localName = this.form.name
+                        this.local.localNum = this.form.num
+                        this.local.localTag = this.form.tag
+                        this.local.localWeekday = this.form.weekday
+                        this.local.localSession = this.form.session
+                        this.local.localCampus = this.form.campus
                     } else {
                         ElMessage.error("更新失败");
                     }
