@@ -73,7 +73,10 @@
       </div>
     </div>
     <!--    预约按钮-->
-    <SubmitDialog :time="selectTime" :campus="selectedLocation" :row="selectedRow" :column="selectedColumn"
+    <SubmitDialog :week_num="selectTime" :time_index="selectedColumn*selectedColumn+(selectedLocation=='shahe' ? 28:0)"
+                  :campus="selectedLocation"
+                  :row="selectedRow"
+                  :column="selectedColumn"
                   ref="submitDialogRef"
                   @refresh="getTableData()"/>
   </div>
