@@ -27,11 +27,11 @@
             <el-main>
                 <!-- 讲解员列表 -->
                 <div>
-                    <el-row v-for="(commentators, index) in filteredCommentators" :gutter="20" :key="index">
-                        <el-col v-for="(commentator, index) in commentators" :key="index" :span="8">
+                    <el-row v-for="(rowCommentators, index) in filteredCommentators" :gutter="20" :key="index">
+                        <el-col v-for="(commentator, index) in rowCommentators" :key="index" :span="8">
                             <CommentatorCard :name="commentator.name" :num="commentator.num" :tag="commentator.tag"
                                 :weekday="commentator.weekday" :session="commentator.session" :campus="commentator.campus"
-                                @getCommentators="getCommentators" />
+                                @deleteCommentator="deleteCommentator" />
                         </el-col>
                     </el-row>
                 </div>
@@ -43,7 +43,8 @@
                     @cancel="cancelDelete" @deleteAll="deleteAll" @getCommentators="getCommentators"></DeleteDialog>
                 <!-- 上传按钮dialog -->
 
-                <Upload v-model="uploadDialogVisible" @exportAll="exportAll" @cancel="cancelUpload"></Upload>
+                <Upload v-model="uploadDialogVisible" @exportAll="exportAll" @cancel="cancelUpload"
+                    @Commentators="getCommentators" @closeDialog="uploadDialogVisible = false"></Upload>
                 <!-- 添加按钮dialog -->
                 <AddDialog @getCommentators="getCommentators"></AddDialog>
             </div>
@@ -182,8 +183,6 @@ export default {
 
 
         mySearch() {
-            //console.log(this.select)
-            //console.log( this.input )
             let postData: { "tags": Number[], "content"?: string } = {
                 "tags": select2PostData(this.select),
             }
@@ -197,7 +196,6 @@ export default {
                     this.input = ''
                 } else {
                     // 处理未获取到数据的情况
-                    ElMessage.error('获取数据失败');
                     ElMessage.error('获取数据失败');
                 }
             }).catch(error => {
@@ -247,17 +245,7 @@ export default {
 
 
         async exportAll() {
-            await myGET('/api/manage/lecturer', {}).then(response => {
-                if (response.status === 200) {
-                    this.exportData = getData2Show(response.data.list);
-                } else {
-                    // 处理未获取到数据的情况
-                    ElMessage.error('获取数据失败');
-                }
-            }).catch(error => {
-                // 处理请求失败的情况
-                ElMessage.error('获取数据失败');
-            });
+            this.exportData = getData2Show(this.commentators);
             try {
                 let buf = JSON.parse(JSON.stringify(this.exportData));
                 let json: Array<ExportData> = buf.map((item: ExportData) => {
@@ -280,12 +268,18 @@ export default {
 
                 return Promise.resolve();
             } catch (error) {
-                console.error('Export failed:', error);
+                ElMessage.error('导出失败');
                 return Promise.reject(error);
             }
+        },
+
+        // addCommentator(commentator: Commentator) {
+        //     this.commentators.unshift(commentator);
+        // }
+        deleteCommentator(num: any) {
+            console.log(num)
+            this.commentators = this.commentators.filter(item => item.num != num);
         }
-
-
     }
 }
 </script>
