@@ -63,7 +63,8 @@
 <script lang="ts">
 import { Plus } from '@element-plus/icons-vue'
 import { reactive } from 'vue'
-import { info2TimeIndex } from '/@/utils/timeIndex'
+import { info2TimeIndex } from '/@/utils/transform'
+import { Commentator } from '/@/types/commentator';
 import { myPOST } from '/@/api/commentator/index'
 import { ElMessage } from 'element-plus'
 
@@ -102,12 +103,14 @@ export default {
                 ElMessage.error('请填写完整的表单信息！');
                 return;
             }
-            myPOST('/api/manage/lecturer/add', {
-                "name": this.form.name,
-                "num": this.form.num,
-                "tag": this.form.tag == "入门" ? 1 : 2,
-                "time_index": info2TimeIndex(this.form)
-            })
+            const commentator: Commentator = {
+                name: this.form.name,
+                num: this.form.num,
+                tag: this.form.tag == "入门" ? 0 : 1,
+                time_index: info2TimeIndex(this.form),
+            };
+
+            myPOST('/api/manage/lecturer/add', commentator)
                 .then((response) => {
                     if (response.data.success) {
                         ElMessage.success('添加成功！');
@@ -119,6 +122,7 @@ export default {
                             session: '',
                             campus: ''
                         });
+                        //this.$emit('addCommentator', commentator)
                         this.$emit('getCommentators')
                     } else {
                         ElMessage.error('添加失败');

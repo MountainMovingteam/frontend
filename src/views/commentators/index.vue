@@ -27,11 +27,11 @@
             <el-main>
                 <!-- 讲解员列表 -->
                 <div>
-                    <el-row v-for="(commentators, index) in filteredCommentators" :gutter="20" :key="index">
-                        <el-col v-for="(commentator, index) in commentators" :key="index" :span="8">
+                    <el-row v-for="(rowCommentators, index) in filteredCommentators" :gutter="20" :key="index">
+                        <el-col v-for="(commentator, index) in rowCommentators" :key="index" :span="8">
                             <CommentatorCard :name="commentator.name" :num="commentator.num" :tag="commentator.tag"
                                 :weekday="commentator.weekday" :session="commentator.session" :campus="commentator.campus"
-                                @getCommentators="getCommentators" />
+                                @deleteCommentator="deleteCommentator" />
                         </el-col>
                     </el-row>
                 </div>
@@ -43,7 +43,8 @@
                     @cancel="cancelDelete" @deleteAll="deleteAll" @getCommentators="getCommentators"></DeleteDialog>
                 <!-- 上传按钮dialog -->
 
-                <Upload v-model="uploadDialogVisible" @exportAll="exportAll" @cancel="cancelUpload"></Upload>
+                <Upload v-model="uploadDialogVisible" @exportAll="exportAll" @cancel="cancelUpload"
+                    @Commentators="getCommentators" @closeDialog="uploadDialogVisible = false"></Upload>
                 <!-- 添加按钮dialog -->
                 <AddDialog @getCommentators="getCommentators"></AddDialog>
             </div>
@@ -58,22 +59,25 @@ import AddDialog from "/@/components/4commentator/addDialog.vue";
 import Upload from "/@/components/4commentator/uploadDialog.vue";
 
 import download from "/@/utils/exportXLSX";
-import { timeIndex2Info, select2PostData } from "/@/utils/timeIndex";
+import { select2PostData, getData2Show } from "/@/utils/transform";
 import { Commentator, ExportData } from '/@/types/commentator';
+import { myPOST, myGET } from '/@/api/commentator/index'
 
 import { Search } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { myPOST, myGET } from '/@/api/commentator/index'
+
+import { ref } from 'vue';
+
 
 export default {
     data() {
         return {
-            commentators: [] as Array<Commentator>,
-            exportData: [] as Array<ExportData>,
-            select: [],
-            input: '',
-            deleteDialogVisible: false,
-            uploadDialogVisible: false,
+            commentators: ref([] as Array<Commentator>),
+            exportData: ref([] as Array<ExportData>),
+            select: ref([]),
+            input: ref(''),
+            deleteDialogVisible: ref(false),
+            uploadDialogVisible: ref(false),
             options: [
                 {
                     value: 1,
@@ -154,16 +158,8 @@ export default {
     },
     computed: {
         filteredCommentators() {
-            let buf: Array<any> = [];
+            let buf: Array<any> = getData2Show(this.commentators);
             let bufCommentators: Array<Array<any>> = [];
-            for (let i = 0; i < this.commentators.length; i++) {
-                buf.push({
-                    ...this.commentators[i],
-                    tag: this.commentators[i].tag == 2 ? '熟练' : '入门',
-                    ...timeIndex2Info(this.commentators[i].time_index)
-                });
-            }
-            this.exportData = buf;
             for (let i = 0; i < buf.length; i += 3) {
                 bufCommentators.push(buf.slice(i, i + 3))
             }
@@ -187,25 +183,22 @@ export default {
 
 
         mySearch() {
-            //console.log(this.select)
-            //     console.log( this.input )
-            const postData = select2PostData(this.select)
-            console.log(postData)
-            myPOST('/api/manage/lecturer/find', {
-                "tags": postData,
-                "content": this.input
-            }).then(response => {
+            let postData: { "tags": Number[], "content"?: string } = {
+                "tags": select2PostData(this.select),
+            }
+            if (this.input !== "") {
+                postData["content"] = this.input
+            }
+            myPOST('/api/manage/lecturer/find', postData).then(response => {
                 if (response.status === 200) {
-                    this.commentators = response.data.list;
+                    this.commentators = [...response.data.list]
                     this.select = []
                     this.input = ''
-                    this.filteredCommentators
                 } else {
                     // 处理未获取到数据的情况
                     ElMessage.error('获取数据失败');
                 }
             }).catch(error => {
-                // 处理请求失败的情况
                 ElMessage.error('获取数据失败');
             });
         },
@@ -252,6 +245,7 @@ export default {
 
 
         async exportAll() {
+            this.exportData = getData2Show(this.commentators);
             try {
                 let buf = JSON.parse(JSON.stringify(this.exportData));
                 let json: Array<ExportData> = buf.map((item: ExportData) => {
@@ -274,12 +268,18 @@ export default {
 
                 return Promise.resolve();
             } catch (error) {
-                console.error('Export failed:', error);
+                ElMessage.error('导出失败');
                 return Promise.reject(error);
             }
+        },
+
+        // addCommentator(commentator: Commentator) {
+        //     this.commentators.unshift(commentator);
+        // }
+        deleteCommentator(num: any) {
+            console.log(num)
+            this.commentators = this.commentators.filter(item => item.num != num);
         }
-
-
     }
 }
 </script>

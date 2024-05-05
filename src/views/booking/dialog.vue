@@ -23,7 +23,7 @@
 
           <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form-item label="预约日期">
-              <el-select v-model="state.selectedDay" placeholder="请选择预约日期" class="w100">
+              <el-select v-model="state.selectedDay" placeholder="请选择预约日期" class="w100" @change="updateDate">
                 <el-option
                     v-for="(day, index) in state.days"
                     :key="index"
@@ -39,7 +39,7 @@
 
           <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form-item label="预约场次">
-              <el-select v-model="state.selectedEvent" placeholder="请选择预约场次" class="w100">
+              <el-select v-model="state.selectedEvent" placeholder="请选择预约场次" class="w100" @change="updateSession">
                 <el-option
                     v-for="(event, index) in state.events"
                     :key="index"
@@ -90,7 +90,7 @@
                   </el-col>
                 </el-form-item>
                 <div style="margin-top: 20px;"></div>
-                <el-button style="margin-top: 20px;" v-if="index === state.teamMembers.length - 1 && state.teamMembers.length < 20"
+                <el-button style="margin-top: 20px;" v-if="index === state.teamMembers.length - 1 && state.teamMembers.length < state.selectedCapacity[state.events.indexOf(state.selectedEvent)]"
                            @click="addTeamMember">增加成员</el-button>
               </template>
             </el-form>
@@ -177,6 +177,10 @@ const props = defineProps({
   singleColors: {
     type: Array as PropType<string[]>,
     default: () => [],
+  },
+  capacity: {
+    type: Array as PropType<number[]>,
+    default: () => [],
   }
 });
 
@@ -205,6 +209,8 @@ const state = reactive({
   accessibleEvents: [] as number[],
   groupColors: [] as string[],
   singleColors: [] as string[],
+  capacity: [] as number[],
+  selectedCapacity: [] as number[],
   teamMembers: [
     { name: '', studentId: '', phone: '', college: ''}
   ],
@@ -313,7 +319,7 @@ const labelText = (index: number, event: string) => {
   if (!state.accessibleEvents.includes(index)) {
     return event + "（该时间段不可预约）";
   } else {
-    return event;
+    return event + `（剩余可预约人数${state.selectedCapacity[index]}人）`;
   }
 }
 
@@ -356,11 +362,17 @@ const openDialog = (type: string, row?: any) => {
   state.selectedDay = state.days[state.data.column - 1];
   state.groupColors = props.groupColors;
   state.singleColors = props.singleColors;
+  state.capacity = props.capacity;
   let start = 4 * (state.data.column - 1) + 1;
   if (state.data.campus === 'shahe') {
     start += 28;
   }
   console.log("start" + start);
+  state.selectedCapacity = [];
+  for (let i = start;i < start + 4;i++) {
+    state.selectedCapacity.push(state.capacity[i]);
+  }
+  console.log(state.selectedCapacity);
   state.accessibleEvents = [];
   for(let i = start; i < start + 4;i++) {
     if (state.data.bookingWay === 'group') {
@@ -373,6 +385,7 @@ const openDialog = (type: string, row?: any) => {
       }
     }
   }
+  console.log("capacity" + state.capacity)
   console.log("groupcolors" + state.groupColors)
   console.log("singlecolors" + state.singleColors)
   console.log("accessibleEvents" + state.accessibleEvents)
@@ -403,12 +416,49 @@ const onCancel = () => {
   closeDialog();
 };
 
+const changeState = (campus: string, selectedDay: string) => {
+  let start = 4 * (state.data.column - 1) + 1;
+  if (selectedDay != null) {
+    start = 4 * state.days.indexOf(selectedDay) + 1;
+  }
+  if (campus != null && campus =='shahe') {
+    start += 28;
+  }
+  state.selectedCapacity = [];
+  for (let i = start;i < start + 4;i++) {
+    state.selectedCapacity.push(state.capacity[i]);
+  }
+  state.accessibleEvents = [];
+  for(let i = start; i < start + 4;i++) {
+    if (state.data.bookingWay === 'group') {
+      if (state.groupColors[i] == "#99FF99") {
+        state.accessibleEvents.push(i - start);
+      }
+    } else {
+      if (state.singleColors[i] == "#99FF99") {
+        state.accessibleEvents.push(i - start);
+      }
+    }
+  }
+}
+
 const updateCampus = (campus: string) => {
+  changeState(campus, null);
   emit('updateCampus', campus)
 }
 
+const updateDate = (selectedDay: string) => {
+  refreshData();
+  changeState(null, selectedDay);
+}
+
 const updateBookingWay = (way: string) => {
+  refreshData();
   emit('updateBookingWay', way)
+}
+
+const updateSession = () => {
+  refreshData();
 }
 
 const validateSeletion = () => {

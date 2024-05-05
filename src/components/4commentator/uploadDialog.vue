@@ -14,8 +14,12 @@
         </el-upload>
         <div class="buttonContainer">
             <el-button type="info" @click="cancel">取消</el-button>
-            <el-button type="danger" @click="submitUploadAll">直接上传</el-button>
+            <el-button type="danger" @click="uploadAll">直接上传</el-button>
             <el-button type="success" @click="exportAndUploadAll">导出并上传</el-button>
+        </div>
+        <div v-if="loading" class="loading-container" v-loading="loading" element-loading-text="正在上传..."
+            element-loading-background="rgba(122, 122, 122, 0.8)">
+            <el-loading text="上传中..." fullscreen></el-loading>
         </div>
     </el-dialog>
 </template>
@@ -30,9 +34,10 @@ import { myFormDataPOST } from '/@/api/commentator/index'
 
 export default {
     setup() {
+        const loading = ref(false);
         const uploadRef = ref<UploadInstance>()
         // 定义响应式变量 uploadFile
-        const uploadFile = ref<UploadRawFile[]>()
+        const uploadFile = ref<any[]>()
 
         const submitUploadAll = () => {
             if (uploadFile != undefined && uploadFile.value != undefined) {
@@ -40,33 +45,10 @@ export default {
                 // console.log("is click upload")
                 const formData = new FormData();
                 formData.append('file', uploadFile.value[0].raw);
-                // formData.forEach((value, key) => {
-                //     if (value instanceof File) {
-                //         console.log(`${key}: ${value.name} (${value.type})`);
-                //     } else {
-                //         console.log(`${key}: ${value}`);
-                //     }
-                // });
-                myFormDataPOST('api/manage/lecturer/upload', formData).then(response => {
-                    if (response.status === 200) {
-                        ElMessage({
-                            message: '上传成功',
-                            type: 'success'
-                        });
-                    } else {
-                        ElMessage({
-                            message: '上传失败',
-                            type: 'error'
-                        });
-                    }
-                }).catch(error => {
-                    ElMessage({
-                        message: '上传失败',
-                        type: 'error'
-                    });
-                })
+                return myFormDataPOST('/api/manage/lecturer/upload', formData)
                 //uploadRef.value!.submit()
             }
+            return null
         }
         const handleExceed: UploadProps['onExceed'] = (files) => {
             uploadRef.value!.clearFiles()
@@ -79,7 +61,8 @@ export default {
             uploadRef,
             submitUploadAll,
             handleExceed,
-            uploadFile
+            uploadFile,
+            loading
         }
     },
     props: {
@@ -90,7 +73,7 @@ export default {
     },
     data() {
         return {
-
+            //loading: ref(false)
         }
     },
     computed: {
@@ -111,7 +94,38 @@ export default {
             this.$emit('cancel')
         },
         uploadAll() {
-            this.submitUploadAll()
+            let status: any = this.submitUploadAll();
+            if (status != null) {
+                this.loading = true;
+                status.then((response: Response) => {
+                    if (response.status === 200) {
+                        ElMessage({
+                            message: '上传成功',
+                            type: 'success'
+                        });
+
+                    } else {
+                        ElMessage({
+                            message: '上传失败',
+                            type: 'error'
+                        });
+                    }
+                }).catch((error: Error) => {
+                    ElMessage({
+                        message: '上传失败',
+                        type: 'error'
+                    });
+                }).finally(() => {
+                    this.loading = false;
+                    this.$emit("closeDialog")
+                    this.$emit("getCommentators")
+                })
+            } else {
+                ElMessage({
+                    message: '请选择文件',
+                    type: 'warning'
+                });
+            }
         },
         exportAndUploadAll() {
             const exportPromise = new Promise((resolve) => {
@@ -141,5 +155,18 @@ export default {
     justify-content: flex-end;
     padding: 10px;
     display: flex;
+}
+
+.loading-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.7);
+    /* 背景色，半透明 */
 }
 </style>

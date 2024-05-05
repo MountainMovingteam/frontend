@@ -32,13 +32,15 @@ const state = reactive({
 		isShowDialog: false,
         title: ''
   },
+  formData:new FormData()
 });
 
 // 打开弹窗
-const openDialog = (avatar:any) => {
+const openDialog = (avatar:any,formData:FormData) => {
 	state.dialog.isShowDialog = true;
     state.dialog.title = '上传头像';
     state.avatar = avatar;
+    state.formData = formData;
 };
 // 关闭弹窗
 const closeDialog = () => {
@@ -63,9 +65,8 @@ const openFileInput = () => {
   }
 }
 const submit = () => {
-  const formData = new FormData();
-  formData.append('avatar', fileList.value[0]);
-  const response = modifyBaseInfo(formData);
+  state.formData.append('avatar', fileList.value[0]);
+  const response = modifyBaseInfo(state.formData);
   response.then(response => {
     ElMessage({
         type: 'success',

@@ -11,13 +11,26 @@
 				>
 					<div class="home-card-change-item " style='margin-top: auto' >
 						<el-carousel :interval="5000" arrow="always">
-							<el-carousel-item v-for="item in 4" :key="item">
-							<h3 text="2xl" justify="center">{{ item }}</h3>
+							<el-carousel-item v-for="(src, index) in pics.pictureArray" :key="index">
+								<img :src="`${pics.base}${src}`" style="height: 100%;width:100%"/>
 							</el-carousel-item>
 						</el-carousel>
 					</div>
 					<div class="home-card-change-item" style='margin-top: 0px;'>
-						<img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" style="height: 100%;width:100%"/>
+						<div class="home-card-item-title">快捷导航工具</div>
+							<div class="home-monitor">
+								<div class="flex-warp">
+									<div class="flex-warp-item" v-for="(v, k) in state.homeThree" :key="k">
+										<div class="flex-warp-item-box" :class="`home-animation${k}`">
+											<div class="flex-margin">
+												<i :class="v.icon" :style="{ color: v.iconColor }"></i>
+												<span class="pl5">{{ v.label }}</span>
+												<div class="mt10">{{ v.value }}</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 					</div>
 				</div>
 			</el-col>
@@ -29,19 +42,19 @@
 				:xl="12"
 			>
 			<div class='home-card-item' >
-				<ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto">
+				<ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto" >
 					<el-carousel :interval="5000" arrow="always" v-if='!isCollapse'>
-							<el-carousel-item v-for="item in 4" :key="item" >
-							<h3 text="2xl" justify="center">{{ item }}</h3>
+							<el-carousel-item v-for="(src, index) in pics.pictureArray" :key="index">
+								<img :src="`${pics.base}${src}`" style="height: 100%;width:100%"/>
 							</el-carousel-item>
 						</el-carousel>
-					<li v-for="i in count" :key="i" class="infinite-list-item">
+					<li v-for="(item, index) in info.infoArray" :key="index" class="infinite-list-item">
 						<div class="left-content">
-							<div class="text-line-title">Title {{ i }}</div>
-							<div class="text-line-content">Text Line 2</div>
+							<div class="text-line-title">{{ item.title }}</div>
+							<div class="text-line-content">{{item.pre_content}}</div>
 						</div>
 						<div class="right-content">
-							<img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" style="height: 60px;width:100px"/>
+							<img :src="`${info.base}${item.picture}`" style="height: 60px;width:100px"/>
 						</div>
 					</li>
 				</ul>
@@ -52,27 +65,39 @@
 </template>
 
 <script setup lang="ts" name="home">
-import { reactive, onMounted, ref, watch, nextTick, onActivated, markRaw } from 'vue';
+import { reactive, onMounted, ref, watch, nextTick, onActivated, markRaw,computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useThemeConfig } from '/@/stores/themeConfig';
 import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
-
-
+import { getInfoList,getPicList } from '/@/api/mainpage/index'
+import { ElMessage } from 'element-plus';
 // 定义变量内容
 
 const storesTagsViewRoutes = useTagsViewRoutes();
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
 const { isTagsViewCurrenFull } = storeToRefs(storesTagsViewRoutes);
-const count = ref(0)
+
+const message = ref(ElMessage);
 const screenWidth = ref(window.innerWidth)
 const isCollapse = ref(screenWidth.value >= 768)
+
+const info = reactive<any>({
+	base:'http://47.93.19.22:8000',
+	maxInfos : 0,
+	infoArray : [],
+	start: 1,
+	end:10,
+})
+
+const pics = reactive<any>({
+	base:'http://47.93.19.22:8000',
+	pictureArray:[],
+})
 const handleResize = () => {
   screenWidth.value = window.innerWidth
 }
-const load = () => {
-  count.value += 2
-}
+
 const state = reactive({
 	global: {
 		homeChartOne: null,
@@ -80,6 +105,56 @@ const state = reactive({
 		homeCharThree: null,
 		dispose: [null, '', undefined],
 	} as any,
+	homeThree: [
+		{
+			icon: 'iconfont icon-yangan',
+			label: '浅粉红',
+			value: '2.1%OBS/M',
+			iconColor: '#F72B3F',
+		},
+		{
+			icon: 'iconfont icon-wendu',
+			label: '深红(猩红)',
+			value: '30℃',
+			iconColor: '#91BFF8',
+		},
+		{
+			icon: 'iconfont icon-shidu',
+			label: '淡紫红',
+			value: '57%RH',
+			iconColor: '#88D565',
+		},
+		{
+			icon: 'iconfont icon-shidu',
+			label: '弱紫罗兰红',
+			value: '107w',
+			iconColor: '#88D565',
+		},
+		{
+			icon: 'iconfont icon-zaosheng',
+			label: '中紫罗兰红',
+			value: '57DB',
+			iconColor: '#FBD4A0',
+		},
+		{
+			icon: 'iconfont icon-zaosheng',
+			label: '紫罗兰',
+			value: '57PV',
+			iconColor: '#FBD4A0',
+		},
+		{
+			icon: 'iconfont icon-zaosheng',
+			label: '暗紫罗兰',
+			value: '517Cpd',
+			iconColor: '#FBD4A0',
+		},
+		{
+			icon: 'iconfont icon-zaosheng',
+			label: '幽灵白',
+			value: '12kg',
+			iconColor: '#FBD4A0',
+		},
+	],
 	myCharts: [] as EmptyArrayType,
 	charts: {
 		theme: '',
@@ -104,8 +179,50 @@ const initEchartsResize = () => {
 	window.addEventListener('resize', initEchartsResizeFun);
 };
 // 页面加载时
+
+const getGraph = () => {
+	const response = getPicList();
+	response.then(response => {
+		pics.pictureArray = response.data.pictures;
+	}).catch(error => {
+		message.value.error('图片加载失败');
+	})
+}
+
+const getInfo = (start:number,end:number)  => {
+	const data = {
+		start:start,
+		end:end
+	}
+	const response = getInfoList(data);
+  	response.then(response => {
+		info.maxInfos = response.data.total;
+		info.infoArray = info.infoArray.concat(response.data.list);
+		console.log(info.infoArray);
+		
+	}).catch(error => {
+		message.value.error('推送加载失败');
+	})
+}
+
+const load = () => {
+	if (info.infoArray.length >= info.maxInfos) {
+		return;
+	} else {
+		info.start = info.end + 1;
+		if (info.start + 9 < info.maxInfos) {
+			info.end = info.start + 9;
+		} else {
+			info.end = info.maxInfos;
+		}
+		getInfo(info.start,info.end);
+	}
+}
+
 onMounted(() => {
 	initEchartsResize();
+	getGraph();
+	getInfo(1,10);
 });
 // 由于页面缓存原因，keep-alive
 onActivated(() => {
@@ -135,6 +252,8 @@ watch(
 	}
 );
 
+
+
 watch(screenWidth, (newValue, oldValue) => {
   if (newValue < 768) {
     isCollapse.value = false
@@ -154,7 +273,8 @@ $homeNavLengh: 8;
 
 		.infinite-list {
 			overflow-y: hidden;
-			height: 650px;
+			@media only screen and (max-width: 768px) {height:650px;};
+			@media only screen and (min-width: 768px) {height:600px;};
 			width: 100%;
 			padding: 0;
 			margin: 0;
@@ -181,12 +301,15 @@ $homeNavLengh: 8;
 
 				.text-line-title {
 					margin-top: 5px; 
+					margin-left: 5px; 
 					font-weight: bold; 
     				font-size: 16px;
 				}
 
 				.text-line-content {
-					margin-top: 10px;
+					margin-left: 5px;
+					@media only screen and (max-width: 768px) {margin-top: 5px;};
+					@media only screen and (min-width: 768px) {margin-top: 10px;};
 				}
 			}
 			
@@ -264,21 +387,38 @@ $homeNavLengh: 8;
 				font-weight: bold;
 				height: 30px;
 			}
-			.el-carousel__item h3 {
-				color: #475669;
-				opacity: 0.75;
-				line-height: 300px;
-				margin: 0;
-				text-align: center;
+			.home-monitor {
+				height: 100%;
+				.flex-warp-item {
+					width: 25%;
+					height: 111px;
+					display: flex;
+					.flex-warp-item-box {
+						margin: auto;
+						text-align: center;
+						color: var(--el-text-color-primary);
+						display: flex;
+						border-radius: 5px;
+						background: var(--next-bg-color);
+						cursor: pointer;
+						transition: all 0.3s ease;
+						&:hover {
+							background: var(--el-color-primary-light-9);
+							transition: all 0.3s ease;
+						}
+					}
+					@for $i from 0 through $homeNavLengh {
+						.home-animation#{$i} {
+							opacity: 0;
+							animation-name: error-num;
+							animation-duration: 0.5s;
+							animation-fill-mode: forwards;
+							animation-delay: calc($i/10) + s;
+						}
+					}
 				}
-
-				.el-carousel__item:nth-child(2n) {
-				background-color: #99a9bf;
-				}
-
-				.el-carousel__item:nth-child(2n + 1) {
-				background-color: #d3dce6;
-				}
+			}
+			
 		}
 	}
 	.home-card-three {
