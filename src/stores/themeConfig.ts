@@ -126,11 +126,11 @@ export const useThemeConfig = defineStore('themeConfig', {
 			isRequestRoutes: false,
 
 			// 网站主标题（菜单导航、浏览器当前网页标题）
-			globalTitle: '软工大作业',
+			globalTitle: '安全教育体验馆',
 			// 网站副标题（登录页顶部文字）
-			globalViceTitle: '软工大作业',
+			globalViceTitle: '安全教育体验馆',
 			// 网站副标题（登录页顶部文字）
-			globalViceTitleMsg: '预约管理',
+			globalViceTitleMsg: '预约管理系统',
 			globalI18n: 'zh-cn',
 			globalComponentSize: 'large',
 		},
