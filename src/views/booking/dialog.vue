@@ -474,6 +474,13 @@ const validateSeletion = () => {
 }
 
 const validateGroupBooking = () => {
+  if (state.accessibleEvents.indexOf(state.events.indexOf(state.selectedEvent)) == -1) {
+    ElMessage({
+      type: 'error',
+      message: '请选择有效时间段！'
+    });
+    return false;
+  }
   if (state.teamMembers.length < 10) {
     ElMessage({
       type: 'error',

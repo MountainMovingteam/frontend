@@ -73,7 +73,8 @@
       </div>
     </div>
     <!--    预约按钮-->
-    <SubmitDialog :week_num="selectTime" :time_index="selectedColumn*selectedColumn+(selectedLocation=='shahe' ? 28:0)"
+    <SubmitDialog :week_num="selectedTime"
+                  :time_index="(selectedColumn - 1) * 4 + selectedRow + 1 + (selectedLocation=='shahe' ? 28:0)"
                   :campus="selectedLocation"
                   :row="selectedRow"
                   :column="selectedColumn"
@@ -83,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import {defineAsyncComponent, onMounted, reactive, ref} from "vue";
+import {defineAsyncComponent, nextTick, onMounted, reactive, ref} from "vue";
 import '/@/types/session.d.ts'
 import {getPlaceDetails} from "/@/api/session";
 import {ElMessage} from "element-plus";
@@ -425,7 +426,9 @@ const onCellClick = (info: any) => {
   console.log('点击的列数据:', info.column);
   selectedRow.value = info.row;
   selectedColumn.value = info.column;
-  onOpenSubmit("success");
+  nextTick(() => {
+    onOpenSubmit("success");
+  });
 }
 
 function areValuesValid(rowValue: number, columnValue: number) {

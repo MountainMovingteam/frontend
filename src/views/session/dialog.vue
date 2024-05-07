@@ -111,6 +111,16 @@
 
           <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form-item label="团队信息" :span="24">
+              <span v-if="state.leaderInfo.name == '' && state.leaderInfo.studentId == '' && state.leaderInfo.phone == ''">
+                <el-col class="mb10" style="font-weight: bold;">
+                    无团队预约
+                </el-col>
+              </span>
+              <span v-else>
+              <el-col class="mb10" style="margin-bottom: 5px;font-weight: bold;">
+                <hr>
+                负责人
+              </el-col>
               <el-col class="mb10">
                 姓名：{{state.leaderInfo.name}}
               </el-col>
@@ -120,15 +130,20 @@
               <el-col class="mb10">
                 电话号码：{{state.leaderInfo.phone}}
               </el-col>
+              </span>
             </el-form-item>
           </el-col>
 
           <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form-item label="个人信息" :span="24">
-              <el-form>
-                <div v-for="(member, index) in state.otherMembers" :key="member.name">
+                <span v-if="state.otherMembers.length === 0">
+                  <el-col class="mb10" style="font-weight: bold;">
+                    无个人预约
+                  </el-col>
+                </span>
+                <span v-else>
+                <span v-for="(member, index) in state.otherMembers" :key="member.name">
                   <el-col class="mb10" style="margin-bottom: 5px;font-weight: bold;">
-                    <hr>
                     预约人 {{index + 1}}
                   </el-col>
                   <el-col class="mb10">
@@ -140,8 +155,9 @@
                   <el-col class="mb10">
                     电话号码：{{member.phone}}
                   </el-col>
-                </div>
-              </el-form>
+                </span>
+                </span>
+
             </el-form-item>
           </el-col>
 
@@ -272,7 +288,9 @@ const refreshData = () => {
   state.personalInfo.name = '';
   state.personalInfo.studentId = '';
   state.personalInfo.phone = '';
-  state.leaderInfo = { name: '', studentId: '', phone: '' };
+  state.leaderInfo.name = '';
+  state.leaderInfo.studentId = '';
+  state.leaderInfo.phone = '';
   state.otherMembers = [];
 }
 
@@ -319,7 +337,7 @@ const getTableData = () => {
     const data = response.data;
     state.list = data.list;
     console.log(state.list);
-    state.list.forEach(function(item){
+    state.list.forEach(function(item: any){
       if (item.order_type === 'team') {
         state.leaderInfo.name = item.name;
         state.leaderInfo.studentId = item.id;
@@ -348,7 +366,6 @@ const getMenuData = (routes: RouteItems) => {
 };
 // 打开弹窗
 const openDialog = (type: string, row?: any) => {
-  getTableData();
   state.data.campus = props.campus;
   state.data.bookingWay = props.bookingWay;
   state.data.row = props.row;
@@ -357,7 +374,9 @@ const openDialog = (type: string, row?: any) => {
   state.selectedDay = state.days[state.data.column - 1];
   state.data.week_num = props.week_num;
   state.data.time_index = props.time_index;
-
+  console.log('weeknum' + state.data.week_num);
+  console.log('time_index' + state.data.time_index);
+  getTableData();
   if (type === 'edit') {
     // 模拟数据，实际请走接口
     row.menuType = 'menu';
