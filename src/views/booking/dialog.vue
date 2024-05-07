@@ -416,7 +416,7 @@ const onCancel = () => {
   closeDialog();
 };
 
-const changeState = (campus: string, selectedDay: string) => {
+const changeState = (campus: string, selectedDay: string, way: string) => {
   let start = 4 * (state.data.column - 1) + 1;
   if (selectedDay != null) {
     start = 4 * state.days.indexOf(selectedDay) + 1;
@@ -430,7 +430,7 @@ const changeState = (campus: string, selectedDay: string) => {
   }
   state.accessibleEvents = [];
   for(let i = start; i < start + 4;i++) {
-    if (state.data.bookingWay === 'group') {
+    if (way == 'group') {
       if (state.groupColors[i] == "#99FF99") {
         state.accessibleEvents.push(i - start);
       }
@@ -443,17 +443,18 @@ const changeState = (campus: string, selectedDay: string) => {
 }
 
 const updateCampus = (campus: string) => {
-  changeState(campus, null);
+  changeState(campus, state.selectedDay, state.data.bookingWay);
   emit('updateCampus', campus)
 }
 
 const updateDate = (selectedDay: string) => {
   refreshData();
-  changeState(null, selectedDay);
+  changeState(state.data.campus, selectedDay, state.data.bookingWay);
 }
 
 const updateBookingWay = (way: string) => {
   refreshData();
+  changeState(state.data.campus, state.selectedDay, way)
   emit('updateBookingWay', way)
 }
 
@@ -546,6 +547,16 @@ const onGroupBooking = () => {
 }
 
 const validateSingleBooking = () => {
+  // console.log(state.selectedEvent)
+  // console.log(state.events)
+  // console.log(state.accessibleEvents)
+  if (state.accessibleEvents.indexOf(state.events.indexOf(state.selectedEvent)) == -1) {
+    ElMessage({
+      type: 'error',
+      message: '请选择有效时间段！'
+    });
+    return false;
+  }
   const person = state.personalInfo;
   if (person.name.trim() === '' || person.studentId.trim() === '' || person.phone.trim() === '' || person.college.trim() === '') {
     ElMessage({
