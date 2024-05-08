@@ -214,26 +214,26 @@ const initLineChart = () => {
 	const option = {
 		backgroundColor: state.charts.bgColor,
 		title: {
-			text: '政策补贴额度',
+			text: '参观人数',
 			x: 'left',
 			textStyle: { fontSize: '15', color: state.charts.color },
 		},
 		grid: { top: 70, right: 20, bottom: 30, left: 30 },
 		tooltip: { trigger: 'axis' },
-		legend: { data: ['预购队列', '最新成交价'], right: 0 },
+		legend: { data: ['人数', '最新成交价'], right: 0 },
 		xAxis: {
 			data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
 		},
 		yAxis: [
 			{
 				type: 'value',
-				name: '价格',
+				name: '人数',
 				splitLine: { show: true, lineStyle: { type: 'dashed', color: '#f5f5f5' } },
 			},
 		],
 		series: [
 			{
-				name: '预购队列',
+				name: '人数',
 				type: 'line',
 				symbolSize: 6,
 				symbol: 'circle',
@@ -248,7 +248,7 @@ const initLineChart = () => {
 					]),
 				},
 			},
-			{
+			/*{
 				name: '最新成交价',
 				type: 'line',
 				symbolSize: 6,
@@ -283,7 +283,7 @@ const initLineChart = () => {
 						borderWidth: 2,
 					},
 				},
-			},
+			},*/
 		],
 	};
 	state.global.homeChartOne.setOption(option);
