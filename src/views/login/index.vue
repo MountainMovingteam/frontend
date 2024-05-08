@@ -8,7 +8,7 @@
 					<span class="login-left-logo-text-msg">{{ getThemeConfig.globalViceTitleMsg }}</span>
 				</div>
 			</div>
-			<div class="login-left-img">
+			<div class="login-left-img" v-if='isCollapse'>
 				<img :src="loginMain" />
 			</div>
 			<img :src="loginBg" class="login-left-waves" />
@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts" name="loginIndex">
-import { defineAsyncComponent, onMounted, reactive, computed } from 'vue';
+import { defineAsyncComponent, onMounted, reactive, computed,ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useThemeConfig } from '/@/stores/themeConfig';
 import { NextLoading } from '/@/utils/loading';
@@ -49,6 +49,9 @@ import loginBg from '/@/assets/login-bg.svg';
 // 引入组件
 const Account = defineAsyncComponent(() => import('/@/views/login/component/account.vue'));
 const Register = defineAsyncComponent(() => import('/@/views/login/component/register.vue'));
+const screenWidth = ref(window.innerWidth)
+const isCollapse = ref(screenWidth.value >= 1200)
+console.log(isCollapse.value);
 
 // 定义变量内容
 const storesThemeConfig = useThemeConfig();
@@ -69,6 +72,9 @@ const getThemeConfig = computed(() => {
 // 页面加载时
 onMounted(() => {
 	NextLoading.done();
+});
+window.addEventListener('resize', () => {
+    isCollapse.value = window.innerWidth >= 1201;
 });
 </script>
 
