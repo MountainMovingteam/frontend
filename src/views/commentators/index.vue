@@ -27,7 +27,7 @@
                 <!-- 讲解员列表 -->
                 <div>
                     <el-row v-for="(rowCommentators, index) in filteredCommentators" :gutter="20" :key="index">
-                        <el-col v-for="(commentator, index) in rowCommentators" :key="index" :span="8">
+                        <el-col v-for="(commentator, index) in rowCommentators" :key="index" :span="getCardSpan">
                             <CommentatorCard :name="commentator.name" :num="commentator.num" :tag="commentator.tag"
                                 :weekday="commentator.weekday" :session="commentator.session" :campus="commentator.campus"
                                 @deleteCommentator="deleteCommentator" />
@@ -47,7 +47,7 @@
                 <AddDialog @getCommentators="getCommentators"></AddDialog>
             </div>
             <!-- 让下述div背景透明 -->
-            <div style="height: 500px;" v-loading="loading"></div>
+            <div style="height: 500px;" v-loading="loading" v-if="loading"></div>
         </el-container>
     </div>
 </template>
