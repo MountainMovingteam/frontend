@@ -182,20 +182,33 @@ export default {
                 .then(res => {
                     if (res.status == 200) {
                         ElMessage.success("更新成功");
-                        this.local.localName = this.form.name
-                        this.local.localNum = this.form.num
-                        this.local.localTag = this.form.tag
-                        this.local.localWeekday = this.form.weekday
-                        this.local.localSession = this.form.session
-                        this.local.localCampus = this.form.campus
+                        const { name, num, tag, weekday, session, campus } = this.form;
+                        this.local = {
+                            localName: name,
+                            localNum: num,
+                            localTag: tag,
+                            localWeekday: weekday,
+                            localSession: session,
+                            localCampus: campus
+                        };
                     } else {
+                        this.updateFrom()
                         ElMessage.error("更新失败");
                     }
                 })
                 .catch(err => {
+                    this.updateFrom()
                     ElMessage.error("更新失败");
                 })
             this.dialogVisible = false
+        },
+        updateFrom() {
+            this.form.name = this.local.localName
+            this.form.num = this.local.localNum
+            this.form.tag = this.local.localTag
+            this.form.weekday = this.local.localWeekday
+            this.form.session = this.local.localSession
+            this.form.campus = this.local.localCampus
         },
     },
     props: ["name", "num", "tag", "weekday", "session", "campus"]
