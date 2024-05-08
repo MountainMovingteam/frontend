@@ -5,107 +5,24 @@
         <el-row :gutter="35">
           <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form-item label="校区选择">
-              <el-radio-group v-model="state.data.campus" @change="updateCampus">
-                <el-radio label="xueyuan">学院路校区</el-radio>
-                <el-radio label="shahe">沙河校区</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-
-          <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
-            <el-form-item label="预约方式">
-              <el-radio-group v-model="state.data.bookingWay" @change="updateBookingWay">
-                <el-radio label="group">团队预约&nbsp;&nbsp;&nbsp;&nbsp;</el-radio>
-                <el-radio label="single">个人预约</el-radio>
-              </el-radio-group>
+              <div v-if="state.data.campus=='xueyuan'">
+                学院路校区
+              </div>
+              <div v-else>
+                沙河校区
+              </div>
             </el-form-item>
           </el-col>
 
           <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form-item label="预约日期">
-              <el-select v-model="state.selectedDay" placeholder="请选择预约日期" class="w100">
-                <el-option
-                    v-for="(day, index) in state.days"
-                    :key="index"
-                    :label="day"
-                    :value="day"
-                >
-                  {{ day }}
-                  <!--                  //asd-->
-                </el-option>
-              </el-select>
+              {{showDate(state.data.column, state.data.week_num)}}
             </el-form-item>
           </el-col>
 
           <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form-item label="预约场次">
-              <el-select v-model="state.selectedEvent" placeholder="请选择预约场次" class="w100">
-                <el-option
-                    v-for="(event, index) in state.events"
-                    :key="index"
-                    :label="labelText(index, event)"
-                    :value="event"
-                    :disabled="!state.accessibleEvents.includes(index)"
-                >
-                  <span :style="{ color: !state.accessibleEvents.includes(index) ? 'gray' : 'inherit' }">{{ labelText(index, event)}}</span>
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-
-          <el-col v-if="state.data.bookingWay === 'group'" :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
-            <el-form-item label="团队信息" :span="24"></el-form-item>
-            <template v-for="(member, index) in state.teamMembers" >
-              <el-row class="mb10" type="flex" justify="space-between">
-                <span style="margin-left: 12px; font-weight: bold;">成员{{ index === 0 ? index + 1 + '（负责人）' : index + 1 }}</span>
-                <el-form-item v-if="index != 0" >
-                  <el-col>
-                    <el-button @click="removeTeamMember(index)" type="danger" size="small">删除该成员</el-button>
-                  </el-col>
-                </el-form-item>
-              </el-row>
-
-              <el-form-item :span="24">
-                <el-col class="mb10">
-                  <el-input v-model="member.name" placeholder="姓名" clearable></el-input>
-                </el-col>
-              </el-form-item>
-
-              <el-form-item :span="24">
-                <el-col class="mb10">
-                  <el-input v-model="member.studentId" placeholder="学号" clearable></el-input>
-                </el-col>
-              </el-form-item>
-
-              <el-form-item :span="24">
-                <el-col class="mb10">
-                  <el-input v-model="member.phone" placeholder="电话号码" clearable></el-input>
-                </el-col>
-              </el-form-item>
-
-              <el-button v-if="index === state.teamMembers.length - 1 && state.teamMembers.length < 20"
-                         @click="addTeamMember">增加成员</el-button>
-            </template>
-          </el-col>
-
-          <el-col v-else-if="state.data.bookingWay === 'single'" :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
-            <el-form-item label="个人信息"></el-form-item>
-            <el-form-item :span="24">
-              <el-col class="mb10">
-                <el-input v-model="state.personalInfo.name" placeholder="姓名" clearable></el-input>
-              </el-col>
-            </el-form-item>
-
-            <el-form-item :span="24">
-              <el-col class="mb10">
-                <el-input v-model="state.personalInfo.studentId" placeholder="学号" clearable></el-input>
-              </el-col>
-            </el-form-item>
-
-            <el-form-item :span="24">
-              <el-col class="mb10">
-                <el-input v-model="state.personalInfo.phone" placeholder="电话号码" clearable></el-input>
-              </el-col>
+              {{state.selectedEvent}}
             </el-form-item>
           </el-col>
 
@@ -179,10 +96,10 @@
 </template>
 
 <script setup lang="ts" name="systemMenuDialog">
-import {defineAsyncComponent, reactive, onMounted, ref} from 'vue';
-import { storeToRefs } from 'pinia';
-import { useRoutesList } from '/@/stores/routesList';
-import { i18n } from '/@/i18n/index';
+import {defineAsyncComponent, onMounted, reactive, ref} from 'vue';
+import {storeToRefs} from 'pinia';
+import {useRoutesList} from '/@/stores/routesList';
+import {i18n} from '/@/i18n/index';
 import {ElMessage} from "element-plus";
 import {getSearchDetails} from "/@/api/session";
 // import { setBackEndControlRefreshRoutes } from "/@/router/backEnd";
@@ -308,6 +225,19 @@ const labelText = (index: number, event: string) => {
   } else {
     return event;
   }
+}
+
+const showDate = (column: number, index: number) => {
+  const currentDay = new Date();
+  const dayOfWeek = currentDay.getDay();
+  const offset = index == 0 ? 0 : 7;
+  const targetDay = dayOfWeek + 1 + column + offset + 1;
+
+  const targetDate = new Date(currentDay.getFullYear(), currentDay.getMonth(), targetDay);
+  const formattedDate = targetDate.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
+  const formattedDay = targetDate.toLocaleDateString('zh-CN', { weekday: 'long' });
+
+  return `${formattedDate} ${formattedDay}`;
 }
 
 function initializeDays(): string[] {
