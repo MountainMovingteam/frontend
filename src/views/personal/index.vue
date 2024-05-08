@@ -30,7 +30,7 @@
 								</el-col>
 								<el-col :span="24">
 									<el-row>
-										<el-col :xs="24" :sm="8" class="personal-item mb6">
+										<el-col :xs="24" :sm="8" class="personal-item mb6" v-if='!state.isAdmin'>
 											<div class="personal-item-label">学院：</div>
 											<div class="personal-item-value">{{ state.personalForm.academy === 0 ? '暂无学院信息' : state.personalForm.academy }}</div>
 										</el-col>
@@ -324,12 +324,13 @@ const getInfo = () => {
     state.personalForm.name = data.name;
     state.personalForm.email = data.email;
 	state.personalForm.phone = data.phone;
-	state.personalForm.academy = data.academy === null ? 0 : data.academys;
+	state.personalForm.academy = data.academy === null ? 0 : data.academy;
 	state.personalForm.logintime = Local.get('userInfo').logintime;
     if (Local.get('role') == 1) {
 		state.personalForm.role = '管理员'
 		state.roleIdent = '工号'
 		state.isAdmin = true;
+		state.personalForm.academy = 0;
 	} else {
 		state.personalForm.role = '普通用户'
 		state.roleIdent = '学号'
