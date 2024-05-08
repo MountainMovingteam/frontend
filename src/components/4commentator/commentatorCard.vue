@@ -108,21 +108,27 @@ export default {
     watch: {
         name(newVal) {
             this.local.localName = newVal
+            this.form.name = newVal
         },
         num(newVal) {
             this.local.localNum = newVal
+            this.form.num = newVal
         },
         tag(newVal) {
             this.local.localTag = newVal
+            this.form.tag = newVal
         },
         weekday(newVal) {
             this.local.localWeekday = newVal
+            this.form.weekday = newVal
         },
         session(newVal) {
             this.local.localSession = newVal
+            this.form.session = newVal
         },
         campus(newVal) {
             this.local.localCampus = newVal
+            this.form.campus = newVal
         },
     },
     computed: {
