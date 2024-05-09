@@ -70,20 +70,25 @@
 				</el-card>
 			</el-col>
 
-			<!-- 参与过的活动 -->
+			<!-- 预约记录 -->
 			<el-col :span="24">
-				<el-card shadow="hover" class="mt15" header="活动记录" style="height: 400px!;">
+				<el-card shadow="hover" class="mt15" header="预约记录" style="height: 400px!;">
 					<el-row :gutter="15" class="personal-recommend-row">
 						<el-col :sm="6" v-for="(v, k) in state.recommendList" :key="k" class="personal-recommend-col">
 							<div class="personal-recommend" :style="{ 'background-color': v.bg }">
 								<SvgIcon :name="v.icon" :size="70" :style="{ color: v.iconColor }" />
-								<el-tag class="personal-tag" type="danger" effect="light">{{ v.type }}</el-tag>
+								<div class="tags-container">
+									<el-tag class="personal-tag" type="warning" effect="light">{{ v.type }}</el-tag>
+									<el-tag class="personal-tag" type="danger" effect="light" v-if="v.status == '已过期'">{{
+										v.status }}</el-tag>
+								</div>
 								<div class="personal-recommend-auto">
 									<div>校区：{{ v.campus }}</div>
 									<div class="personal-recommend-msg">{{ v.week_num }}: {{ v.weekday }}</div>
 									<div class="personal-recommend-msg">场次: {{ v.session }}</div>
 									<div class="personal-recommend-msg">讲解员: {{ v.commentator }}</div>
 								</div>
+
 							</div>
 						</el-col>
 					</el-row>
@@ -220,14 +225,15 @@
 <script setup lang="ts" name="personal">
 import { reactive, computed, onMounted, ref, defineAsyncComponent } from 'vue';
 import { formatAxis } from '/@/utils/formatTime';
-import { newsInfoList, recommendList } from './mock';
+import { newsInfoList, recommendList as mockList } from './mock';
 import { storeToRefs } from 'pinia';
 import router from '/@/router';
-import { reqInfo, modifyBaseInfo, modifyPassword, reqAvatar } from "/@/api/user/index";
+import { reqInfo, modifyBaseInfo, modifyPassword, reqAvatar, refBookingInfo } from "/@/api/user/index";
 import { useUserInfo } from '/@/stores/userInfo';
 import { Local, Session } from '/@/utils/storage';
 import { ElMessage } from 'element-plus';
 import { reqNotice } from '/@/api/notification/index';
+import { getBookingData2Show } from '/@/utils/transform';
 const DetailDialog = defineAsyncComponent(() => import('/@/views/notification/dialog.vue'));
 const DetailDialogRef = ref();
 const message = ref(ElMessage);
@@ -243,7 +249,7 @@ const changeAvatar = () => {
 const state = reactive<PersonalState>({
 	isAdmin: false,
 	newsInfoList,
-	recommendList,
+	recommendList: [...mockList],
 	roleIdent: '',
 	personalForm: {
 		id: '',
@@ -286,6 +292,7 @@ const changePassword = () => {
 onMounted(() => {
 	getInfo();
 	getNotice();
+	getBookingInfo();
 })
 
 const getNotice = () => {
@@ -337,6 +344,16 @@ const getInfo = () => {
 		Local.set('userInfo', userInfos.value)
 		Session.remove('userInfo')
 		Session.set('userInfo', userInfos.value)
+	})
+}
+
+const getBookingInfo = () => {
+	const response = refBookingInfo();
+	response.then(response => {
+		// console.log(response.data.list)
+		state.recommendList = getBookingData2Show(response.data.list);
+	}).catch(error => {
+		ElMessage.error('获取预约信息失败:', error);
 	})
 }
 
@@ -420,7 +437,7 @@ const openDetailDialog = (i: any) => {
 	.personal-tag {
 		// 放在最右边
 		float: right;
-		margin-top: 20px;
+		margin-top: 12px;
 		margin-right: 5px;
 	}
 
@@ -532,6 +549,7 @@ const openDetailDialog = (i: any) => {
 				border-radius: 3px;
 				overflow: hidden;
 				cursor: pointer;
+				margin-top: 8px;
 
 				&:hover {
 					i {
@@ -617,5 +635,11 @@ const openDetailDialog = (i: any) => {
 			}
 		}
 	}
+}
+
+.tags-container {
+	display: flex;
+	float: right;
+	flex-direction: column;
 }
 </style>

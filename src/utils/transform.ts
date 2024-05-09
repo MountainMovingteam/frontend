@@ -51,3 +51,23 @@ export function getData2Show(commentators: Array<Commentator>) {
 	}
 	return buf;
 }
+
+export function getBookingData2Show(bookingData: any) {
+	let buf: Array<Recommend> = [];
+	const icons = ['ele-Food', 'ele-ShoppingCart', 'ele-School', 'ele-AlarmClock'];
+	const bgs = ['#48D18D', '#F95959', '#8595F4', '#FEBB50'];
+	const iconColors = ['#64d89d', '#F86C6B', '#92A1F4', '#FDC566'];
+	for (let i = 0; i < bookingData.length; i++) {
+		buf.push({
+			...bookingData[i],
+			status: bookingData[i].status == 1 ? '已过期' : '未过期',
+			week_num: '第' + bookingData[i].week_num + '周',
+			commentator: bookingData[i].lecturer[0],
+			...timeIndex2Info(bookingData[i].time_index),
+			icon: icons[i % 4],
+			bg: bgs[i % 4],
+			iconColor: iconColors[i % 4],
+		});
+	}
+	return buf;
+}

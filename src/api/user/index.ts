@@ -43,8 +43,8 @@ export function modifyPassword(data: any) {
 	return reponse;
 }
 
-export function getBookingInfo(data: any) {
+export function refBookingInfo() {
 	let url = baseURL + API.BOOKING_INFO;
-	const reponse = client.withAuth(client.GET, url, { data: data });
+	const reponse = client.withAuth(client.GET, url, {});
 	return reponse;
 }
