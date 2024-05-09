@@ -236,6 +236,8 @@ import { useUserInfo } from '/@/stores/userInfo';
 import { Local, Session } from '/@/utils/storage';
 import { ElMessage } from 'element-plus';
 import { reqNotice } from '/@/api/notification/index';
+import { encrypt } from '/@/utils/rsa';
+
 const DetailDialog = defineAsyncComponent(() => import('/@/views/notification/dialog.vue'));
 const DetailDialogRef = ref();
 const message = ref(ElMessage);
@@ -395,8 +397,8 @@ const clearCpwInfo = () => {
 const onConfirmChange= () => {
 	changePw.loading = true;
 	const data = {
-		password: changePw.newPassword,
-		confirmPassword:changePw.newConfirmPassword
+		password: encrypt(changePw.newPassword),
+		confirmPassword:encrypt(changePw.newConfirmPassword)
 	}
 	const response = modifyPassword(data);
 	response.then(response => {

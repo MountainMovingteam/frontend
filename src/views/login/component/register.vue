@@ -71,6 +71,7 @@ import { NextLoading } from '/@/utils/loading';
 import { formatAxis } from '/@/utils/formatTime';
 import { useI18n } from 'vue-i18n';
 import { useLoginApi } from '/@/api/login';
+import { encrypt } from '/@/utils/rsa';
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
@@ -99,7 +100,7 @@ const onRegister = async () => {
 		ElMessage.warning('注册失败，两次输入的密码不一致');
  	} else {
 		try {
-			let data = {id: state.ruleForm.student_id, name: state.ruleForm.student_id,password: state.ruleForm.password, comfirmPassword:state.ruleForm.password_confirm,
+			let data = {id: state.ruleForm.student_id, name: state.ruleForm.userName,password: encrypt(state.ruleForm.password), comfirmPassword:encrypt(state.ruleForm.password_confirm),
 				email:'',phone:'',academy:0,avatar:''}
 			const response = await useLoginApi().register(data);
 			ElMessage.success('注册成功,请登录');

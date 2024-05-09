@@ -49,7 +49,7 @@ import { Session,Local } from '/@/utils/storage';
 import { formatAxis } from '/@/utils/formatTime';
 import { NextLoading } from '/@/utils/loading';
 import { useLoginApi } from '/@/api/login';
-
+import { encrypt } from '/@/utils/rsa';
 // 定义变量内容
 const { t } = useI18n();
 const storesThemeConfig = useThemeConfig();
@@ -75,7 +75,14 @@ const currentTime = computed(() => {
 const onSignIn = async () => {
 	state.loading.signIn = true;
 	try {
-		const response = await useLoginApi().signIn(state.ruleForm);
+		const secret = {
+			id:state.ruleForm.id,
+			password:encrypt(state.ruleForm.password),
+		}
+		console.log(secret.password);
+		
+		//const response = await useLoginApi().signIn(state.ruleForm);
+		const response = await useLoginApi().signIn(secret);
 		Session.set('token', response.token)
 		Local.set('access',response.token) //access 本地持久化存储
 		Session.set('role',response.role)
