@@ -17,20 +17,7 @@
 						</el-carousel>
 					</div>
 					<div class="home-card-change-item" style='margin-top: 0px;'>
-						<div class="home-card-item-title">快捷导航工具</div>
-							<div class="home-monitor">
-								<div class="flex-warp">
-									<div class="flex-warp-item" v-for="(v, k) in state.homeThree" :key="k">
-										<div class="flex-warp-item-box" :class="`home-animation${k}`">
-											<div class="flex-margin">
-												<i :class="v.icon" :style="{ color: v.iconColor }"></i>
-												<span class="pl5">{{ v.label }}</span>
-												<div class="mt10">{{ v.value }}</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
+						<div style="height: 100%" ref="homeLineRef"></div>
 					</div>
 				</div>
 			</el-col>
@@ -71,6 +58,7 @@ import { useThemeConfig } from '/@/stores/themeConfig';
 import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
 import { getInfoList,getPicList } from '/@/api/mainpage/index'
 import { ElMessage } from 'element-plus';
+import * as echarts from 'echarts';
 // 定义变量内容
 import router from '/@/router';
 const storesTagsViewRoutes = useTagsViewRoutes();
@@ -81,7 +69,7 @@ const { isTagsViewCurrenFull } = storeToRefs(storesTagsViewRoutes);
 const message = ref(ElMessage);
 const screenWidth = ref(window.innerWidth)
 const isCollapse = ref(screenWidth.value >= 768)
-
+const homeLineRef = ref();
 const info = reactive<any>({
 	base:'http://47.93.19.22:8000',
 	maxInfos : 0,
@@ -105,38 +93,6 @@ const state = reactive({
 		homeCharThree: null,
 		dispose: [null, '', undefined],
 	} as any,
-	homeThree: [
-		{
-			icon: 'iconfont icon-yangan',
-			label: '快捷工具1',
-			value: '1',
-			iconColor: '#F72B3F',
-		},
-		{
-			icon: 'iconfont icon-wendu',
-			label: '快捷工具2',
-			value: '2',
-			iconColor: '#91BFF8',
-		},
-		{
-			icon: 'iconfont icon-shidu',
-			label: '快捷工具3',
-			value: '3',
-			iconColor: '#88D565',
-		},
-		{
-			icon: 'iconfont icon-shidu',
-			label: '快捷工具4',
-			value: '4',
-			iconColor: '#88D565',
-		},
-		{
-			icon: 'iconfont icon-zaosheng',
-			label: '快捷工具5',
-			value: '5',
-			iconColor: '#FBD4A0',
-		},
-	],
 	myCharts: [] as EmptyArrayType,
 	charts: {
 		theme: '',
@@ -230,6 +186,9 @@ watch(
 			state.charts.theme = isIsDark ? 'dark' : '';
 			state.charts.bgColor = isIsDark ? 'transparent' : '';
 			state.charts.color = isIsDark ? '#dadada' : '#303133';
+			setTimeout(() => {
+				initLineChart();
+			}, 500);
 		});
 	},
 	{
@@ -248,6 +207,88 @@ watch(screenWidth, (newValue, oldValue) => {
   }
   console.log("值发生了变更", newValue, oldValue, isCollapse.value)
 })
+
+const initLineChart = () => {
+	if (!state.global.dispose.some((b: any) => b === state.global.homeChartOne)) state.global.homeChartOne.dispose();
+	state.global.homeChartOne = markRaw(echarts.init(homeLineRef.value, state.charts.theme));
+	const option = {
+		backgroundColor: state.charts.bgColor,
+		title: {
+			text: '参观人数',
+			x: 'left',
+			textStyle: { fontSize: '15', color: state.charts.color },
+		},
+		grid: { top: 70, right: 20, bottom: 30, left: 30 },
+		tooltip: { trigger: 'axis' },
+		legend: { data: ['人数', '最新成交价'], right: 0 },
+		xAxis: {
+			data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+		},
+		yAxis: [
+			{
+				type: 'value',
+				name: '人数',
+				splitLine: { show: true, lineStyle: { type: 'dashed', color: '#f5f5f5' } },
+			},
+		],
+		series: [
+			{
+				name: '人数',
+				type: 'line',
+				symbolSize: 6,
+				symbol: 'circle',
+				smooth: true,
+				data: [0, 41.1, 30.4, 65.1, 53.3, 53.3, 53.3, 41.1, 30.4, 65.1, 53.3, 10],
+				lineStyle: { color: '#fe9a8b' },
+				itemStyle: { color: '#fe9a8b', borderColor: '#fe9a8b' },
+				areaStyle: {
+					color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+						{ offset: 0, color: '#fe9a8bb3' },
+						{ offset: 1, color: '#fe9a8b03' },
+					]),
+				},
+			},
+			/*{
+				name: '最新成交价',
+				type: 'line',
+				symbolSize: 6,
+				symbol: 'circle',
+				smooth: true,
+				data: [0, 24.1, 7.2, 15.5, 42.4, 42.4, 42.4, 24.1, 7.2, 15.5, 42.4, 0],
+				lineStyle: { color: '#9E87FF' },
+				itemStyle: { color: '#9E87FF', borderColor: '#9E87FF' },
+				areaStyle: {
+					color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+						{ offset: 0, color: '#9E87FFb3' },
+						{ offset: 1, color: '#9E87FF03' },
+					]),
+				},
+				emphasis: {
+					itemStyle: {
+						color: {
+							type: 'radial',
+							x: 0.5,
+							y: 0.5,
+							r: 0.5,
+							colorStops: [
+								{ offset: 0, color: '#9E87FF' },
+								{ offset: 0.4, color: '#9E87FF' },
+								{ offset: 0.5, color: '#fff' },
+								{ offset: 0.7, color: '#fff' },
+								{ offset: 0.8, color: '#fff' },
+								{ offset: 1, color: '#fff' },
+							],
+						},
+						borderColor: '#9E87FF',
+						borderWidth: 2,
+					},
+				},
+			},*/
+		],
+	};
+	state.global.homeChartOne.setOption(option);
+	state.myCharts.push(state.global.homeChartOne);
+};
 </script>
 
 <style scoped lang="scss">

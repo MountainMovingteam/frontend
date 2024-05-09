@@ -80,17 +80,17 @@
 
         </el-row>
       </el-form>
-      <template #footer>
-				<span class="dialog-footer">
-					<el-button @click="onCancel" size="default">取 消</el-button>
-					<el-button type="success" @click="onSubmit" size="default">
-            <el-icon>
-              <ele-Check/>
-            </el-icon>
-            确定预约
-          </el-button>
-				</span>
-      </template>
+<!--      <template #footer>-->
+<!--				<span class="dialog-footer">-->
+<!--					<el-button @click="onCancel" size="default">取 消</el-button>-->
+<!--					<el-button type="success" @click="onSubmit" size="default">-->
+<!--            <el-icon>-->
+<!--              <ele-Check/>-->
+<!--            </el-icon>-->
+<!--            确定预约-->
+<!--          </el-button>-->
+<!--				</span>-->
+<!--      </template>-->
     </el-dialog>
   </div>
 </template>
@@ -274,9 +274,9 @@ const getTableData = () => {
         state.leaderInfo.phone = item.phone;
       } else {
         let info = {
-          id: item.id,
           name: item.name,
-          phone: item.phone
+          studentId: item.id,
+          phone: item.phone,
         }
         state.otherMembers.push(info);
       }
