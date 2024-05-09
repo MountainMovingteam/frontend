@@ -6,13 +6,14 @@ type NewInfo = {
 	date: string;
 	link: string;
 };
-type Recommend = {
+declare type Recommend = {
 	type: string;
 	week_num: string;
 	commentator: string;
 	campus: string;
 	weekday: string;
 	session: string;
+	status: String;
 	icon: string;
 	bg: string;
 	iconColor: string;
