@@ -5,6 +5,7 @@ enum API {
 	USER_EDIT_INFO = '/api/base/editInfo',
 	USER_GET_AVATAR = '/api/base/getAvatar',
 	User_EDIT_PASSWORD = '/api/base/modify/password',
+	BOOKING_INFO = '/api/base/orderLog',
 }
 const baseURL = 'http://47.93.19.22:8000';
 
@@ -36,9 +37,14 @@ export function modifyBaseInfo(data: FormData) {
 	return reponse;
 }
 
-
 export function modifyPassword(data: any) {
 	let url = baseURL + API.User_EDIT_PASSWORD;
 	const reponse = client.withAuth(client.POST, url, { data: data });
+	return reponse;
+}
+
+export function getBookingInfo(data: any) {
+	let url = baseURL + API.BOOKING_INFO;
+	const reponse = client.withAuth(client.GET, url, { data: data });
 	return reponse;
 }
