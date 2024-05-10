@@ -351,7 +351,6 @@ const getBookingInfo = () => {
 	const response = refBookingInfo();
 	response.then(response => {
 		state.recommendList = getBookingData2Show(response.data.list);
-		console.log(state.recommendList)
 	}).catch(error => {
 		ElMessage.error('获取预约信息失败:', error);
 	})

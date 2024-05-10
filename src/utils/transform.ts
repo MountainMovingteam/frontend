@@ -70,6 +70,5 @@ export function getBookingData2Show(bookingData: any) {
 			iconColor: iconColors[i % 4],
 		});
 	}
-	console.log(buf);
 	return buf;
 }
