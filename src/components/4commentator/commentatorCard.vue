@@ -143,7 +143,7 @@ export default {
             this.local.localWeekday = this.weekday
             this.local.localSession = this.session
             this.local.localCampus = this.campus
-            console.log(this.local)
+            //console.log(this.local)
         }
     },
     components: {
@@ -153,7 +153,7 @@ export default {
     methods: {
         closeDialog() {
             this.dialogVisible = true
-            console.log(this.name)
+            //console.log(this.name)
         },
         myDelete() {
             myPOST('/api/manage/lecturer/delete', {

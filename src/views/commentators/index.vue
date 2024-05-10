@@ -285,7 +285,7 @@ export default {
         //     this.commentators.unshift(commentator);
         // }
         deleteCommentator(num: any) {
-            console.log(num)
+            //console.log(num)
             this.commentators = this.commentators.filter(item => item.num != num);
         },
 
