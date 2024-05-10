@@ -83,7 +83,7 @@
 										v.status }}</el-tag>
 								</div>
 								<div class="personal-recommend-auto">
-									<div>校区：{{ v.campus }}</div>
+									<div style="font-weight: bold;">校区：{{ v.campus }}</div>
 									<div class="personal-recommend-msg">{{ v.week_num }}: {{ v.weekday }}</div>
 									<div class="personal-recommend-msg">场次: {{ v.session }}</div>
 									<div class="personal-recommend-msg">讲解员: {{ v.commentator }}</div>
@@ -249,7 +249,7 @@ const changeAvatar = () => {
 const state = reactive<PersonalState>({
 	isAdmin: false,
 	newsInfoList,
-	recommendList: [...mockList],
+	recommendList: [],
 	roleIdent: '',
 	personalForm: {
 		id: '',
@@ -350,8 +350,8 @@ const getInfo = () => {
 const getBookingInfo = () => {
 	const response = refBookingInfo();
 	response.then(response => {
-		// console.log(response.data.list)
 		state.recommendList = getBookingData2Show(response.data.list);
+		console.log(state.recommendList)
 	}).catch(error => {
 		ElMessage.error('获取预约信息失败:', error);
 	})
@@ -572,10 +572,10 @@ const openDetailDialog = (i: any) => {
 					padding: 15px;
 					position: absolute;
 					left: 0;
-					top: 5%;
 					color: var(--next-color-white);
 
 					.personal-recommend-msg {
+						font-weight: bold;
 						font-size: 12px;
 						margin-top: 10px;
 					}
