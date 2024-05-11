@@ -233,7 +233,9 @@ import { useUserInfo } from '/@/stores/userInfo';
 import { Local, Session } from '/@/utils/storage';
 import { ElMessage } from 'element-plus';
 import { reqNotice } from '/@/api/notification/index';
+import { encrypt } from '/@/utils/rsa';
 import { getBookingData2Show } from '/@/utils/transform';
+
 const DetailDialog = defineAsyncComponent(() => import('/@/views/notification/dialog.vue'));
 const DetailDialogRef = ref();
 const message = ref(ElMessage);
@@ -400,20 +402,22 @@ const clearCpwInfo = () => {
 	changePw.newConfirmPassword = '';
 }
 
-const onConfirmChange = () => {
+const onConfirmChange = async () => {
 	changePw.loading = true;
 	const data = {
-		password: changePw.newPassword,
-		confirmPassword: changePw.newConfirmPassword
+		old_password: await encrypt(changePw.originPassword),
+		password: await encrypt(changePw.newPassword),
 	}
-	const response = modifyPassword(data);
-	response.then(response => {
+	
+	try {
+		const response = await modifyPassword(data);
 		message.value.success('修改成功');
 		changePw.loading = false;
 		clearCpwInfo();
-	}).catch(error => {
+	}
+	catch(error) {
 		message.value.error('修改失败');
-	})
+	}
 }
 
 const onCancelChange = () => {
