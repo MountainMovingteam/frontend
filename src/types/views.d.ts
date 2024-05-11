@@ -6,15 +6,20 @@ type NewInfo = {
 	date: string;
 	link: string;
 };
-type Recommend = {
-	title: string;
-	msg: string;
+declare type Recommend = {
+	type: string;
+	week_num: string;
+	commentator: string;
+	campus: string;
+	weekday: string;
+	session: string;
+	status: String;
 	icon: string;
 	bg: string;
 	iconColor: string;
 };
 declare type PersonalState = {
-	isAdmin: boolean,
+	isAdmin: boolean;
 	newsInfoList: NewInfo[];
 	recommendList: Recommend[];
 	roleIdent: string;
@@ -23,12 +28,12 @@ declare type PersonalState = {
 		name: string;
 		email: string;
 		academy: number;
-		role:string;
+		role: string;
 		autograph: string;
 		avatar: string;
 		phone: string;
 		sex: string;
-		logintime:string;
+		logintime: string;
 	};
 };
 
