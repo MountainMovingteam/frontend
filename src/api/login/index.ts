@@ -31,15 +31,4 @@ export function useLoginApi() {
 		}
 	};
 }
-/*
-import client from '../client'
-import qs from 'qs'
-const baseURL = ''
-
-export function userSignIn(data: any) {
-    let url = baseURL + `/user/signIn/`;
-    const reponse = client.withAuth(client.POST, url, {data: data});
-    return reponse
-}
-*/
 

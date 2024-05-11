@@ -77,7 +77,7 @@ const onSignIn = async () => {
 	try {
 		const secret = {
 			id:state.ruleForm.id,
-			password:encrypt(state.ruleForm.password),
+			password:await encrypt(state.ruleForm.password),
 		}
 		console.log(secret.password);
 		

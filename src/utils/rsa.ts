@@ -1,6 +1,6 @@
 import { log } from 'console';
 import JSEncrypt from 'jsencrypt';
-
+import { pubKeyApi } from '/@/api/pubkey/index'
 // 创建一个单例的 JSEncrypt 实例
 const entry = new JSEncrypt();
 
@@ -10,11 +10,20 @@ const entry = new JSEncrypt();
 }*/
 
 // 封装 encrypt 方法
-const encrypt = (data: string) => {
+const encrypt = async (data: string) => {
+    try {
+        const response = await pubKeyApi().getPubKey();
+        const pubKey = response.public_key
+        console.log(pubKey);
+        
+        entry.setPublicKey(pubKey);
+        console.log(entry.encrypt(data));
+        
+        return entry.encrypt(data);
+    } catch (error) {
+        return "";
+    } 
     
-    const pubKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvnuBHhh9/Mwi4Z8Ea2IfVc7SJYyKkJT+4m4LBJbgxRVPa+ej1iAvJAJ++1CNfH6oVr6tw/wqEIZybTG7+iPm7SzfoW9eb/LYsLR43zLqriYWy7qAd7S/13zILiAGLUy/h9CDYwoXYaNXanVGe0iJb+NXmg7f4MAEo7rR15QHQ8zDtomPI/Fz9vz+o/xzHqsLVnxZIpn4dlCp+7QtzOePnvEda5xqWk4DNaVV2fr9gwfBFd8MyAP+CyBXLAWpmxinRU6knsLKAlqcbOLNjk2+aPNvH9EWHODKWBuMPpdDwQexD+V3/nOp8c07NzSfwXmlZuRKod9SqVY88Pg1r84WwQIDAQAB'
-    entry.setPublicKey(pubKey);
-    return entry.encrypt(data);
 }
 
 /*const decrypt = (data: string) => {

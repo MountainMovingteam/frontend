@@ -394,20 +394,22 @@ const clearCpwInfo = () => {
 	changePw.newConfirmPassword = '';
 }
 
-const onConfirmChange= () => {
+const onConfirmChange = async () => {
 	changePw.loading = true;
 	const data = {
-		password: encrypt(changePw.newPassword),
-		confirmPassword:encrypt(changePw.newConfirmPassword)
+		old_password: await encrypt(changePw.originPassword),
+		password: await encrypt(changePw.newPassword),
 	}
-	const response = modifyPassword(data);
-	response.then(response => {
+	
+	try {
+		const response = await modifyPassword(data);
 		message.value.success('修改成功');
 		changePw.loading = false;
 		clearCpwInfo();
-	}).catch(error => {
+	}
+	catch(error) {
 		message.value.error('修改失败');
-	})
+	}
 }
 
 const onCancelChange = () => {

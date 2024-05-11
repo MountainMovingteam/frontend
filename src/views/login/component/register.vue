@@ -100,7 +100,7 @@ const onRegister = async () => {
 		ElMessage.warning('注册失败，两次输入的密码不一致');
  	} else {
 		try {
-			let data = {id: state.ruleForm.student_id, name: state.ruleForm.userName,password: encrypt(state.ruleForm.password), comfirmPassword:encrypt(state.ruleForm.password_confirm),
+			let data = {id: state.ruleForm.student_id, name: state.ruleForm.userName,password: await encrypt(state.ruleForm.password), comfirmPassword:await encrypt(state.ruleForm.password_confirm),
 				email:'',phone:'',academy:0,avatar:''}
 			const response = await useLoginApi().register(data);
 			ElMessage.success('注册成功,请登录');
