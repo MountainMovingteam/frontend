@@ -7,8 +7,9 @@
 			view-class="layout-main-scroll"
 		>
 			<LayoutParentView />
-			<LayoutFooter v-if="isFooter" />
+			
 		</el-scrollbar>
+		<LayoutFooter v-if="isFooter" />
 		<el-backtop :target="setBacktopClass" />
 	</el-main>
 </template>
@@ -33,10 +34,20 @@ const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
 const { isTagsViewCurrenFull } = storeToRefs(storesTagsViewRoutes);
 
+const width = ref(window.innerWidth);
 // 设置 footer 显示/隐藏
 const isFooter = computed(() => {
-	return themeConfig.value.isFooter && !route.meta.isIframe;
+	//return themeConfig.value.isFooter && !route.meta.isIframe;
+	const isMobile = width.value < 768; // 假设 768 像素以下是移动设备
+    return !route.meta.isIframe && isMobile;
+
 });
+
+const updateSize = () => {
+    width.value = window.innerWidth;
+};
+
+
 // 设置 header 固定
 const isFixedHeader = computed(() => {
 	return themeConfig.value.isFixedHeader;
@@ -56,6 +67,7 @@ const setMainHeight = computed(() => {
 // 页面加载前
 onMounted(() => {
 	NextLoading.done(600);
+	window.addEventListener('resize', updateSize);
 });
 
 // 暴露变量
