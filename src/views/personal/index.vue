@@ -81,7 +81,7 @@
 									<el-tag class="personal-recommend-tag" type="warning" effect="light">{{ v.type
 									}}</el-tag>
 									<el-tag class="personal-recommend-tag" type="danger" effect="light"
-										v-if="v.status == '未过期'">{{
+										v-if="v.status == '已驳回'">{{
 											v.status }}</el-tag>
 								</div>
 								<div class="personal-recommend-auto">
@@ -601,11 +601,11 @@ const openDetailDialog = (i: any) => {
 					border-radius: 5px;
 					cursor: pointer;
 					transition: opacity 0.3s ease;
-					height: 21%;
+					height: 23%;
 					/* 设置按钮高度 */
 					line-height: 21%;
 					/* 设置行高使文本垂直居中 */
-					padding: 0 5%;
+					padding: 0 4%;
 					/* 调整内边距使按钮内容居中 */
 					font-size: 12px;
 					/* 调整字体大小 */
