@@ -137,6 +137,21 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					icon: 'iconfont icon-gerenzhongxin',
 				},
 			},
+			{
+				path: '/QandA',
+				name: 'QandA',
+				component: () => import('/@/views/QandA/index.vue'),
+				meta: {
+					title: 'message.router.QandA',
+					isLink: '',
+					isHide: false,
+					isKeepAlive: true,
+					isAffix: false,
+					isIframe: false,
+					roles: ['admin', 'user'],
+					icon: 'iconfont icon-gerenzhongxin',
+				},
+			},
 		],
 	},
 ];
