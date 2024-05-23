@@ -376,7 +376,7 @@ const changeInfo = () => {
 	const formData = assemblyFormData();
 
 	const response = modifyBaseInfo(formData);
-	console.log(formData);
+	//console.log(formData);
 
 	response.then(response => {
 		message.value.success('修改成功');
@@ -386,7 +386,6 @@ const changeInfo = () => {
 		Session.remove('userInfo')
 		Session.set('userInfo', userInfos.value)
 	}).catch(error => {
-		console.error('修改失败:', error);
 		message.value.error('修改失败');
 	})
 }
