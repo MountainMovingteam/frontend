@@ -77,10 +77,12 @@
 						<el-col :sm="6" v-for="(v, k) in state.recommendList" :key="k" class="personal-recommend-col">
 							<div class="personal-recommend" :style="{ 'background-color': v.bg }">
 								<SvgIcon :name="v.icon" :size="70" :style="{ color: v.iconColor }" />
-								<div class="tags-container">
-									<el-tag class="personal-tag" type="warning" effect="light">{{ v.type }}</el-tag>
-									<el-tag class="personal-tag" type="danger" effect="light" v-if="v.status == '已过期'">{{
-										v.status }}</el-tag>
+								<div class="personal-recommend-tagsContainer">
+									<el-tag class="personal-recommend-tag" type="warning" effect="light">{{ v.type
+									}}</el-tag>
+									<el-tag class="personal-recommend-tag" type="danger" effect="light"
+										v-if="v.status == '未过期'">{{
+											v.status }}</el-tag>
 								</div>
 								<div class="personal-recommend-auto">
 									<div style="font-weight: bold;">校区：{{ v.campus }}</div>
@@ -88,8 +90,10 @@
 									<div class="personal-recommend-msg">场次: {{ v.session }}</div>
 									<div class="personal-recommend-msg">讲解员: {{ v.commentator }}</div>
 								</div>
-
+								<el-button color="#626aef" plain class="personal-recommend-cancel-button">取消预约</el-button>
 							</div>
+
+
 						</el-col>
 					</el-row>
 				</el-card>
@@ -407,14 +411,14 @@ const onConfirmChange = async () => {
 		old_password: await encrypt(changePw.originPassword),
 		password: await encrypt(changePw.newPassword),
 	}
-	
+
 	try {
 		const response = await modifyPassword(data);
 		message.value.success('修改成功');
 		changePw.loading = false;
 		clearCpwInfo();
 	}
-	catch(error) {
+	catch (error) {
 		message.value.error('修改失败');
 	}
 }
@@ -436,12 +440,6 @@ const openDetailDialog = (i: any) => {
 @import '../../theme/mixins/index.scss';
 
 .personal {
-	.personal-tag {
-		// 放在最右边
-		float: right;
-		margin-top: 12px;
-		margin-right: 5px;
-	}
 
 	.personal-user {
 		height: 130px;
@@ -550,7 +548,6 @@ const openDetailDialog = (i: any) => {
 				height: 150px;
 				border-radius: 3px;
 				overflow: hidden;
-				cursor: pointer;
 				margin-top: 8px;
 
 				&:hover {
@@ -581,6 +578,37 @@ const openDetailDialog = (i: any) => {
 						font-size: 12px;
 						margin-top: 10px;
 					}
+				}
+
+				.personal-recommend-tagsContainer {
+					display: flex;
+					float: right;
+					flex-direction: row;
+					/* 修改为横向排布 */
+
+					.personal-recommend-tag {
+						// 放在最右边
+						float: right;
+						margin-top: 12px;
+						margin-right: 5px;
+					}
+				}
+
+				.personal-recommend-cancel-button {
+					position: absolute;
+					right: 5px;
+					bottom: 10px;
+					border-radius: 5px;
+					cursor: pointer;
+					transition: opacity 0.3s ease;
+					height: 21%;
+					/* 设置按钮高度 */
+					line-height: 21%;
+					/* 设置行高使文本垂直居中 */
+					padding: 0 5%;
+					/* 调整内边距使按钮内容居中 */
+					font-size: 12px;
+					/* 调整字体大小 */
 				}
 			}
 		}
@@ -637,11 +665,5 @@ const openDetailDialog = (i: any) => {
 			}
 		}
 	}
-}
-
-.tags-container {
-	display: flex;
-	float: right;
-	flex-direction: column;
 }
 </style>
