@@ -1,85 +1,46 @@
 <template>
   <div class="system-menu-dialog-container">
-    <el-dialog :title="state.dialog.title" v-model="state.dialog.isShowDialog" width="769px">
-      <el-form ref="menuDialogFormRef" :model="state.ruleForm" size="default" label-width="80px">
-        <el-row :gutter="35">
-          <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
-            <el-form-item label="校区选择">
-              <div v-if="state.data.campus=='xueyuan'">
+    <el-dialog :title="state.dialog.title" v-model="state.dialog.isShowDialog" width="769px" :before-close="handleClose">
+      <el-descriptions
+        title="场次信息"
+        direction="vertical"
+        :column="3"
+        border
+      >
+        <el-descriptions-item label="预约校区">
+          <div v-if="state.data.campus=='xueyuan'">
                 学院路校区
               </div>
               <div v-else>
                 沙河校区
               </div>
-            </el-form-item>
-          </el-col>
-
-          <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
-            <el-form-item label="预约日期">
-              {{showDate(state.data.column, state.data.week_num)}}
-            </el-form-item>
-          </el-col>
-
-          <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
-            <el-form-item label="预约场次">
-              {{state.selectedEvent}}
-            </el-form-item>
-          </el-col>
-
-          <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
-            <el-form-item label="团队信息" :span="24">
-              <span v-if="state.leaderInfo.name == '' && state.leaderInfo.studentId == '' && state.leaderInfo.phone == ''">
-                <el-col class="mb10" style="font-weight: bold;">
-                    无团队预约
-                </el-col>
-              </span>
-              <span v-else>
-              <el-col class="mb10" style="margin-bottom: 5px;font-weight: bold;">
-                <hr>
-                负责人
-              </el-col>
-              <el-col class="mb10">
-                姓名：{{state.leaderInfo.name}}
-              </el-col>
-              <el-col class="mb10">
-                学号：{{state.leaderInfo.studentId}}
-              </el-col>
-              <el-col class="mb10">
-                电话号码：{{state.leaderInfo.phone}}
-              </el-col>
-              </span>
-            </el-form-item>
-          </el-col>
-
-          <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
-            <el-form-item label="个人信息" :span="24">
-                <span v-if="state.otherMembers.length === 0">
-                  <el-col class="mb10" style="font-weight: bold;">
-                    无个人预约
-                  </el-col>
-                </span>
-                <span v-else>
-                <span v-for="(member, index) in state.otherMembers" :key="member.name">
-                  <el-col class="mb10" style="margin-bottom: 5px;font-weight: bold;">
-                    预约人 {{index + 1}}
-                  </el-col>
-                  <el-col class="mb10">
-                    姓名：{{member.name}}
-                  </el-col>
-                  <el-col class="mb10">
-                    学号：{{member.studentId}}
-                  </el-col>
-                  <el-col class="mb10">
-                    电话号码：{{member.phone}}
-                  </el-col>
-                </span>
-                </span>
-
-            </el-form-item>
-          </el-col>
-
-        </el-row>
-      </el-form>
+            </el-descriptions-item>
+        <el-descriptions-item label="预约日期">{{showDate(state.data.column, state.data.week_num)}}</el-descriptions-item>
+        <el-descriptions-item label="预约场次" :span='2'>{{state.selectedEvent}}</el-descriptions-item>
+        <el-descriptions-item label="团队预约数量">
+          <div v-if="state.leaderInfo.name == '' && state.leaderInfo.studentId == '' && state.leaderInfo.phone == ''">
+            0    
+          </div>
+          <div v-else>
+            1
+            </div>
+        </el-descriptions-item>
+        <el-descriptions-item label="个人预约数量">{{state.otherMembers.length}}</el-descriptions-item>
+  </el-descriptions>
+  <el-tabs v-model="activeName"  type='border-card'>
+    <el-tab-pane label="团队预约" name="first">
+        <SessionTable
+          ref="tableRef"
+          v-bind="teamData.tableData"
+        />
+    </el-tab-pane>
+    <el-tab-pane label="个人预约" name="second">
+      <SessionTable
+          ref="tableRef"
+          v-bind="singleData.tableData"
+        />
+    </el-tab-pane>
+  </el-tabs>
 <!--      <template #footer>-->
 <!--				<span class="dialog-footer">-->
 <!--					<el-button @click="onCancel" size="default">取 消</el-button>-->
@@ -136,11 +97,56 @@ const emit = defineEmits(['refresh', 'updateCampus', 'updateBookingWay']);
 
 // 引入组件
 const IconSelector = defineAsyncComponent(() => import('/@/components/iconSelector/index.vue'));
+const activeName = ref('first')
 
 // 定义变量内容
+const SessionTable = defineAsyncComponent(() => import('/@/components/table/sessionDialogTable.vue'));
 const menuDialogFormRef = ref();
 const stores = useRoutesList();
 const { routesList } = storeToRefs(stores);
+const tableRef = ref<any>();
+const teamData = reactive<any>({
+  tableData:{
+    data: [],
+    // 表头内容（必传，注意格式）
+    header: [
+      {key: 'name', colWidth: '', title: '负责人姓名', type: 'text', isCheck: true},
+      {key: 'student_id', colWidth: '', title: '负责人学号', type: 'text', isCheck: true},
+      {key: 'phone', colWidth: '', title: '负责人电话', type: 'text', isCheck: true},
+      {key: 'status', colWidth: '', title: '预约状态', type: 'label', isCheck: true},
+      {key: 'op', colWidth: '', title: '操作', type: 'button',btType:'danger', isCheck: true},
+    ],    // 配置项
+    config: {
+      total: 0,
+      loading: false, // loading 加载
+      isBorder: true, // 是否显示表格边框
+      isSerialNo: false, // 是否显示表格序号
+      isSelection: false, // 是否显示表格多选
+      isOperate: false, // 是否显示表格操作栏
+    },
+  }
+}) 
+const singleData = reactive<any>({
+  tableData:{
+    data: [],
+    // 表头内容（必传，注意格式）
+    header: [
+      {key: 'name', colWidth: '', title: '姓名', type: 'text', isCheck: true},
+      {key: 'student_id', colWidth: '', title: '学号', type: 'text', isCheck: true},
+      {key: 'phone', colWidth: '', title: '电话', type: 'text', isCheck: true},
+      {key: 'status', colWidth: '', title: '状态', type: 'label', isCheck: true},
+      {key: 'op', colWidth: '', title: '操作', type: 'button',btType:'danger', isCheck: true},
+    ],    // 配置项
+    config: {
+      total: 0,
+      loading: false, // loading 加载
+      isBorder: true, // 是否显示表格边框
+      isSerialNo: true, // 是否显示表格序号
+      isSelection: false, // 是否显示表格多选
+      isOperate: false, // 是否显示表格操作栏
+    },
+  }
+}) 
 const state = reactive({
   data : {
     campus: '',
@@ -211,21 +217,6 @@ const refreshData = () => {
   state.otherMembers = [];
 }
 
-const addTeamMember = () => {
-  state.teamMembers.push({ name: '', studentId: '', phone: '' });
-};
-
-const removeTeamMember = (index: number) => {
-  state.teamMembers.splice(index, 1);
-}
-
-const labelText = (index: number, event: string) => {
-  if (!state.accessibleEvents.includes(index)) {
-    return event + "（该时间段不可预约）";
-  } else {
-    return event;
-  }
-}
 
 const showDate = (column: number, index: number) => {
   const currentDay = new Date();
@@ -272,6 +263,12 @@ const getTableData = () => {
         state.leaderInfo.name = item.name;
         state.leaderInfo.studentId = item.id;
         state.leaderInfo.phone = item.phone;
+        teamData.tableData.data.push({
+          'name':item.name,
+          'student_id':item.id,
+          'phone':item.phone,
+          'op':"删除",
+        })
       } else {
         let info = {
           name: item.name,
@@ -279,11 +276,19 @@ const getTableData = () => {
           phone: item.phone,
         }
         state.otherMembers.push(info);
+        singleData.tableData.data.push({
+          'name':item.name,
+          'student_id':item.id,
+          'phone':item.phone,
+          'op':"删除",
+        })
       }
     });
   })
 }
-
+const handleClose = () => {
+  state.dialog.isShowDialog = false;
+}
 // 获取 pinia 中的路由
 const getMenuData = (routes: RouteItems) => {
   const arr: RouteItems = [];
@@ -307,119 +312,16 @@ const openDialog = (type: string, row?: any) => {
   console.log('weeknum' + state.data.week_num);
   console.log('time_index' + state.data.time_index);
   getTableData();
-  if (type === 'edit') {
-    // 模拟数据，实际请走接口
-    row.menuType = 'menu';
-    row.menuSort = Math.floor(Math.random() * 100);
-    state.ruleForm = JSON.parse(JSON.stringify(row));
-    state.dialog.title = '修改菜单';
-    state.dialog.submitTxt = '修 改';
-  } else {
-    state.dialog.title = '预约信息';
-    state.dialog.submitTxt = '新 增';
-    // 清空表单，此项需加表单验证才能使用
-    // nextTick(() => {
-    // 	menuDialogFormRef.value.resetFields();
-    // });
-  }
-  state.dialog.type = type;
+  state.dialog.title = '预约信息';
   state.dialog.isShowDialog = true;
+  teamData.tableData.data = [];
+  singleData.tableData.data = [];
 };
 // 关闭弹窗
 const closeDialog = () => {
   state.dialog.isShowDialog = false;
 };
-// 取消
-const onCancel = () => {
-  closeDialog();
-};
 
-const updateCampus = (campus: string) => {
-  emit('updateCampus', campus)
-}
-
-const updateBookingWay = (way: string) => {
-  emit('updateBookingWay', way)
-}
-
-const validateSeletion = () => {
-  if (state.selectedDay.trim() === '' || state.selectedEvent.trim() === '') {
-    ElMessage({
-      type: 'error',
-      message: '请选择具体时间！'
-    });
-    return false;
-  }
-  return true;
-}
-
-const validateGroupBooking = () => {
-  const leader = state.teamMembers[0];
-  const otherMembers = state.teamMembers.slice(1);
-  if (leader.name.trim() === '' || leader.studentId.trim() === '' || leader.phone.trim() === '') {
-    ElMessage({
-      type: 'error',
-      message: '请完整填写负责人的个人信息！'
-    });
-    return false;
-  }
-  for (const member of otherMembers) {
-    if (member.name.trim() === '' || member.studentId.trim() === '') {
-      ElMessage({
-        type: 'error',
-        message: '请至少完整填写其他成员的姓名和学号！'
-      });
-      return false;
-    }
-  }
-  return true;
-}
-
-const validateSingleBooking = () => {
-  const person = state.personalInfo;
-  if (person.name.trim() === '' || person.studentId.trim() === '' || person.phone.trim() === '') {
-    ElMessage({
-      type: 'error',
-      message: '请完整填写个人信息！'
-    });
-    return false;
-  }
-  return true;
-}
-
-// 提交
-const onSubmit = () => {
-  if (!validateSeletion()) {
-    return;
-  }
-  if (state.data.bookingWay === 'group') {
-    if (validateGroupBooking()) {
-      closeDialog();
-      refreshData();
-      ElMessage({
-        type: 'success',
-        message: '预约成功'
-      });
-      emit('refresh');
-    } else {
-      return;
-    }
-  } else {
-    if (validateSingleBooking()) {
-      closeDialog();
-      refreshData();
-      ElMessage({
-        type: 'success',
-        message: '预约成功'
-      });
-      emit('refresh');
-    } else {
-      return;
-    }
-  }
-};
-
-// 页面加载时
 onMounted(() => {
   state.menuData = getMenuData(routesList.value);
 });
