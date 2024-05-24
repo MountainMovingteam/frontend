@@ -300,6 +300,8 @@ const openDialog = (type: string, row?: any) => {
   state.dialog.isShowDialog = true;
   teamData.tableData.data = [];
   singleData.tableData.data = [];
+  state.hasTeam = false;
+  state.individual = 0
 };
 // 关闭弹窗
 const closeDialog = () => {

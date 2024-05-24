@@ -1,12 +1,12 @@
 <template>
-  <div class="session-table-container" style='overflow: scroll;'>
+  <div class="session-table-container">
     <el-table
         :data="data"
         :border="setBorder"
+        :cell-style="getCell"
         v-bind="$attrs"
         row-key="id"
         stripe
-        style="width: 100%;"
         v-loading="config.loading"
         @selection-change="onSelectionChange"
     >
@@ -19,20 +19,16 @@
           :prop="item.key"
           :width="item.colWidth"
           :label="item.title"
-          style='max-height: 20px !important;overflow: auto;'
+          
       >
         <template v-slot="scope">
           <template v-if="item.key === 'event'">
-            <span  style="display: flex; align-items: center; justify-content: flex-start; height: 100px;">
+            <span  style="display: flex; align-items: center; justify-content: flex-start; height: 100%;">
               {{ scope.row[item.key] }}
             </span>
           </template>
           <template v-else>
-<!--            <span :class="{ 'cell-active': isSelected(scope.$index, index) }"-->
-<!--                  :style="{ backgroundColor: scope.row[item.key], display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center' }"-->
-<!--                  @click="handleCellClick(scope.$index, index, scope.row[item.key] )"-->
-<!--            > <i v-if="isSelected(scope.$index, index)" class="check-mark">✓</i> </span>-->
-            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100px;white-space: pre-wrap;" :style="{ backgroundColor: scope.row[item.key].color, display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center' }" @click="handleCellClick(scope.$index, index, scope.row[item.key] )">
+            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100%;white-space: pre-wrap;" :style="getCellStyle(scope.row[item.key])" @click="handleCellClick(scope.$index, index, scope.row[item.key] )">
               {{ scope.row[item.key].text }}
               </span>
           </template>
@@ -59,6 +55,7 @@
 import { reactive, computed, nextTick, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useThemeConfig } from '/@/stores/themeConfig';
+import { toRaw } from '@vue/reactivity';
 import '/@/theme/tableTool.scss';
 
 const selectedCell = ref<any>(null);
@@ -144,6 +141,30 @@ const pageReset = () => {
   emit('pageChange', state.page);
 };
 
+const getCellStyle = (cell:any) => {
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    whiteSpace: 'pre-wrap',
+    height:'100%',
+    width: '100%',
+    position: 'relative',
+    textAlign: 'center',
+    overflow: 'auto',
+  };
+};
+
+const getCell = (row:any , column:any) => {
+  var list = toRaw(props.data);
+  var obj = list[row.rowIndex][`day${row.columnIndex}`];
+  if (obj) {
+    console.log(obj.color);
+    
+    if (obj.color != '#ffffff')
+    return {'background-color': obj.color,}
+  }
+}
 
 
 // 暴露变量
@@ -156,18 +177,16 @@ defineExpose({
 .session-table-container {
   display: flex;
   flex-direction: column;
-
+  height: 83%;
   .el-table {
     flex: 1;
-    overflow: auto; // 确保内容溢出时出现滚动条
-    
+    overflow-y: auto;
 
-    .cell-active::after {
-      content: ''; /* 对勾符号 */
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+    .cell:hover{
+        .taskName{
+            color: rgb(18, 157, 250);
+            cursor: pointer;
+        }
     }
   }
   .table-footer {
