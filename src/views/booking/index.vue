@@ -326,7 +326,7 @@ const getTableData = () => {
           }
           continue;
         }
-        if (place_detail.enrolled > 0) {
+        if (place_detail.enrolled >= 10) {
           colors[i + 1] = "#f54545";
         } else {
           colors[i + 1] = "#99FF99";

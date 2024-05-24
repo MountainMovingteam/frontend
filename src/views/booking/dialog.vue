@@ -31,7 +31,7 @@
                     :value="day"
                 >
                   {{ day }}
-<!--                  //asd-->
+                  <!--                  //asd-->
                 </el-option>
               </el-select>
             </el-form-item>
@@ -55,7 +55,7 @@
 
           <el-col v-if="state.data.bookingWay === 'group'" :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form :model="state" :rules="rules" ref="form">
-            <el-form-item label="团队信息" :span="24"></el-form-item>
+              <el-form-item label="团队信息" :span="24"></el-form-item>
               <template v-for="(member, index) in state.teamMembers" >
                 <el-row class="mb10" type="flex" justify="space-between">
                   <span style="margin-left: 5px; font-weight: bold;">成员{{ index === 0 ? index + 1 + '（负责人）' : index + 1 }}</span>
@@ -68,13 +68,13 @@
 
                 <el-form-item :span="24" class="mb20" label="姓名" :prop="'teamMembers[' + index + '].name'" :rules="rules.teamMembers[index].name">
                   <el-col>
-                    <el-input v-model="member.name" placeholder="姓名" clearable></el-input>
+                    <el-input v-model="member.name" placeholder="姓名" v-bind:disabled="isDisabled(index)"></el-input>
                   </el-col>
                 </el-form-item>
                 <div style="margin-top: 20px;"></div>
                 <el-form-item :span="24" class="mb20" label="学号" :prop="'teamMembers[' + index + '].studentId'" :rules="rules.teamMembers[index].studentId">
                   <el-col>
-                    <el-input v-model="member.studentId" placeholder="学号" clearable></el-input>
+                    <el-input v-model="member.studentId" placeholder="学号" v-bind:disabled="isDisabled(index)"></el-input>
                   </el-col>
                 </el-form-item>
                 <div style="margin-top: 20px;"></div>
@@ -102,13 +102,13 @@
 
               <el-form-item :span="24" class="mb20" label="姓名" prop="personalInfo.name" :rules="rules.personalInfo.name">
                 <el-col>
-                <el-input v-model="state.personalInfo.name" placeholder="姓名" clearable></el-input>
+                  <el-input v-model="state.personalInfo.name" placeholder="姓名" :disabled="true"></el-input>
                 </el-col>
               </el-form-item>
               <div style="margin-top: 20px;"></div>
-              <el-form-item :span="24" class="mb20" label="学号" prop="personalInfo.studentId" :rules="rules.personalInfo.studentId">
+              <el-form-item :span="24" class="mb20" label="学号" prop="personalInfo.studentId" :rules="rules.personalInfo.studentId" >
                 <el-col>
-                  <el-input v-model="state.personalInfo.studentId" placeholder="学号" clearable></el-input>
+                  <el-input v-model="state.personalInfo.studentId" placeholder="学号" :disabled="true"></el-input>
                 </el-col>
               </el-form-item>
               <div style="margin-top: 20px;"></div>
@@ -123,7 +123,7 @@
                   <el-input v-model="state.personalInfo.college" placeholder="系号+学院名称，例如“6系 计算机学院”" clearable></el-input>
                 </el-col>
               </el-form-item>
-              </el-form>
+            </el-form>
           </el-col>
 
         </el-row>
@@ -151,6 +151,7 @@ import { i18n } from '/@/i18n';
 import {ElMessage} from "element-plus";
 import {groupBooking, singleBooking} from "/@/api/booking";
 import {PropType} from "vue-demi";
+import {reqInfo} from "/@/api/user";
 // import { setBackEndControlRefreshRoutes } from "/@/router/backEnd";
 
 const props = defineProps({
@@ -293,18 +294,23 @@ const rules = reactive({
   }
 });
 
-const refreshData = () => {
-  state.teamMembers.splice(1);
-  const firstMember = state.teamMembers[0];
-  firstMember.name = '';
-  firstMember.studentId = '';
-  firstMember.phone = '';
-  firstMember.college = '';
+const isDisabled = (index: number) => {
+  return index === 0;
+}
 
-  state.personalInfo.name = '';
-  state.personalInfo.studentId = '';
-  state.personalInfo.phone = '';
-  state.personalInfo.college = '';
+const refreshData = () => {
+  state.teamMembers.splice(state.selectedCapacity[state.events.indexOf(state.selectedEvent)]);
+  // console.log(state.selectedCapacity[state.events.indexOf(state.selectedEvent)]);
+  // const firstMember = state.teamMembers[0];
+  // firstMember.name = '';
+  // firstMember.studentId = '';
+  // firstMember.phone = '';
+  // firstMember.college = '';
+
+  // state.personalInfo.name = '';
+  // state.personalInfo.studentId = '';
+  // state.personalInfo.phone = '';
+  // state.personalInfo.college = '';
 }
 
 const addTeamMember = () => {
@@ -367,12 +373,12 @@ const openDialog = (type: string, row?: any) => {
   if (state.data.campus === 'shahe') {
     start += 28;
   }
-  console.log("start" + start);
+  // console.log("start" + start);
   state.selectedCapacity = [];
   for (let i = start;i < start + 4;i++) {
     state.selectedCapacity.push(state.capacity[i]);
   }
-  console.log(state.selectedCapacity);
+  // console.log(state.selectedCapacity);
   state.accessibleEvents = [];
   for(let i = start; i < start + 4;i++) {
     if (state.data.bookingWay === 'group') {
@@ -385,10 +391,6 @@ const openDialog = (type: string, row?: any) => {
       }
     }
   }
-  console.log("capacity" + state.capacity)
-  console.log("groupcolors" + state.groupColors)
-  console.log("singlecolors" + state.singleColors)
-  console.log("accessibleEvents" + state.accessibleEvents)
   if (type === 'edit') {
     // 模拟数据，实际请走接口
     row.menuType = 'menu';
@@ -531,10 +533,6 @@ const onGroupBooking = () => {
   if (state.data.campus == 'shahe') {
     time_index += 28;
   }
-  // console.log("leaderObj", leaderObj);
-  // console.log("personsArr", personsArr);
-  // console.log("collegeNumber", collegeNumber);
-  // console.log("time_index", time_index);
   const response = groupBooking(leaderObj, personsArr, collegeNumber, time_index);
   response
       .then(() => {
@@ -554,9 +552,6 @@ const onGroupBooking = () => {
 }
 
 const validateSingleBooking = () => {
-  // console.log(state.selectedEvent)
-  // console.log(state.events)
-  // console.log(state.accessibleEvents)
   if (state.accessibleEvents.indexOf(state.events.indexOf(state.selectedEvent)) == -1) {
     ElMessage({
       type: 'error',
@@ -589,8 +584,6 @@ const onSingleBooking = () => {
   }
   const matchResult = state.personalInfo.college.trim().match(regex);
   let collegeNumber = parseInt(<string>matchResult?.[0], 10);
-  // console.log("index" + time_index);
-  // console.log("collegeNumber" + collegeNumber);
   const response = singleBooking(
       time_index,
       state.personalInfo.name,
@@ -642,6 +635,18 @@ const onSubmit = () => {
 // 页面加载时
 onMounted(() => {
   state.menuData = getMenuData(routesList.value);
+  const response = reqInfo();
+  response.then(response => {
+    const data = response.data.student_info;
+
+    state.personalInfo.name = data.name;
+    state.personalInfo.studentId = data.id;
+
+    const firstMember = state.teamMembers[0];
+    firstMember.name = data.name;
+    firstMember.studentId = data.id;
+
+  })
 });
 
 // 暴露变量
