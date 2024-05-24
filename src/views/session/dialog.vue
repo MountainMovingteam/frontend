@@ -18,14 +18,10 @@
         <el-descriptions-item label="预约日期">{{showDate(state.data.column, state.data.week_num)}}</el-descriptions-item>
         <el-descriptions-item label="预约场次" :span='2'>{{state.selectedEvent}}</el-descriptions-item>
         <el-descriptions-item label="团队预约数量">
-          <div v-if="state.leaderInfo.name == '' && state.leaderInfo.studentId == '' && state.leaderInfo.phone == ''">
-            0    
-          </div>
-          <div v-else>
-            1
-            </div>
+          <div v-if="state.hasTeam">1 </div>
+          <div v-else>0</div>
         </el-descriptions-item>
-        <el-descriptions-item label="个人预约数量">{{state.otherMembers.length}}</el-descriptions-item>
+        <el-descriptions-item label="个人预约数量">{{state.individual}}</el-descriptions-item>
   </el-descriptions>
   <el-tabs v-model="activeName"  type='border-card'>
     <el-tab-pane label="团队预约" name="first">
@@ -134,7 +130,7 @@ const singleData = reactive<any>({
       {key: 'name', colWidth: '', title: '姓名', type: 'text', isCheck: true},
       {key: 'student_id', colWidth: '', title: '学号', type: 'text', isCheck: true},
       {key: 'phone', colWidth: '', title: '电话', type: 'text', isCheck: true},
-      {key: 'status', colWidth: '', title: '状态', type: 'label', isCheck: true},
+      {key: 'status', colWidth: '', title: '预约状态', type: 'label', isCheck: true},
       {key: 'op', colWidth: '', title: '操作', type: 'button',btType:'danger', isCheck: true},
     ],    // 配置项
     config: {
@@ -166,10 +162,8 @@ const state = reactive({
     { name: '', studentId: '', phone: '' }
   ],
   personalInfo: { name: '', studentId: '', phone: '' }, // 初始个人信息
-  leaderInfo: { name: '', studentId: '', phone: '' },
-  otherMembers: [
-    { name: '', studentId: '', phone: '' }
-  ],
+  hasTeam:false,
+  individual:0,
   ruleForm: {
     menuSuperior: [],
     menuType: 'menu',
@@ -211,10 +205,6 @@ const refreshData = () => {
   state.personalInfo.name = '';
   state.personalInfo.studentId = '';
   state.personalInfo.phone = '';
-  state.leaderInfo.name = '';
-  state.leaderInfo.studentId = '';
-  state.leaderInfo.phone = '';
-  state.otherMembers = [];
 }
 
 
@@ -257,31 +247,25 @@ const getTableData = () => {
   response.then(response => {
     const data = response.data;
     state.list = data.list;
-    console.log(state.list);
     state.list.forEach(function(item: any){
       if (item.order_type === 'team') {
-        state.leaderInfo.name = item.name;
-        state.leaderInfo.studentId = item.id;
-        state.leaderInfo.phone = item.phone;
         teamData.tableData.data.push({
           'name':item.name,
           'student_id':item.id,
           'phone':item.phone,
+          'status':'未生效',
           'op':"删除",
         })
+        state.hasTeam=true
       } else {
-        let info = {
-          name: item.name,
-          studentId: item.id,
-          phone: item.phone,
-        }
-        state.otherMembers.push(info);
         singleData.tableData.data.push({
           'name':item.name,
           'student_id':item.id,
           'phone':item.phone,
+          'status':'未生效',
           'op':"删除",
         })
+        state.individual = state.individual + 1;
       }
     });
   })
@@ -324,6 +308,9 @@ const closeDialog = () => {
 
 onMounted(() => {
   state.menuData = getMenuData(routesList.value);
+  activeName.value = 'first';
+  state.hasTeam=false;
+  state.individual = 0;
 });
 
 // 暴露变量

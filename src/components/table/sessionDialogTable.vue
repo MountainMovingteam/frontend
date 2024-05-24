@@ -11,7 +11,7 @@
 			@selection-change="onSelectionChange"
 		>
 			<el-table-column type="selection" :reserve-selection="true" width="30" v-if="config.isSelection" />
-			<el-table-column type="index" label="序号" width="60" v-if="config.isSerialNo" />
+			<el-table-column type="index" label="序号" width='' v-if="config.isSerialNo" />
 			<el-table-column
 				v-for="(item, index) in setHeader"
 				:key="index"
@@ -25,7 +25,7 @@
 						{{ scope.row[item.key] }}
 					</template>
 					<template v-else-if="item.type === 'label'">
-						<el-tag type="danger">{{ scope.row[item.key] }}</el-tag>
+						<el-tag type="warning">{{ scope.row[item.key] }}</el-tag>
 					</template>
                     <template v-else>
                         <el-popconfirm title="确定删除吗？" @confirm="onDelRow(scope.row)">
@@ -36,9 +36,6 @@
 					</template>
 				</template>
 			</el-table-column>
-			<template #empty>
-				<el-empty description="暂无数据" />
-			</template>
 		</el-table>
 	</div>
 </template>
