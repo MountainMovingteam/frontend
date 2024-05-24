@@ -2,11 +2,12 @@
 export default {
 	router: {
 		home: '首页',
-		booking:'学生预约',
-		session:'场次管理',
-		commentators:'讲解员管理',
+		booking: '学生预约',
+		session: '场次管理',
+		commentators: '讲解员管理',
 		personal: '个人中心',
-		notification:'通知中心'
+		notification: '通知中心',
+		QandA: '常见问题解答',
 	},
 	staticRoutes: {
 		signIn: '登录',
