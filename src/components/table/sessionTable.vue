@@ -113,15 +113,11 @@ const getConfig = computed(() => {
 const setHeader = computed(() => {
   return props.header.filter((v) => v.isCheck);
 });
-// tool 列显示全选改变时
-const onCheckAllChange = <T>(val: T) => {
-  if (val) props.header.forEach((v) => (v.isCheck = true));
-  else props.header.forEach((v) => (v.isCheck = false));
-  state.checkListIndeterminate = false;
-};
 
 const handleCellClick = (row: number, column: number, text: string) => {
     emit('cellClick', {row: row, column: column});
+    console.log(row);
+    console.log(column);
 }
 // 表格多选改变时，用于导出
 const onSelectionChange = (val: EmptyObjectType[]) => {
