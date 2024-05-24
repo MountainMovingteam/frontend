@@ -55,7 +55,7 @@
 import { reactive, computed, nextTick, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useThemeConfig } from '/@/stores/themeConfig';
-import { toRaw } from '@vue/reactivity';
+//import { toRaw } from '@vue/reactivity';
 import '/@/theme/tableTool.scss';
 
 const selectedCell = ref<any>(null);
@@ -139,7 +139,7 @@ const pageReset = () => {
 
 
 const getCell = (row:any , column:any) => {
-  var list = toRaw(props.data);
+  var list = JSON.parse(JSON.stringify(props.data));
   var obj = list[row.rowIndex][`day${row.columnIndex}`];
   if (obj) {
     if (obj.color != '#ffffff')
