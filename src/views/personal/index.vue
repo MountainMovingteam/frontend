@@ -86,11 +86,12 @@
 								</div>
 								<div class="personal-recommend-auto">
 									<div style="font-weight: bold;">校区：{{ v.campus }}</div>
-									<div class="personal-recommend-msg">{{ v.week_num }}: {{ v.weekday }}</div>
+									<div class="personal-recommend-msg">第{{ v.week_num }}周: {{ v.weekday }}</div>
 									<div class="personal-recommend-msg">场次: {{ v.session }}</div>
 									<div class="personal-recommend-msg">讲解员: {{ v.commentator }}</div>
 								</div>
-								<el-button color="#626aef" plain class="personal-recommend-cancel-button">取消预约</el-button>
+								<el-button v-if="v.status != '已驳回'" color="#626aef" plain
+									class="personal-recommend-cancel-button" @click="cancelBooking(v)">取消预约</el-button>
 							</div>
 
 
@@ -229,16 +230,16 @@
 <script setup lang="ts" name="personal">
 import { reactive, computed, onMounted, ref, defineAsyncComponent } from 'vue';
 import { formatAxis } from '/@/utils/formatTime';
-import { newsInfoList, recommendList as mockList } from './mock';
+import { newsInfoList } from './mock';
 import { storeToRefs } from 'pinia';
 import router from '/@/router';
-import { reqInfo, modifyBaseInfo, modifyPassword, reqAvatar, refBookingInfo } from "/@/api/user/index";
+import { reqInfo, modifyBaseInfo, modifyPassword, reqAvatar, refBookingInfo, refCancelBooking } from "/@/api/user/index";
 import { useUserInfo } from '/@/stores/userInfo';
 import { Local, Session } from '/@/utils/storage';
 import { ElMessage } from 'element-plus';
 import { reqNotice } from '/@/api/notification/index';
 import { encrypt } from '/@/utils/rsa';
-import { getBookingData2Show } from '/@/utils/transform';
+import { getBookingData2Show, info2TimeIndex } from '/@/utils/transform';
 
 const DetailDialog = defineAsyncComponent(() => import('/@/views/notification/dialog.vue'));
 const DetailDialogRef = ref();
@@ -359,6 +360,23 @@ const getBookingInfo = () => {
 		state.recommendList = getBookingData2Show(response.data.list);
 	}).catch(error => {
 		ElMessage.error('获取预约信息失败:', error);
+	})
+}
+
+const cancelBooking = (v: any) => {
+	refCancelBooking({
+		"week_num": v.week_num,
+		"time_index": info2TimeIndex(v)
+	}).then(response => {
+		console.log(response)
+		if (response.data.success) {
+			ElMessage.success('取消预约成功');
+			getBookingInfo();
+		} else {
+			ElMessage.error('取消预约失败');
+		}
+	}).catch(error => {
+		ElMessage.error('取消预约失败:', error);
 	})
 }
 
