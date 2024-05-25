@@ -152,6 +152,21 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					icon: 'iconfont icon-gerenzhongxin',
 				},
 			},
+			{
+				path: '/answer',
+				name: 'answer',
+				component: () => import('/@/views/answer/index.vue'),
+				meta: {
+					title: 'message.router.answer',
+					isLink: '',
+					isHide: false,
+					isKeepAlive: true,
+					isAffix: false,
+					isIframe: false,
+					roles: ['admin', 'user'],
+					icon: 'iconfont icon-shenqingkaiban',
+				},
+			},
 		],
 	},
 ];
