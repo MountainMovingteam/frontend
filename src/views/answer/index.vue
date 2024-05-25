@@ -1,7 +1,31 @@
 <template>
   <div>
+    <el-card v-if="showOriginal" class="main-card" shadow="always">
+      <el-alert
+          title="欢迎来到答题界面！"
+          type="success"
+          description=" "
+          center
+          :closable="false"
+      />
+      <div style="margin-top: 50px;text-align: center;line-height: 2;">
+      <el-text class="mx-1">
+        在这里巩固你的安全知识吧！
+        <br>
+        点击下方开始答题进行练习，共10道题，总分100分。题型包括单选、多选。
+      </el-text>
+      </div>
+
+      <div class="start-button">
+      <el-button color="#626aef" size="large" plain @click="switch2Questions">
+        开始答题
+      </el-button>
+      </div>
+    </el-card>
+
+    <div v-if="showQuestions" >
     <div v-for="(question, index) in questions" :key="index">
-      <el-card class="question_card">
+      <el-card class="question_card" shadow="hover">
 
         <template #header>
           <div class="card-header">
@@ -16,6 +40,7 @@
               size="large"
               :disabled="showResult"
               @change="handleCheckboxChange(index, 'a_option')"
+              style="white-space: pre-wrap;overflow-wrap: break-word;;"
           />
           <br>
           <el-checkbox
@@ -24,6 +49,7 @@
               size="large"
               :disabled="showResult"
               @change="handleCheckboxChange(index, 'b_option')"
+              style="white-space: pre-wrap;overflow-wrap: break-word;"
           />
           <br>
           <el-checkbox
@@ -32,6 +58,7 @@
               size="large"
               :disabled="showResult"
               @change="handleCheckboxChange(index, 'c_option')"
+              style="white-space: pre-wrap;overflow-wrap: break-word;"
           />
           <br>
           <el-checkbox
@@ -40,6 +67,7 @@
               size="large"
               :disabled="showResult"
               @change="handleCheckboxChange(index, 'd_option')"
+              style="white-space: pre-wrap;overflow-wrap: break-word;"
           />
         </div>
 
@@ -59,6 +87,7 @@
         </el-icon>
         提交
       </el-button>
+    </div>
     </div>
 
   </div>
@@ -93,7 +122,43 @@ export interface Answer {
 
 const questions = ref<Question[]>([]);
 const answers = ref<Answer[]>([]);
+const showOriginal = ref(true);
+const showQuestions = ref(false);
 const showResult = ref(false);
+ref(false);
+const generateQuestionList = () => {
+  const questionList = [];
+  for (let i = 0; i < 10; i++) {
+    const content = {
+      a_option: `Option A for Question ${i + 1}`,
+      b_option: `Option B for Question ${i + 1}`,
+      c_option: `Option C for Question ${i + 1}`,
+      d_option: `Option D for Question ${i + 1}`,
+      title: `Title for Question ${i + 1}`,
+    };
+    const question = {
+      question_id: i + 1,
+      type: i % 2,
+      content: content,
+    };
+    questionList.push(question);
+  }
+  return questionList;
+};
+
+const generateInitialAnswers = () => {
+  const initialAnswers = [];
+  for (let i = 0; i < 10; i++) {
+    const initialAnswer = {
+      a_option: false,
+      b_option: false,
+      c_option: false,
+      d_option: false,
+    };
+    initialAnswers.push(initialAnswer);
+  }
+  return initialAnswers;
+};
 
 const state = reactive<any>({
   answerData: {
@@ -106,19 +171,8 @@ const state = reactive<any>({
     ],
     correct_rate: 0,
   },
-  questionList: [
-    {
-      question_id: 0,
-      type: 0,
-      content: {
-        a_option: "",
-        b_option: "",
-        c_option: "",
-        d_option: "",
-        title: "",
-      }
-    }
-  ],
+  questionList: generateQuestionList(),
+  answers: generateInitialAnswers(),
 });
 
 const correctType = computed(() => {
@@ -200,7 +254,7 @@ const fetchQuestions =  () => {
 const pushStaticQuestions = () => {
   for (let i = 1; i <= 10; i++) {
     let content = {
-      a_option: `${i}a`,
+      a_option: `${i}a******************** ******************** ************** ************* ***********8`,
       b_option: `${i}b`,
       c_option: `${i}c`,
       d_option: `${i}d`,
@@ -235,7 +289,13 @@ const generateNumberArray = (a: boolean, b: boolean, c: boolean, d: boolean): nu
 onMounted(() => {
   //fetchQuestions();
   pushStaticQuestions();
+
 });
+
+const switch2Questions = () => {
+  showOriginal.value = false;
+  showQuestions.value = true;
+}
 
 const submitAnswers = () => {
   let list: { question_id: number; student_answer: number[] }[] = [];
@@ -265,6 +325,30 @@ const submitAnswers = () => {
 </script>
 
 <style scoped lang="scss">
+.main-card{
+  width: 70%;
+  height: 450px;
+  margin-top: 10%;
+  margin-left: 15%;
+  margin-right: 15%;
+}
+
+@media screen and (max-width: 768px) {
+  .main-card {
+    width: 80%;
+    height: 500px;
+    margin-top: 20%;
+    margin-left: 10%;
+    margin-right: 10%;
+  }
+}
+
+.start-button{
+  margin-top: 150px;
+  display: flex;
+  justify-content: center;
+}
+
 .question_card{
   width: 92%;
   margin-left: 4%;
