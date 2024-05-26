@@ -107,13 +107,13 @@
       </div>
 
     <div class="flex-warp-item-box" style="display: flex; justify-content: center; margin-top: 20px; margin-bottom: 20px;">
-      <el-button type="success" size="large" @click="submitAnswers">
+      <el-button v-if="showQuestions && !showResult" type="success" size="large" @click="submitAnswers">
         <el-icon>
           <ele-Check />
         </el-icon>
         提交
       </el-button>
-      <el-button type="info" size="large" @click="switch2Main">
+      <el-button v-if="showQuestions && showResult" type="info" size="large" @click="switch2Main">
         <el-icon>
           <RefreshLeft />
         </el-icon>
@@ -127,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref} from 'vue';
+import {computed, onMounted, ref} from 'vue';
 import {useRouter} from "vue-router";
 import {RefreshLeft} from "@element-plus/icons-vue";
 
@@ -154,63 +154,21 @@ export interface Answer {
   d_option: boolean;
 }
 
+export interface Result {
+  question_id: number;
+  correct: boolean;
+  correct_ans: number;
+}
+
 const questions = ref<Question[]>([]);
 const answers = ref<Answer[]>([]);
+const results = ref<Result[]>([]);
 const showOriginal = ref(true);
 const showQuestions = ref(false);
 const showResult = ref(false);
 
-const generateQuestionList = () => {
-  const questionList = [];
-  for (let i = 0; i < 10; i++) {
-    const content = {
-      a_option: `Option A for Question ${i + 1}`,
-      b_option: `Option B for Question ${i + 1}`,
-      c_option: `Option C for Question ${i + 1}`,
-      d_option: `Option D for Question ${i + 1}`,
-      title: `Title for Question ${i + 1}`,
-    };
-    const question = {
-      question_id: i + 1,
-      type: i % 2,
-      content: content,
-    };
-    questionList.push(question);
-  }
-  return questionList;
-};
-
-const generateInitialAnswers = () => {
-  const initialAnswers = [];
-  for (let i = 0; i < 10; i++) {
-    const initialAnswer = {
-      a_option: false,
-      b_option: false,
-      c_option: false,
-      d_option: false,
-    };
-    initialAnswers.push(initialAnswer);
-  }
-  return initialAnswers;
-};
-
-const state = reactive<any>({
-  answerData: {
-    list: [
-      {
-        question_id: 0,
-        correct: true,
-        correct_ans: 0,
-      }
-    ],
-    correct_rate: 0,
-  },
-  questionList: generateQuestionList(),
-  answers: generateInitialAnswers(),
-});
-
 const correctType = computed(() => {
-  return state.answerData.list.reduce((acc: any, curr: any) => {
+  return results.value.reduce((acc: any, curr: any) => {
     acc[curr.question_id] = curr.correct ? 'success' : 'error';
     return acc;
   }, {});
@@ -222,7 +180,7 @@ const isAnswerCorrect = (question_id: number) => {
 };
 
 const correctAnswer = computed(() => {
-  return state.answerData.list.reduce((acc: any, curr: any) => {
+  return results.value.reduce((acc: any, curr: any) => {
     acc[curr.question_id] = curr.correct_ans;
     return acc;
   }, {});
@@ -276,6 +234,7 @@ const handleCheckboxChange = (index: number, selectedOption: string) => {
 };
 
 const initQuestions = () => {
+  questions.value.splice(0, questions.value.length);
   for (let i = 1; i <= 10; i++) {
     let content = {
       a_option: `${i}a******************** ******************** ******************************** **************** *********** *********************8`,
@@ -301,6 +260,7 @@ const initQuestions = () => {
 }
 
 const initAnswers = () => {
+  answers.value.splice(0, answers.value.length);
   for (let i = 1; i <= 10; i++) {
     let answer = {
       a_option: false,
@@ -338,6 +298,7 @@ onMounted(() => {
 function saveDataToLocalStorage() {
   localStorage.setItem('questions', JSON.stringify(questions.value));
   localStorage.setItem('answers', JSON.stringify(answers.value));
+  localStorage.setItem('results', JSON.stringify(results.value));
   localStorage.setItem('showOriginal', JSON.stringify(showOriginal.value));
   localStorage.setItem('showQuestions', JSON.stringify(showQuestions.value));
   localStorage.setItem('showResult', JSON.stringify(showResult.value));
@@ -357,6 +318,11 @@ function restoreDataFromLocalStorage() {
     answers.value = JSON.parse(storedAnswers);
   } else {
     initAnswers();
+  }
+
+  const storedResults = localStorage.getItem('results');
+  if (storedResults !== null) {
+    results.value = JSON.parse(storedResults);
   }
 
   const storedShowOriginal = localStorage.getItem('showOriginal');
@@ -382,6 +348,8 @@ function restoreDataFromLocalStorage() {
 }
 
 const switch2Questions = () => {
+  initQuestions();
+  initAnswers();
   showOriginal.value = false;
   showQuestions.value = true;
   showResult.value = false;
@@ -414,8 +382,7 @@ const submitAnswers = () => {
     }
     objects.push(object);
   }
-  state.answerData.list = objects;
-  //console.log(state.answerData.list)
+  results.value = objects;
   showResult.value = true;
 };
 </script>
