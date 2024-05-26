@@ -127,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, ref} from 'vue';
+import {computed, onBeforeUnmount, onMounted, ref} from 'vue';
 import {useRouter} from "vue-router";
 import {RefreshLeft} from "@element-plus/icons-vue";
 
@@ -292,6 +292,10 @@ router.beforeEach((to, from, next) => {
 onMounted(() => {
   // 加载页面时先加载本地存储，如果不存在就手动赋初值
   restoreDataFromLocalStorage();
+});
+
+window.addEventListener('beforeunload', () => {
+  saveDataToLocalStorage();
 });
 
 // 保存数据到本地存储
