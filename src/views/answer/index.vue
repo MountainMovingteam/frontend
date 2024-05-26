@@ -1,4 +1,5 @@
 <template>
+  <keep-alive>
   <div>
     <el-card v-if="showOriginal" class="main-card" shadow="always">
       <el-alert
@@ -113,11 +114,13 @@
     </div>
 
   </div>
+  </keep-alive>
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref} from 'vue';
+import {computed, onBeforeUnmount, onMounted, reactive, ref} from 'vue';
 import {getQuestions} from "/@/api/answer";
+import {useRouter} from "vue-router";
 
 export interface Question {
   question_id: number;
@@ -147,7 +150,7 @@ const answers = ref<Answer[]>([]);
 const showOriginal = ref(true);
 const showQuestions = ref(false);
 const showResult = ref(false);
-ref(false);
+
 const generateQuestionList = () => {
   const questionList = [];
   for (let i = 0; i < 10; i++) {
@@ -311,9 +314,42 @@ const generateNumberArray = (a: boolean, b: boolean, c: boolean, d: boolean): nu
 
 onMounted(() => {
   //fetchQuestions();
-  pushStaticQuestions();
+  const storedQuestions = localStorage.getItem('questions');
+  if (storedQuestions !== null) {
+    questions.value = JSON.parse(storedQuestions);
+  }
 
+  const storedAnswers = localStorage.getItem('answers');
+  if (storedAnswers !== null) {
+    answers.value = JSON.parse(storedAnswers);
+  }
+
+  const storedShowOriginal = localStorage.getItem('showOriginal');
+  if (storedShowOriginal !== null) {
+    showOriginal.value = JSON.parse(storedShowOriginal);
+  }
+
+  const storedShowQuestions = localStorage.getItem('showQuestions');
+  if (storedShowQuestions !== null) {
+    showQuestions.value = JSON.parse(storedShowQuestions);
+  }
+
+  const storedShowResult = localStorage.getItem('showResult');
+  if (storedShowResult !== null) {
+    showResult.value = JSON.parse(storedShowResult);
+  }
+  pushStaticQuestions();
 });
+
+onBeforeUnmount(() => {
+  localStorage.setItem('questions', JSON.stringify(questions.value));
+  localStorage.setItem('answers', JSON.stringify(answers.value));
+  localStorage.setItem('showOriginal', JSON.stringify(showOriginal.value));
+  localStorage.setItem('showQuestions', JSON.stringify(showQuestions.value));
+  localStorage.setItem('showResult', JSON.stringify(showResult.value));
+});
+
+const router = useRouter();
 
 const switch2Questions = () => {
   showOriginal.value = false;
