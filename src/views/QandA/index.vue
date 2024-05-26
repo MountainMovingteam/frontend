@@ -6,7 +6,7 @@
                     <div class="cardList" v-if="item.cards">
                         <div class="cardItem" v-for="(card, cardIndex) in item.cards" :key="cardIndex"
                             @click="showDetails(card)">
-                            {{ card.title }}
+                            {{ card.content }}
                         </div>
                     </div>
                     <div v-else>
@@ -30,14 +30,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, nextTick } from 'vue';
 import { ElInput, ElButton, ElMessage } from 'element-plus';
+import { search, answer } from '/@/api/QandA';
+import { tr } from 'element-plus/es/locale';
 
 const msg = ref('');
-const info = ref<Array<{ isRobot: boolean; content: string; time: string; cards?: Array<{ title: string; details: string }> }>>([]);
+const info = ref<Array<{ isRobot: boolean; content: string; time: string; cards?: Array<{ problem_id: number; content: string }> }>>([]);
 
 // Function to send message
-function sendMessage() {
+async function sendMessage() {
     if (!msg.value.trim()) {
         ElMessage({ message: '不能发送空消息！', type: 'error' });
         return;
@@ -46,15 +48,19 @@ function sendMessage() {
     // Simulate user message
     info.value.push({ isRobot: false, content: msg.value.trim(), time: getTime() });
 
-    // Simulate robot reply with cards
-    const cards = [
-        { title: '卡片一', details: '卡片一的详细内容' },
-        { title: '卡片二', details: '卡片二的详细内容' },
-        { title: '卡片三', details: '卡片三的详细内容' },
-        { title: '卡片四', details: '卡片四的详细内容' },
-        { title: '卡片五', details: '卡片五的详细内容' },
-    ];
-    info.value.push({ isRobot: true, cards: cards, time: getTime(), content: '' });
+    const result = await search({ keywords: msg.value.trim() });
+
+    if (result.data.num == 0 || result.status != 200) {
+        info.value.push({ isRobot: true, content: '对不起，我无法回答您的问题。', time: getTime() });
+    } else {
+        let cards: any = [];
+        for (let i = 0; i < result.data.num; i++) {
+            if (result.status == 200) {
+                cards.push({ problem_id: result.data.list[i].problem_id, content: result.data.list[i].content });
+            }
+        }
+        info.value.push({ isRobot: true, cards: cards, time: getTime(), content: '' });
+    }
 
     msg.value = ''; // Clear input
     scrollToBottom();
@@ -77,12 +83,18 @@ function getTime() {
 }
 
 // Show details of selected card
-function showDetails(card: { title: string; details: string }) {
-    info.value.push({
-        isRobot: true,
-        content: card.details,
-        time: getTime(),
-    });
+async function showDetails(card: { problem_id: number; content: string }) {
+    const result = await answer({ question_id: card.problem_id });
+    if (result.status != 200) {
+        ElMessage({ message: '无法获取答案，请稍后重试。', type: 'error' });
+    } else {
+        info.value.push({
+            isRobot: true,
+            content: result.data.answer,
+            time: getTime(),
+        });
+    }
+
     scrollToBottom();
 }
 </script>
