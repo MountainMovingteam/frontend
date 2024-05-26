@@ -26,6 +26,8 @@
     </el-card>
 
     <div v-if="showQuestions" >
+      <div class="scrollbar-container">
+
     <div v-for="(question, index) in questions" :key="index">
       <el-card class="question_card" shadow="hover">
 
@@ -102,6 +104,7 @@
       </el-card>
       <el-divider />
     </div>
+      </div>
 
     <div class="flex-warp-item-box" style="display: flex; justify-content: center; margin-top: 20px; margin-bottom: 20px;">
       <el-button type="success" size="large" @click="submitAnswers">
@@ -109,6 +112,12 @@
           <ele-Check />
         </el-icon>
         提交
+      </el-button>
+      <el-button type="info" size="large" @click="switch2Main">
+        <el-icon>
+          <RefreshLeft />
+        </el-icon>
+        返回
       </el-button>
     </div>
     </div>
@@ -118,9 +127,9 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onBeforeUnmount, onMounted, reactive, ref} from 'vue';
-import {getQuestions} from "/@/api/answer";
+import {computed, onMounted, reactive, ref} from 'vue';
 import {useRouter} from "vue-router";
+import {RefreshLeft} from "@element-plus/icons-vue";
 
 export interface Question {
   question_id: number;
@@ -237,7 +246,6 @@ const getCorrectAnswer = (question_id: number) => {
   return answer;
 }
 
-
 const myAnswer = (index: number) => {
   let answer = ' ';
   if (answers.value[index].a_option) {
@@ -267,16 +275,7 @@ const handleCheckboxChange = (index: number, selectedOption: string) => {
   }
 };
 
-const fetchQuestions =  () => {
-  // ********** TODO ***************** 实际调用接口接受questionList的值
-  const response = getQuestions(10);
-  response.then(response =>{
-    state.questionList = response.data;
-    questions.value = response.data;
-  });
-};
-
-const pushStaticQuestions = () => {
+const initQuestions = () => {
   for (let i = 1; i <= 10; i++) {
     let content = {
       a_option: `${i}a******************** ******************** ******************************** **************** *********** *********************8`,
@@ -292,6 +291,17 @@ const pushStaticQuestions = () => {
       content: content,
     }
     questions.value.push(question);
+  }
+  // ********** TODO ***************** 实际调用接口接受questionList的值
+  // const response = getQuestions(10);
+  // response.then(response =>{
+  //   state.questionList = response.data;
+  //   questions.value = response.data;
+  // });
+}
+
+const initAnswers = () => {
+  for (let i = 1; i <= 10; i++) {
     let answer = {
       a_option: false,
       b_option: false,
@@ -300,7 +310,6 @@ const pushStaticQuestions = () => {
     }
     answers.value.push(answer);
   }
-  state.questionList = questions.value;
 }
 
 const generateNumberArray = (a: boolean, b: boolean, c: boolean, d: boolean): number[] => {
@@ -312,48 +321,76 @@ const generateNumberArray = (a: boolean, b: boolean, c: boolean, d: boolean): nu
   return result;
 };
 
-onMounted(() => {
-  //fetchQuestions();
-  const storedQuestions = localStorage.getItem('questions');
-  if (storedQuestions !== null) {
-    questions.value = JSON.parse(storedQuestions);
-  }
+const router = useRouter();
 
-  const storedAnswers = localStorage.getItem('answers');
-  if (storedAnswers !== null) {
-    answers.value = JSON.parse(storedAnswers);
-  }
-
-  const storedShowOriginal = localStorage.getItem('showOriginal');
-  if (storedShowOriginal !== null) {
-    showOriginal.value = JSON.parse(storedShowOriginal);
-  }
-
-  const storedShowQuestions = localStorage.getItem('showQuestions');
-  if (storedShowQuestions !== null) {
-    showQuestions.value = JSON.parse(storedShowQuestions);
-  }
-
-  const storedShowResult = localStorage.getItem('showResult');
-  if (storedShowResult !== null) {
-    showResult.value = JSON.parse(storedShowResult);
-  }
-  pushStaticQuestions();
+router.beforeEach((to, from, next) => {
+  // 切换路由之前存储
+  saveDataToLocalStorage();
+  next();
 });
 
-onBeforeUnmount(() => {
+onMounted(() => {
+  // 加载页面时先加载本地存储，如果不存在就手动赋初值
+  restoreDataFromLocalStorage();
+});
+
+// 保存数据到本地存储
+function saveDataToLocalStorage() {
   localStorage.setItem('questions', JSON.stringify(questions.value));
   localStorage.setItem('answers', JSON.stringify(answers.value));
   localStorage.setItem('showOriginal', JSON.stringify(showOriginal.value));
   localStorage.setItem('showQuestions', JSON.stringify(showQuestions.value));
   localStorage.setItem('showResult', JSON.stringify(showResult.value));
-});
+}
 
-const router = useRouter();
+// 从本地存储中恢复数据
+function restoreDataFromLocalStorage() {
+  const storedQuestions = localStorage.getItem('questions');
+  if (storedQuestions !== null){
+    questions.value = JSON.parse(storedQuestions);
+  } else {
+    initQuestions();
+  }
+
+  const storedAnswers = localStorage.getItem('answers');
+  if (storedAnswers !== null) {
+    answers.value = JSON.parse(storedAnswers);
+  } else {
+    initAnswers();
+  }
+
+  const storedShowOriginal = localStorage.getItem('showOriginal');
+  if (storedShowOriginal !== null) {
+    showOriginal.value = JSON.parse(storedShowOriginal);
+  } else {
+    showOriginal.value = true;
+  }
+
+  const storedShowQuestions = localStorage.getItem('showQuestions');
+  if (storedShowQuestions !== null) {
+    showQuestions.value = JSON.parse(storedShowQuestions);
+  } else {
+    showQuestions.value = false;
+  }
+
+  const storedShowResult = localStorage.getItem('showResult');
+  if (storedShowResult !== null) {
+    showResult.value = JSON.parse(storedShowResult);
+  } else {
+    showResult.value = false;
+  }
+}
 
 const switch2Questions = () => {
   showOriginal.value = false;
   showQuestions.value = true;
+  showResult.value = false;
+}
+
+const switch2Main = () => {
+  showOriginal.value = true;
+  showQuestions.value = false;
+  showResult.value = false;
 }
 
 const submitAnswers = () => {
@@ -406,6 +443,11 @@ const submitAnswers = () => {
   margin-top: 130px;
   display: flex;
   justify-content: center;
+}
+
+.scrollbar-container {
+  height: 80vh;
+  overflow-y: auto;
 }
 
 .question_card{
