@@ -7,8 +7,9 @@
           description=" "
           center
           :closable="false"
+          style="margin-top: 40px"
       />
-      <div style="margin-top: 50px;text-align: center;line-height: 2;">
+      <div style="margin-top: 60px;text-align: center;line-height: 2;">
       <el-text class="mx-1">
         在这里巩固你的安全知识吧！
         <br>
@@ -29,46 +30,67 @@
 
         <template #header>
           <div class="card-header">
-            <span>{{index + 1}}.{{question.type === 1? '（多选题）': '（单选题）'}}{{ question.content.title }}</span>
+            <span style="font-size: medium">{{index + 1}}.{{question.type === 1? '（多选题）': '（单选题）'}}{{ question.content.title }}</span>
           </div>
         </template>
 
         <div>
+          <div>
           <el-checkbox
               v-model="answers[index].a_option"
               :label="'A. ' + question.content.a_option"
               size="large"
               :disabled="showResult"
               @change="handleCheckboxChange(index, 'a_option')"
-              style="white-space: pre-wrap;overflow-wrap: break-word;;"
-          />
-          <br>
+              class="option-box"
+          >
+            <span style="font-size: small;line-height: 1.5;">
+            {{'A. ' + question.content.a_option}}
+            </span>
+          </el-checkbox>
+          </div>
+          <div>
           <el-checkbox
               v-model="answers[index].b_option"
               :label="'B. ' + question.content.b_option"
               size="large"
               :disabled="showResult"
               @change="handleCheckboxChange(index, 'b_option')"
-              style="white-space: pre-wrap;overflow-wrap: break-word;"
-          />
-          <br>
+              class="option-box"
+          >
+            <span style="font-size: small;line-height: 1.5;">
+            {{'B. ' + question.content.b_option}}
+            </span>
+          </el-checkbox>
+          </div>
+          <div style="display: block">
           <el-checkbox
               v-model="answers[index].c_option"
               :label="'C. ' + question.content.c_option"
               size="large"
               :disabled="showResult"
               @change="handleCheckboxChange(index, 'c_option')"
-              style="white-space: pre-wrap;overflow-wrap: break-word;"
-          />
-          <br>
+              class="option-box"
+          >
+            <span style="font-size: small;line-height: 1.5;">
+            {{'C. ' + question.content.c_option}}
+            </span>
+          </el-checkbox>
+          </div>
+          <div>
           <el-checkbox
               v-model="answers[index].d_option"
               :label="'D. ' + question.content.d_option"
               size="large"
               :disabled="showResult"
               @change="handleCheckboxChange(index, 'd_option')"
-              style="white-space: pre-wrap;overflow-wrap: break-word;"
-          />
+              class="option-box"
+          >
+            <span style="font-size: small;line-height: 1.5;">
+            {{'D. ' + question.content.d_option}}
+            </span>
+          </el-checkbox>
+          </div>
         </div>
 
         <template #footer v-if="showResult">
@@ -254,11 +276,12 @@ const fetchQuestions =  () => {
 const pushStaticQuestions = () => {
   for (let i = 1; i <= 10; i++) {
     let content = {
-      a_option: `${i}a******************** ******************** ************** ************* ***********8`,
-      b_option: `${i}b`,
-      c_option: `${i}c`,
-      d_option: `${i}d`,
-      title: `这个题目的序号为${i}`,
+      a_option: `${i}a******************** ******************** ******************************** **************** *********** *********************8`,
+      b_option: `${i}b问页面时：在哪里，去哪里，若是不合型网站。不合适就会引起用户操作不适（方向不明确）。 以下是索条、帮助按钮、`,
+      c_option: `${i}c哪里，去哪里，怎样去的问题。 一般导航会有「侧栏导航」和「顶部导航」2 种类型。选择合适的导航#选择哪里，去哪里，怎样去的问题。 一般导航会有「侧栏导航」和「顶部导航」2 种类型。选择合适的导航#选择 文字太多会溢出 只能这样调整`,
+      d_option: `${i}d侧栏导航#可导航栏固定在左侧，提高导航可见性，方便页面之间切换侧栏导航#可导航栏固定在左侧，提高导航可见性，方便页面之间切换`,
+      title: `这个题目的序号为${i}导航可以解决用户在访问页面时：在哪里，去哪里，怎样去的问题。 一般导航会有「侧栏导航」和「顶部导航」2 种类型。选择合适的导航#选择合适的导航可以让用户在产品的使用过程中非常流畅，相反若是不合适就会引起用户操作不适（方向不明确）。 以下是「侧栏导航」和 「顶部导航」的区别。
+      侧栏导航#可导航栏固定在左侧，提高导航可见性，方便页面之间切换； `,
     };
     let question = {
       question_id: i,
@@ -344,7 +367,7 @@ const submitAnswers = () => {
 }
 
 .start-button{
-  margin-top: 150px;
+  margin-top: 130px;
   display: flex;
   justify-content: center;
 }
@@ -356,6 +379,12 @@ const submitAnswers = () => {
   margin-top: 10px;
 }
 
+.option-box{
+  display: inline-block;
+  white-space: pre-wrap;
+  padding: 20px 0;
+  overflow-wrap: break-word;
+}
 .el-alert {
   margin: 20px 0 0;
 }
