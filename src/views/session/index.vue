@@ -1,6 +1,6 @@
 <template>
   <div class="table-demo-container layout-padding">
-    <div class="table-demo-padding layout-padding-view layout-padding-auto">
+    <div class="table-demo-padding layout-padding-view" style='height: 100%;'>
       <div class="system-menu-search mb15">
         <el-button size="large" :type="selectedLocation === 'xueyuan' ? 'primary' : 'info'" class="ml10"
                    @click="selectLocation('xueyuan')">
@@ -39,7 +39,7 @@
         <!--        下周按钮-->
       </div>
       <!--      选择时间-->
-      <div v-if="selectedLocation === 'xueyuan' && selectedTime === 0">
+      <div v-if="selectedLocation === 'xueyuan' && selectedTime === 0" style='height: 100%;'>
         <Table
             ref="tableRef"
             v-bind="xyTable0.tableData"
@@ -47,7 +47,7 @@
             @cellClick="onCellClick"
         />
       </div>
-      <div v-else-if="selectedLocation === 'shahe'&& selectedTime=== 0">
+      <div v-else-if="selectedLocation === 'shahe'&& selectedTime=== 0" style='height: 100%;'>
         <Table
             ref="tableRef"
             v-bind="shTable0.tableData"
@@ -55,7 +55,7 @@
             @cellClick="onCellClick"
         />
       </div>
-      <div v-else-if="selectedLocation === 'xueyuan'&& selectedTime === 1">
+      <div v-else-if="selectedLocation === 'xueyuan'&& selectedTime === 1" style='height: 100%;'>
         <Table
             ref="tableRef"
             v-bind="xyTable1.tableData"
@@ -63,7 +63,7 @@
             @cellClick="onCellClick"
         />
       </div>
-      <div v-else-if="selectedLocation === 'shahe'&& selectedTime === 1">
+      <div v-else-if="selectedLocation === 'shahe'&& selectedTime === 1" style='height: 100%;'>
         <Table
             ref="tableRef"
             v-bind="shTable1.tableData"

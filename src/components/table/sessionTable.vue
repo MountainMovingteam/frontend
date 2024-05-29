@@ -1,12 +1,12 @@
 <template>
-  <div class="book-table-container">
+  <div class="session-table-container">
     <el-table
         :data="data"
         :border="setBorder"
+        :cell-style="getCell"
         v-bind="$attrs"
         row-key="id"
         stripe
-        style="width: 100%;"
         v-loading="config.loading"
         @selection-change="onSelectionChange"
     >
@@ -19,19 +19,16 @@
           :prop="item.key"
           :width="item.colWidth"
           :label="item.title"
+          
       >
         <template v-slot="scope">
           <template v-if="item.key === 'event'">
-            <span  style="display: flex; align-items: center; justify-content: flex-start; height: 100px;">
+            <span  style="display: flex; align-items: center; justify-content: flex-start; height: 100%;">
               {{ scope.row[item.key] }}
             </span>
           </template>
           <template v-else>
-<!--            <span :class="{ 'cell-active': isSelected(scope.$index, index) }"-->
-<!--                  :style="{ backgroundColor: scope.row[item.key], display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center' }"-->
-<!--                  @click="handleCellClick(scope.$index, index, scope.row[item.key] )"-->
-<!--            > <i v-if="isSelected(scope.$index, index)" class="check-mark">✓</i> </span>-->
-            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100px;white-space: pre-wrap;":style="{ backgroundColor: scope.row[item.key].color, display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center' }" @click="handleCellClick(scope.$index, index, scope.row[item.key] )">
+            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100px;white-space: pre-wrap;" :style="{  display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center' }" @click="handleCellClick(scope.$index, index, scope.row[item.key] )">
               {{ scope.row[item.key].text }}
               </span>
           </template>
@@ -56,12 +53,9 @@
 
 <script setup lang="ts" name="netxTable">
 import { reactive, computed, nextTick, ref } from 'vue';
-import { ElMessage } from 'element-plus';
-import printJs from 'print-js';
-import table2excel from 'js-table2excel';
-import Sortable from 'sortablejs';
 import { storeToRefs } from 'pinia';
 import { useThemeConfig } from '/@/stores/themeConfig';
+//import { toRaw } from '@vue/reactivity';
 import '/@/theme/tableTool.scss';
 
 const selectedCell = ref<any>(null);
@@ -119,25 +113,11 @@ const getConfig = computed(() => {
 const setHeader = computed(() => {
   return props.header.filter((v) => v.isCheck);
 });
-// tool 列显示全选改变时
-const onCheckAllChange = <T>(val: T) => {
-  if (val) props.header.forEach((v) => (v.isCheck = true));
-  else props.header.forEach((v) => (v.isCheck = false));
-  state.checkListIndeterminate = false;
-};
-// tool 列显示当前项改变时
-const onCheckChange = () => {
-  const headers = props.header.filter((v) => v.isCheck).length;
-  state.checkListAll = headers === props.header.length;
-  state.checkListIndeterminate = headers > 0 && headers < props.header.length;
-};
-
-const isSelected= (rowIndex: number, columnIndex: number) => {
-  return selectedCell.value && selectedCell.value.row === rowIndex && selectedCell.value.column === columnIndex;
-}
 
 const handleCellClick = (row: number, column: number, text: string) => {
     emit('cellClick', {row: row, column: column});
+    console.log(row);
+    console.log(column);
 }
 // 表格多选改变时，用于导出
 const onSelectionChange = (val: EmptyObjectType[]) => {
@@ -148,15 +128,8 @@ const onDelRow = (row: EmptyObjectType) => {
   emit('delRow', row);
 };
 // 分页改变
-const onHandleSizeChange = (val: number) => {
-  state.page.pageSize = val;
-  emit('pageChange', state.page);
-};
-// 分页改变
-const onHandleCurrentChange = (val: number) => {
-  state.page.pageNum = val;
-  emit('pageChange', state.page);
-};
+
+
 // 搜索时，分页还原成默认
 const pageReset = () => {
   state.page.pageNum = 1;
@@ -164,68 +137,16 @@ const pageReset = () => {
   emit('pageChange', state.page);
 };
 
-function getCellColor(type) {
-  return type === 0 ? 'white' : 'yellow';
+
+const getCell = (row:any , column:any) => {
+  var list = JSON.parse(JSON.stringify(props.data));
+  var obj = list[row.rowIndex][`day${row.columnIndex}`];
+  if (obj) {
+    if (obj.color != '#ffffff')
+    return {'background-color': obj.color,}
+  }
 }
-// 打印
-const onPrintTable = () => {
-  // https://printjs.crabbly.com/#documentation
-  // 自定义打印
-  let tableTh = '';
-  let tableTrTd = '';
-  let tableTd: any = {};
-  // 表头
-  props.header.forEach((v) => {
-    tableTh += `<th class="table-th">${v.title}</th>`;
-  });
-  // 表格内容
-  props.data.forEach((val, key) => {
-    if (!tableTd[key]) tableTd[key] = [];
-    props.header.forEach((v) => {
-      if (v.type === 'text') {
-        tableTd[key].push(`<td class="table-th table-center">${val[v.key]}</td>`);
-      } else if (v.type === 'image') {
-        tableTd[key].push(`<td class="table-th table-center"><img src="${val[v.key]}" style="width:${v.width}px;height:${v.height}px;"/></td>`);
-      }
-    });
-    tableTrTd += `<tr>${tableTd[key].join('')}</tr>`;
-  });
-  // 打印
-  printJs({
-    printable: `<div style=display:flex;flex-direction:column;text-align:center><h3>${props.printName}</h3></div><table border=1 cellspacing=0><tr>${tableTh}${tableTrTd}</table>`,
-    type: 'raw-html',
-    css: ['//at.alicdn.com/t/c/font_2298093_rnp72ifj3ba.css', '//unpkg.com/element-plus/dist/index.css'],
-    style: `@media print{.mb15{margin-bottom:15px;}.el-button--small i.iconfont{font-size: 12px !important;margin-right: 5px;}}; .table-th{word-break: break-all;white-space: pre-wrap;}.table-center{text-align: center;}`,
-  });
-};
-// 导出
-const onImportTable = () => {
-  if (state.selectlist.length <= 0) return ElMessage.warning('请先选择要导出的数据');
-  table2excel(props.header, state.selectlist, `${themeConfig.value.globalTitle} ${new Date().toLocaleString()}`);
-};
-// 刷新
-const onRefreshTable = () => {
-  emit('pageChange', state.page);
-};
-// 设置
-const onSetTable = () => {
-  nextTick(() => {
-    const sortable = Sortable.create(toolSetRef.value, {
-      handle: '.handle',
-      dataIdAttr: 'data-key',
-      animation: 150,
-      onEnd: () => {
-        const headerList: EmptyObjectType[] = [];
-        sortable.toArray().forEach((val: string) => {
-          props.header.forEach((v) => {
-            if (v.key === val) headerList.push({ ...v });
-          });
-        });
-        emit('sortHeader', headerList);
-      },
-    });
-  });
-};
+
 
 // 暴露变量
 defineExpose({
@@ -234,23 +155,13 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-.book-table-container {
+.session-table-container {
   display: flex;
   flex-direction: column;
+  height: 83%;
   .el-table {
     flex: 1;
-    overflow: auto;
-    .check-mark {
-      font-size: 50px; /* 调整对勾的大小 */
-      line-height: 100px;
-      user-select: none
-    }
-
-    .cell-active {
-      position: relative;
-      background-color: lightpink !important;
-    }
-
+    overflow-y: auto;
     .cell-active::after {
       content: ''; /* 对勾符号 */
       position: absolute;
@@ -258,6 +169,7 @@ defineExpose({
       left: 50%;
       transform: translate(-50%, -50%);
     }
+   
   }
   .table-footer {
     display: flex;
