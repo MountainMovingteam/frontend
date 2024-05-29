@@ -33,7 +33,6 @@
 import { ref, nextTick } from 'vue';
 import { ElInput, ElButton, ElMessage } from 'element-plus';
 import { search, answer } from '/@/api/QandA';
-import { tr } from 'element-plus/es/locale';
 
 const msg = ref('');
 const info = ref<Array<{ isRobot: boolean; content: string; time: string; cards?: Array<{ problem_id: number; content: string }> }>>([]);
@@ -84,7 +83,7 @@ function getTime() {
 
 // Show details of selected card
 async function showDetails(card: { problem_id: number; content: string }) {
-    const result = await answer({ question_id: card.problem_id });
+    const result = await answer({ problem_id: card.problem_id });
     if (result.status != 200) {
         ElMessage({ message: '无法获取答案，请稍后重试。', type: 'error' });
     } else {
