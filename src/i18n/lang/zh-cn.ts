@@ -8,6 +8,7 @@ export default {
 		personal: '个人中心',
 		notification: '通知中心',
 		QandA: '常见问题解答',
+		answer: '答题界面',
 	},
 	staticRoutes: {
 		signIn: '登录',
