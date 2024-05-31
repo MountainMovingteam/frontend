@@ -4,24 +4,25 @@
       <el-descriptions
         title="场次信息"
         direction="vertical"
-        :column="3"
+        :column="6"
         border
       >
         <el-descriptions-item label="预约校区">
-          <div v-if="state.data.campus=='xueyuan'">
+          <div v-if="state.data.campus=='xueyuan'" :span='3'>
                 学院路校区
               </div>
               <div v-else>
                 沙河校区
               </div>
             </el-descriptions-item>
-        <el-descriptions-item label="预约日期">{{showDate(state.data.column, state.data.week_num)}}</el-descriptions-item>
-        <el-descriptions-item label="预约场次" :span='2'>{{state.selectedEvent}}</el-descriptions-item>
-        <el-descriptions-item label="团队预约数量">
+        <el-descriptions-item label="预约日期" :span='3'>{{showDate(state.data.column, state.data.week_num)}}</el-descriptions-item>
+        <el-descriptions-item label="预约场次" :span='3'>{{state.selectedEvent}}</el-descriptions-item>
+        <el-descriptions-item label="讲解员" :span='6' label-align='center' align='center'>{{state.assistant}}</el-descriptions-item>
+        <el-descriptions-item label="团队预约数量" :span='3'>
           <div v-if="state.hasTeam">1 </div>
           <div v-else>0</div>
         </el-descriptions-item>
-        <el-descriptions-item label="个人预约数量">{{state.individual}}</el-descriptions-item>
+        <el-descriptions-item label="个人预约数量" :span='3'>{{state.individual}}</el-descriptions-item>
   </el-descriptions>
   <el-tabs v-model="activeName"  type='border-card'>
     <el-tab-pane label="团队预约" name="first">
@@ -163,6 +164,7 @@ const state = reactive({
   ],
   personalInfo: { name: '', studentId: '', phone: '' }, // 初始个人信息
   hasTeam:false,
+  assistant:'abc',
   individual:0,
   ruleForm: {
     menuSuperior: [],
@@ -205,6 +207,7 @@ const refreshData = () => {
   state.personalInfo.name = '';
   state.personalInfo.studentId = '';
   state.personalInfo.phone = '';
+  state.assistant = '';
 }
 
 
@@ -284,7 +287,7 @@ const getMenuData = (routes: RouteItems) => {
   return arr;
 };
 // 打开弹窗
-const openDialog = (type: string, row?: any) => {
+const openDialog = (type: string, assist:any) => {
   state.data.campus = props.campus;
   state.data.bookingWay = props.bookingWay;
   state.data.row = props.row;
@@ -293,6 +296,7 @@ const openDialog = (type: string, row?: any) => {
   state.selectedDay = state.days[state.data.column - 1];
   state.data.week_num = props.week_num;
   state.data.time_index = props.time_index;
+  
   console.log('weeknum' + state.data.week_num);
   console.log('time_index' + state.data.time_index);
   getTableData();
@@ -301,7 +305,12 @@ const openDialog = (type: string, row?: any) => {
   teamData.tableData.data = [];
   singleData.tableData.data = [];
   state.hasTeam = false;
-  state.individual = 0
+  state.individual = 0;
+  if (assist) {
+    state.assistant = assist.trim().split('\n').join(', ');
+  } else {
+    state.assistant = '暂无讲解员'
+  }
 };
 // 关闭弹窗
 const closeDialog = () => {

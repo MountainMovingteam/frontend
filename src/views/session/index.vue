@@ -91,7 +91,7 @@ import {ElMessage} from "element-plus";
 
 const selectedTime = ref(0);
 
-
+const texts = reactive<any>([]);
 const selectedLocation = ref('xueyuan');
 const submitDialogRef = ref();
 const SubmitDialog = defineAsyncComponent(() => import('/@/views/session/dialog.vue'));
@@ -327,8 +327,7 @@ const getTableData = () => {
   xyTable1.tableData.config.loading = true;
   shTable1.tableData.config.loading = true;
   const response = getPlaceDetails();
-  let colors = [];
-  let texts = [];
+  let colors:any = [];
   response.then(response => {
     const data = response.data;
     state.place_details = data.place_details;
@@ -337,10 +336,10 @@ const getTableData = () => {
       let lectures=[];
       lectures=state.place_details[i].lecturer;
       const time=place_detail.time_index+place_detail.week_num*56
-      texts[time]=' '
+      texts[time]=''
       for(let j=0;j<lectures.length;j++)
       {
-        texts[time]+=' '+lectures[j]+'\n';
+        texts[time]+=lectures[j]+'\n';
       }
       if (place_detail.enrolled > 0) {
         colors[i] = "#ffff00";
@@ -440,7 +439,21 @@ function areValuesValid(rowValue: number, columnValue: number) {
 
 const onOpenSubmit = (type: string) => {
   if (areValuesValid(selectedRow.value, selectedColumn.value)) {
-    submitDialogRef.value.openDialog(type);
+    var init = 0;
+    if (selectedLocation.value == 'xueyuan' && selectedTime.value == 0) {
+      if (selectedTime.value == 0) {
+        init = 0;
+      } else {
+        init = 56;
+      }
+    } else {
+      if (selectedTime.value == 0) {
+        init = 28;
+      } else {
+        init = 84;
+      }
+    }    
+    submitDialogRef.value.openDialog(type,texts[init+(selectedColumn.value-1) * 4 + selectedRow.value]);
   } else {
     ElMessage({
       type: 'warning',

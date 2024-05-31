@@ -28,8 +28,8 @@
             </span>
           </template>
           <template v-else>
-            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100px;white-space: pre-wrap;" :style="{  display: 'inline-block', width: '100%', height: '100px', position: 'relative', textAlign: 'center' }" @click="handleCellClick(scope.$index, index, scope.row[item.key] )">
-              {{ scope.row[item.key].text }}
+            <span style="display: flex; align-items: center; justify-content: flex-start; height: 100px;white-space: pre-wrap;" @click="handleCellClick(scope.$index, index, scope.row[item.key] )">
+              {{ getFirstTwoLines(scope.row[item.key].text) }}
               </span>
           </template>
 <!--          格内功能-->
@@ -147,6 +147,13 @@ const getCell = (row:any , column:any) => {
   }
 }
 
+const getFirstTwoLines = (text:any) => {
+  if (!text) {
+    return '暂无讲解员';
+  }
+  const lines = text.split('\n');
+  return lines.slice(0, 2).join('\n');
+}
 
 // 暴露变量
 defineExpose({
