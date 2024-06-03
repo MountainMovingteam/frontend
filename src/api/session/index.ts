@@ -22,4 +22,11 @@ export function getSearchDetails(week_num: number, time_index: number) {
     });
 }
 
+export function rejectOppointment(data:any) {
+    let url = baseURL + '/api/manage/reject'
+    return client.withAuth(client.POST, url,{data:data});
+}
+
+
+
 

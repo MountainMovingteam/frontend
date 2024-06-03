@@ -29,12 +29,14 @@
         <SessionTable
           ref="tableRef"
           v-bind="teamData.tableData"
+          @rejectRow='onRejectRow'
         />
     </el-tab-pane>
     <el-tab-pane label="个人预约" name="second">
       <SessionTable
           ref="tableRef"
           v-bind="singleData.tableData"
+          @rejectRow='onRejectRow'
         />
     </el-tab-pane>
   </el-tabs>
@@ -59,7 +61,7 @@ import {storeToRefs} from 'pinia';
 import {useRoutesList} from '/@/stores/routesList';
 import {i18n} from '/@/i18n/index';
 import {ElMessage} from "element-plus";
-import {getSearchDetails} from "/@/api/session";
+import {getSearchDetails,rejectOppointment} from "/@/api/session";
 // import { setBackEndControlRefreshRoutes } from "/@/router/backEnd";
 
 const props = defineProps({
@@ -259,7 +261,8 @@ const getTableData = () => {
           'student_id':item.id,
           'phone':item.phone,
           'status':'未生效',
-          'op':"删除",
+          'op':"驳回",
+          'order_id':item.order_id
         })
         state.hasTeam=true
       } else {
@@ -268,7 +271,8 @@ const getTableData = () => {
           'student_id':item.id,
           'phone':item.phone,
           'status':'未生效',
-          'op':"删除",
+          'op':"驳回",
+          'order_id':item.order_id
         })
         state.individual = state.individual + 1;
       }
@@ -298,9 +302,6 @@ const openDialog = (type: string, assist:any) => {
   state.selectedDay = state.days[state.data.column - 1];
   state.data.week_num = props.week_num;
   state.data.time_index = props.time_index;
-  
-  console.log('weeknum' + state.data.week_num);
-  console.log('time_index' + state.data.time_index);
   getTableData();
   state.dialog.title = '预约信息';
   state.dialog.isShowDialog = true;
@@ -325,6 +326,27 @@ onMounted(() => {
   state.hasTeam=false;
   state.individual = 0;
 });
+
+const onRejectRow = async (row:EmptyObjectType,reason:any) => {
+  console.log(row.order_id);
+  console.log(state.data.time_index);
+  console.log(state.data.week_num);
+  const data = {
+    option:reason,
+    week_num:state.data.week_num,
+    time_index:state.data.time_index,
+    order_id:row.order_id
+  } 
+  try {
+    const response = await rejectOppointment(data);
+    ElMessage.success('删除成功');
+    tableRef.value.dealChoice();
+  } catch (error) {
+      ElMessage.error('删除失败')
+  }
+  
+
+}
 
 // 暴露变量
 defineExpose({
