@@ -342,9 +342,9 @@ const getTableData = () => {
         texts[time]+=lectures[j]+'\n';
       }
       if (place_detail.enrolled > 0) {
-        colors[i] = "#ffff00";
+        colors[i+1] = "#ffff00";
       } else {
-        colors[i] = "#ffffff";
+        colors[i+1] = "#ffffff";
       }
     }
 
