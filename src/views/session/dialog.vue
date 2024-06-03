@@ -212,14 +212,16 @@ const refreshData = () => {
 
 
 const showDate = (column: number, index: number) => {
-  const currentDay = new Date();
-  const dayOfWeek = currentDay.getDay();
   const offset = index == 0 ? 0 : 7;
-  const targetDay = dayOfWeek + 1 + column + offset + 1;
-
-  const targetDate = new Date(currentDay.getFullYear(), currentDay.getMonth(), targetDay);
-  const formattedDate = targetDate.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
-  const formattedDay = targetDate.toLocaleDateString('zh-CN', { weekday: 'long' });
+  const currentDate = new Date();
+  const dayOfWeek = currentDate.getDay(); // 获取当前星期几，0代表周日
+  const dayDifference = (dayOfWeek === 0 ? 6 : dayOfWeek - 1); // 如果是周日，减去6天；否则，减去对应的天数
+  const mondayDate = new Date(currentDate);
+  mondayDate.setDate(currentDate.getDate() - dayDifference);
+  const expectDate = new Date(currentDate);
+  expectDate.setDate(mondayDate.getDate() +column - 1 + offset);
+  const formattedDate = expectDate.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
+  const formattedDay = expectDate.toLocaleDateString('zh-CN', { weekday: 'long' });
 
   return `${formattedDate} ${formattedDay}`;
 }
