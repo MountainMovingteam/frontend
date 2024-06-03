@@ -28,28 +28,24 @@
 						<el-tag type="warning">{{ scope.row[item.key] }}</el-tag>
 					</template>
                     <template v-else>
-                        <el-popconfirm title="确定删除吗？" @confirm="onDelRow(scope.row)">
-						<template #reference>
-							<el-button size='small' :type=item.btType>{{ scope.row[item.key] }}</el-button>
-						</template>
-					</el-popconfirm>
+						<el-button size='small' :type=item.btType @click="rejectRow(scope.row)">{{ scope.row[item.key] }}</el-button>
 					</template>
 				</template>
 			</el-table-column>
 		</el-table>
 	</div>
+	<ChoiceDialog 
+                  ref="choiceDialogRef"
+                  @confirmReject="onConfirmReject"/>
 </template>
 
 <script setup lang="ts" name="netxTable">
-import { reactive, computed, nextTick, ref } from 'vue';
-import { ElMessage } from 'element-plus';
-import printJs from 'print-js';
-import table2excel from 'js-table2excel';
-import Sortable from 'sortablejs';
+import {defineAsyncComponent, reactive, computed, nextTick, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useThemeConfig } from '/@/stores/themeConfig';
 import '/@/theme/tableTool.scss';
-
+const ChoiceDialog = defineAsyncComponent(() => import('/@/views/session/choiceDialog.vue'));
+const choiceDialogRef = ref();
 // 定义父组件传过来的值
 const props = defineProps({
 	// 列表内容
@@ -70,7 +66,7 @@ const props = defineProps({
 });
 
 // 定义子组件向父组件传值/事件
-const emit = defineEmits(['delRow', 'pageChange', 'sortHeader']);
+const emit = defineEmits(['delRow', 'pageChange', 'sortHeader','rejectRow']);
 
 // 定义变量内容
 const toolSetRef = ref();
@@ -115,9 +111,22 @@ const onSelectionChange = (val: EmptyObjectType[]) => {
 	state.selectlist = val;
 };
 // 删除当前项
-const onDelRow = (row: EmptyObjectType) => {
-	emit('delRow', row);
+
+
+const temp = ref({});
+
+const rejectRow = (row: EmptyObjectType) => {
+	choiceDialogRef.value.openDialog();
+	temp.value = row;
 };
+
+const dealChoice = () => {
+	choiceDialogRef.value.handleClose();
+}
+
+const onConfirmReject = (reason:any) => {
+	emit('rejectRow', temp.value,reason);
+}
 // 分页改变
 const onHandleSizeChange = (val: number) => {
 	state.page.pageSize = val;
@@ -138,6 +147,7 @@ const pageReset = () => {
 // 暴露变量
 defineExpose({
 	pageReset,
+	dealChoice,
 });
 </script>
 

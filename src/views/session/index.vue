@@ -96,7 +96,7 @@ const selectedLocation = ref('xueyuan');
 const submitDialogRef = ref();
 const SubmitDialog = defineAsyncComponent(() => import('/@/views/session/dialog.vue'));
 const Table = defineAsyncComponent(() => import('/@/components/table/sessionTable.vue'));
-const xyTable0 = reactive<TableState>(<TableState>{
+const xyTable0 = reactive<any>(<any>{
   tableData: {
     // 列表数据（必传）
     data: [],
@@ -121,7 +121,7 @@ const xyTable0 = reactive<TableState>(<TableState>{
     },
   },
 });
-const xyTable1 = reactive<TableState>(<TableState>{
+const xyTable1 = reactive<any>(<any>{
   tableData: {
     // 列表数据（必传）
     data: [],
@@ -146,7 +146,7 @@ const xyTable1 = reactive<TableState>(<TableState>{
     },
   },
 });
-const shTable0 = reactive<TableState>(<TableState>{
+const shTable0 = reactive<any>(<any>{
   tableData: {
     // 列表数据（必传）
     data: [],
@@ -220,7 +220,7 @@ const shTable0 = reactive<TableState>(<TableState>{
     },
   },
 });
-const shTable1 = reactive<TableState>(<TableState>{
+const shTable1 = reactive<any>(<any>{
   tableData: {
     // 列表数据（必传）
     data: [],
