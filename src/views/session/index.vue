@@ -348,9 +348,9 @@ const getTableData = () => {
       }
     }
 
-      for (let i = 0; i < 4; i++) {
+      for (let i = 1; i <= 4; i++) {
         xyTable0.tableData.data.push({
-          event: `第${i + 1}场 ${events[i]}`,
+          event: `第${i}场 ${events[i - 1]}`,
           day1: {text: texts[i], color: colors[i]}, // 使用颜色名称
           day2: {text: texts[i + 4], color: colors[i + 4]}, // 使用十六进制颜色码
           day3: {text: texts[i + 8], color: colors[i + 8]}, // 使用 RGB 颜色值
@@ -361,7 +361,7 @@ const getTableData = () => {
         });
 
         shTable0.tableData.data.push({
-          event: `第${i + 1}场 ${events[i]}`,
+          event: `第${i}场 ${events[i - 1]}`,
           day1: {text: texts[i+28], color: colors[i+28]}, // 使用颜色名称
           day2: {text: texts[i + 32], color: colors[i + 32]}, // 使用十六进制颜色码
           day3: {text: texts[i + 36], color: colors[i + 36]}, // 使用 RGB 颜色值
@@ -372,7 +372,7 @@ const getTableData = () => {
         });
 
         xyTable1.tableData.data.push({
-          event: `第${i + 1}场 ${events[i]}`,
+          event: `第${i}场 ${events[i-1]}`,
           day1: {text: texts[i+56], color: colors[i+56]}, // 使用颜色名称
           day2: {text: texts[i +60], color: colors[i + 60]}, // 使用十六进制颜色码
           day3: {text: texts[i + 64], color: colors[i + 64]}, // 使用 RGB 颜色值
@@ -383,7 +383,7 @@ const getTableData = () => {
         });
 
         shTable1.tableData.data.push({
-          event: `第${i + 1}场 \n\n ${events[i]}`,
+          event: `第${i}场 \n\n ${events[i-1]}`,
           day1: {text: texts[i+84], color: colors[i+84]}, // 使用颜色名称
           day2: {text: texts[i + 88], color: colors[i + 88]}, // 使用十六进制颜色码
           day3: {text: texts[i + 92], color: colors[i + 92]}, // 使用 RGB 颜色值
@@ -453,7 +453,7 @@ const onOpenSubmit = (type: string) => {
         init = 84;
       }
     }    
-    submitDialogRef.value.openDialog(type,texts[init+(selectedColumn.value-1) * 4 + selectedRow.value]);
+    submitDialogRef.value.openDialog(type,texts[init+(selectedColumn.value-1) * 4 + selectedRow.value +  1]);
   } else {
     ElMessage({
       type: 'warning',
