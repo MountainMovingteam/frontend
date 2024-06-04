@@ -16,6 +16,7 @@ export const useUserInfo = defineStore('userInfo', {
 			logintime: 0,
 			roles: [],
 			authBtnList: [],
+			notRead:true,
 		},
 	}),
 	actions: {
@@ -53,6 +54,7 @@ export const useUserInfo = defineStore('userInfo', {
 								roles: defaultRoles,
 								email: result.data.email,
 								authBtnList: defaultAuthBtnList,
+								notRead:true
 							};
 							reqAvatar().then((avatar) => {
 								const ava = "http://47.93.19.22:8000" + avatar.data.avatar_url
