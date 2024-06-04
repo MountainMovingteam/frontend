@@ -1,13 +1,17 @@
 <template>
 	<div class="layout-navbars-breadcrumb-user-news">
 		<div class="head-box">
-			<div class="head-box-title">{{ $t('message.user.newTitle') }}</div>
+			<div class="head-box-title">
+				{{ $t('message.user.newTitle') }}
+				<el-badge :is-dot="hasNotRead"/>
+			</div>
+			
 			<!--<div class="head-box-btn" v-if="state.total > 0" @click="onAllReadClick">{{ $t('message.user.newBtn') }}</div>-->
 		</div>
 		<div class="content-box">
 			<template v-if="state.newsList.length > 0">
 				<div class="content-box-item" v-for="(v, k) in state.newsList" :key="k">
-					<div>驳回申请</div>
+					<div>驳回申请<el-badge :is-dot="!v.status"/></div>
 					<div class="content-box-msg">
 						{{ v.key_words}}
 					</div>
@@ -25,7 +29,7 @@ import { reactive,ref } from 'vue';
 import router from '/@/router';
 import { reqNotice } from '/@/api/notification/index';
 import { ElMessage } from 'element-plus';
-
+const hasNotRead = ref(false)
 const message = ref(ElMessage);
 // 定义变量内容
 const state = reactive<any>({
@@ -43,6 +47,7 @@ const onGoToGiteeClick = () => {
 };
 
 const response = reqNotice();
+	hasNotRead.value=false;
 	response.then(response => {
 		state.total = response.data.num;
 		if (state.total > 0) {
@@ -52,7 +57,15 @@ const response = reqNotice();
 			} else {
 				state.newsList = reversedList;
 			}
+			for (let i = 0; i < reversedList.length; i++) {
+				const item = reversedList[i];
+				if (!item.status) {
+					hasNotRead.value = true;
+					break; // 跳出整个循环
+				}
+			}
 		}
+		
 	}).catch(error => {
 		message.value.error('通知加载失败');
 	}) 

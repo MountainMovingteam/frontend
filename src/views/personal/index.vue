@@ -53,14 +53,14 @@
 			<el-col :xs="24" :sm="8" class="pl15 personal-info">
 				<el-card shadow="hover">
 					<template #header>
-						<span>消息通知</span>
+						<span>消息通知<el-badge :is-dot="hasNotRead"/></span>
 						<span class="personal-info-more" @click='moreNotifications' v-if='!state.isAdmin'>更多</span>
 					</template>
 					<div class="personal-info-box">
 						<ul class="personal-info-ul" v-if='notice.total > 0'>
 							<li v-for="(v, k) in notice.noticeArray" :key="k" class="personal-info-li"
 								@click='openDetailDialog(k)'>
-								<p style='font-size: large;'>驳回申请</p>
+								<p style='font-size: large;'>驳回申请<el-badge :is-dot="!v.status"/></p>
 								<div target="_block" class="personal-info-li-title">{{ v.key_words }}</div>
 								<div> {{ v.time }} </div>
 							</li>
@@ -251,7 +251,7 @@ const Dialog = defineAsyncComponent(() => import('/@/views/personal/dialog.vue')
 const changeAvatar = () => {
 	DialogRef.value.openDialog(state.personalForm.avatar, assemblyFormData());
 }
-
+const hasNotRead = ref(false)
 // 定义变量内容
 const state = reactive<PersonalState>({
 	isAdmin: false,
@@ -303,6 +303,7 @@ onMounted(() => {
 })
 
 const getNotice = () => {
+	hasNotRead.value=false;
 	if (Local.get('role') == 1) {
 		return;
 	}
@@ -315,6 +316,13 @@ const getNotice = () => {
 				notice.noticeArray = reversedList.slice(0, 2);
 			} else {
 				notice.noticeArray = reversedList;
+			}
+			for (let i = 0; i < reversedList.length; i++) {
+				const item = reversedList[i];
+				if (!item.status) {
+					hasNotRead.value = true;
+					break; // 跳出整个循环
+				}
 			}
 		}
 	}).catch(error => {
@@ -451,6 +459,7 @@ const moreNotifications = () => {
 
 const openDetailDialog = (i: any) => {
 	DetailDialogRef.value.openDialog(notice.noticeArray[i].notice_id);
+	notice.noticeArray[i].status=true;
 }
 </script>
 

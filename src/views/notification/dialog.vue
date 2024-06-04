@@ -20,7 +20,7 @@
 
 <script setup lang="ts" name="systemUserDialog">
 import { reactive, ref } from 'vue';
-import { reqNoticeDetail } from '/@/api/notification/index';
+import { reqNoticeDetail,readEmail } from '/@/api/notification/index';
 import { ElMessage } from 'element-plus';
 
 const message = ref(ElMessage);
@@ -55,6 +55,7 @@ const openDialog = (id:number) => {
     }).catch(error => {
       message.value.error('通知加载失败');
     })
+    readEmail({notification_id:id});
 };
 // 关闭弹窗
 const closeDialog = () => {

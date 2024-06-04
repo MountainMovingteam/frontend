@@ -9,7 +9,7 @@
 			<i class="icon-skin iconfont" :title="$t('message.user.title3')"></i>
 		</div>-->
 		<div class="layout-navbars-breadcrumb-user-icon" ref="userNewsBadgeRef" v-click-outside="onUserNewsClick" v-if='showNotice'>
-			<el-badge >
+			<el-badge :is-dot="userInfos.notRead">
 				<el-icon :title="$t('message.user.title4')">
 					<ele-Bell />
 				</el-icon>
@@ -66,7 +66,7 @@ import { useUserInfo } from '/@/stores/userInfo';
 import { useThemeConfig } from '/@/stores/themeConfig';
 import mittBus from '/@/utils/mitt';
 import { Session, Local } from '/@/utils/storage';
-
+import { reqNotice } from '/@/api/notification/index';
 // 引入组件
 const UserNews = defineAsyncComponent(() => import('/@/layout/navBars/topBar/userNews.vue'));
 const Search = defineAsyncComponent(() => import('/@/layout/navBars/topBar/search.vue'));
@@ -163,13 +163,18 @@ const onHandleCommandClick = (path: string) => {
 // 菜单搜索点击
 const onSearchClick = () => {
 	searchRef.value.openSearch();
+	Local.remove('userInfo')
+	userInfos.value.notRead = false;
+	Local.set('userInfo', userInfos.value)
+	Session.remove('userInfo')
+	Session.set('userInfo', userInfos.value)
 };
 // 初始化组件大小/i18n
 const initI18nOrSize = (value: string, attr: string) => {
 	(<any>state)[attr] = Local.get('themeConfig')[value];
 };
 // 页面加载时
-onMounted(() => {
+onMounted(async () => {
 	if (Local.get('themeConfig')) {
 		initI18nOrSize('globalComponentSize', 'disabledSize');
 		initI18nOrSize('globalI18n', 'disabledI18n');
@@ -177,6 +182,34 @@ onMounted(() => {
 	if (Local.get('role') == 1) {
 		showNotice.value = false;
 	}
+
+	try {
+		const result = await reqNotice();
+		var mark = 0;
+		for (let i = 0; i < result.data.notice_list.length; i++) {
+			const item = result.data.notice_list[i];
+			if (!item.status) {
+				Local.remove('userInfo');
+				userInfos.value.notRead = true;
+				Local.set('userInfo', userInfos.value);
+				Session.remove('userInfo');
+				Session.set('userInfo', userInfos.value);
+				mark = 1;
+				break; // 跳出整个循环
+			}
+		}
+		if (mark == 0) {
+			Local.remove('userInfo')
+			userInfos.value.notRead = false;
+			Local.set('userInfo', userInfos.value)
+			Session.remove('userInfo')
+			Session.set('userInfo', userInfos.value)
+		}
+	} catch (error) {
+		console.log('debug:信息加载问题');
+	}
+
+
 });
 </script>
 

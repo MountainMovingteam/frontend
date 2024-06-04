@@ -9,6 +9,7 @@ declare interface UserInfos<T = any> {
 	roles: string[];
 	logintime: number;
 	userName: string;
+	notRead:boolean;
 	[key: string]: T;
 }
 declare interface UserInfosState {
