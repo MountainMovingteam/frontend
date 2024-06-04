@@ -28,6 +28,13 @@ export function useLoginApi() {
 				method:'post',
 				data,
 			})
+		},
+		getCode:(data: object) => {
+			return request({
+				url:'/api/base/register/sendMessage',
+				method:'post',
+				data
+			})
 		}
 	};
 }
