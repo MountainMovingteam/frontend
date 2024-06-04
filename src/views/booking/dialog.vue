@@ -56,6 +56,23 @@
           <el-col v-if="state.data.bookingWay === 'group'" :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form :model="state" :rules="rules" ref="form">
               <el-form-item label="团队信息" :span="24"></el-form-item>
+                <el-upload
+                    class="upload-demo"
+                    drag
+                    :before-upload="onImport"
+                    style="margin-bottom: 30px;"
+                >
+                  <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                  <div class="el-upload__text">
+                    点击此处上传文件批量导入团队信息
+                  </div>
+                  <template #tip>
+                    <div class="el-upload__tip">
+                      请上传excel文件，格式要求为两列（学号，姓名），无需提供负责人的信息
+                    </div>
+                  </template>
+                </el-upload>
+
               <template v-for="(member, index) in state.teamMembers" >
                 <el-row class="mb10" type="flex" justify="space-between">
                   <span style="margin-left: 5px; font-weight: bold;">成员{{ index === 0 ? index + 1 + '（负责人）' : index + 1 }}</span>
@@ -149,9 +166,10 @@ import { storeToRefs } from 'pinia';
 import { useRoutesList } from '/@/stores/routesList';
 import { i18n } from '/@/i18n';
 import {ElMessage} from "element-plus";
-import {groupBooking, singleBooking} from "/@/api/booking";
+import {groupBooking, singleBooking, upload} from "/@/api/booking";
 import {PropType} from "vue-demi";
 import {reqInfo} from "/@/api/user";
+import {UploadFilled} from "@element-plus/icons-vue";
 // import { setBackEndControlRefreshRoutes } from "/@/router/backEnd";
 
 const props = defineProps({
@@ -632,6 +650,36 @@ const onSubmit = () => {
   }
 };
 
+const onImport = (file: File) => {
+  const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === 'application/vnd.ms-excel';
+  if (!isExcel) {
+    ElMessage.error('只允许上传Excel文件');
+    return false;
+  }
+
+  const response = upload(file);
+  response.then(response => {
+    const list = response.data;
+    console.log(list);
+
+    state.teamMembers.splice(1);
+    list.forEach((item: { name: string, id: string }) => {
+      state.teamMembers.push({ name: item.name, studentId: item.id, phone: '', college: ''});
+    })
+
+    ElMessage({
+      type: 'success',
+      message: '解析成功!',
+    });
+  }).catch(() => {
+    ElMessage({
+      type: 'error',
+      message: '解析文件失败，请重试!',
+    });
+  });
+
+}
+
 // 页面加载时
 onMounted(() => {
   state.menuData = getMenuData(routesList.value);
@@ -660,5 +708,14 @@ defineExpose({
   content: '*';
   color: red;
   margin-left: 4px;
+}
+.upload-demo {
+  width: 100%;
+}
+.el-upload__text {
+  color: #409EFF;
+}
+.el-upload__tip {
+  color: #909399;
 }
 </style>
