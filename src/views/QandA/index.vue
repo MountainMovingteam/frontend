@@ -2,21 +2,39 @@
     <div class="chatContainer">
         <div class="chatContent" ref="chatBox">
             <li v-for="(item, index) in info" :key="index" :class="[item.isRobot ? 'robot' : 'user']">
-                <div v-if="item.isRobot" class="robotMessage">
-                    <div class="cardList" v-if="item.cards">
-                        <div class="cardItem" v-for="(card, cardIndex) in item.cards" :key="cardIndex"
-                            @click="showDetails(card)">
-                            {{ card.content }}
+                <div style="display: flex;">
+                    <div v-if="item.isRobot" class="avatar">
+                        <img src="../../../public/logo.png" alt="机器人头像">
+                    </div>
+                    <div style="display: block;" v-if="item.isRobot">
+                        <div class="robotMessage">
+                            <div class="cardList" v-if="item.cards">
+                                <div class="cardItem" v-for="(card, cardIndex) in item.cards" :key="cardIndex"
+                                    @click="showDetails(card)">
+                                    {{ card.content }}
+                                </div>
+                            </div>
+                            <div v-else>
+                                <span>{{ item.content }}</span>
+                            </div>
                         </div>
-                    </div>
-                    <div v-else>
-                        <span>{{ item.content }}</span>
+                        <span class="messageTime">{{ item.time }}</span>
                     </div>
                 </div>
-                <div v-else class="userMessage">
-                    <span>{{ item.content }}</span>
+                <div style="display: flex;">
+                    <div style="display: block;" v-if="!item.isRobot">
+                        <div class="userMessage">
+                            <span>{{ item.content }}</span>
+                        </div>
+                        <span class="messageTime">{{ item.time }}</span>
+                    </div>
+                    <div v-if="!item.isRobot" class="avatar">
+                        <img :src="avatar" alt="用户头像">
+                    </div>
+
                 </div>
-                <span class="messageTime">{{ item.time }}</span>
+
+
             </li>
         </div>
         <div class="sendBox">
@@ -30,12 +48,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, onMounted } from 'vue';
 import { ElInput, ElButton, ElMessage } from 'element-plus';
-import { search, answer } from '/@/api/QandA';
+import { search, answer, reqAvatar } from '/@/api/QandA';
 
 const msg = ref('');
+const avatar = ref('')
 const info = ref<Array<{ isRobot: boolean; content: string; time: string; cards?: Array<{ problem_id: number; content: string }> }>>([]);
+
+onMounted(async () => {
+    await reqAvatar().then((res) => {
+        console.log(res)
+        avatar.value = 'http://47.93.19.22:8000' + res.data.avatar_url;
+    });
+    console.log(avatar.value);
+});
 
 // Function to send message
 async function sendMessage() {
@@ -132,6 +159,8 @@ li {
     background-color: #d3e3fc;
     padding: 10px;
     border-radius: 10px;
+    margin-bottom: 5px;
+    /* Add margin to the message box */
 }
 
 .robot {
@@ -145,6 +174,8 @@ li {
     background-color: #f0f0f0;
     padding: 10px;
     border-radius: 10px;
+    margin-bottom: 5px;
+    /* Add margin to the message box */
 }
 
 .cardList {
@@ -162,7 +193,6 @@ li {
     transition: background-color 0.3s ease;
 }
 
-
 .cardItem:hover {
     background-color: #f9f9f9;
 }
@@ -171,6 +201,7 @@ li {
     font-size: 12px;
     color: #999;
     margin-top: 5px;
+    float: right
 }
 
 .sendBox {
@@ -189,7 +220,6 @@ li {
     margin-right: 10px;
 }
 
-
 @media (min-width: 769px) {
     .cardItem {
         width: 45vw;
@@ -200,5 +230,23 @@ li {
     .cardItem {
         width: 70vw;
     }
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    margin-top: -10px;
+    /* Add negative margin to the avatar */
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
 }
 </style>
