@@ -5,6 +5,7 @@
 			:name="themeConfig.isCollapse ? 'ele-Expand' : 'ele-Fold'"
 			:size="16"
 			@click="onThemeConfigChange"
+			v-if='showIcon'
 		/>
 		<el-breadcrumb class="layout-navbars-breadcrumb-hide">
 			<transition-group name="breadcrumb">
@@ -24,7 +25,7 @@
 </template>
 
 <script setup lang="ts" name="layoutBreadcrumb">
-import { reactive, computed, onMounted } from 'vue';
+import { reactive, computed, onMounted,ref } from 'vue';
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import { Local } from '/@/utils/storage';
 import other from '/@/utils/other';
@@ -39,6 +40,7 @@ const { themeConfig } = storeToRefs(storesThemeConfig);
 const { routesList } = storeToRefs(stores);
 const route = useRoute();
 const router = useRouter();
+const showIcon = ref(false);
 const state = reactive<BreadcrumbState>({
 	breadcrumbList: [],
 	routeSplit: [],
@@ -98,6 +100,11 @@ const initRouteSplit = (path: string) => {
 // 页面加载时
 onMounted(() => {
 	initRouteSplit(route.path);
+	showIcon.value = window.innerWidth >= 768;
+});
+
+window.addEventListener('resize', () => {
+    showIcon.value = window.innerWidth >= 768;
 });
 // 路由更新时
 onBeforeRouteUpdate((to) => {

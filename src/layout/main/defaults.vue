@@ -1,6 +1,6 @@
 <template>
 	<el-container class="layout-container">
-		<LayoutAside />
+		<LayoutAside v-if='showAside'/>
 		<el-container class="layout-container-view h100">
 			<el-scrollbar ref="layoutScrollbarRef" class="layout-backtop">
 				<LayoutHeader />
@@ -28,7 +28,7 @@ const layoutMainRef = ref<InstanceType<typeof LayoutMain>>();
 const route = useRoute();
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
-
+const showAside = ref(false);
 // 重置滚动条高度
 const updateScrollbar = () => {
 	// 更新父级 scrollbar
@@ -50,6 +50,11 @@ const initScrollBarHeight = () => {
 onMounted(() => {
 	initScrollBarHeight();
 	NextLoading.done(600);
+	showAside.value = window.innerWidth >= 768;
+});
+
+window.addEventListener('resize', () => {
+    showAside.value = window.innerWidth >= 768;
 });
 // 监听路由的变化，切换界面时，滚动条置顶
 watch(
