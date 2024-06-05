@@ -1,14 +1,17 @@
 <template>
 	<div class="layout-footer pb15">
 		<div class="layout-footer-warp">
-			<div>Appointment Platform，Made by MountainMovingteam</div>
-			<div class="mt5">BUAA</div>
+			dff
+			<el-button @click='clear'>清理</el-button>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts" name="layoutFooter">
 // 此处需有内容（注释也得），否则缓存将失败
+const clear = () => {
+	window.localStorage.clear();
+}
 </script>
 
 <style scoped lang="scss">

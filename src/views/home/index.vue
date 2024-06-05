@@ -1,23 +1,24 @@
 <template>
 	<div class="home-container layout-pd">
 		<el-row :gutter="15" class="home-card-three mb15" >
-			<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" v-if='isCollapse'>
+			<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" v-if='isCollapse' style='height: 100%;'>
 				<div 
 					:xs="24"
 					:sm="12"
 					:md="12"
 					:lg="12"
 					:xl="12"
+					style='height: 100%;'
 				>
-					<div class="home-card-change-item " style='margin-top: auto' >
-						<el-carousel :interval="5000" arrow="always">
+					<div class="home-card-change-item "  >
+						<el-carousel :interval="5000" arrow="always" indicator-position="outside" >
 							<el-carousel-item v-for="(src, index) in pics.pictureArray" :key="index">
-								<img :src="`${pics.base}${src}`" style="height: 100%;width:100%"/>
+								<img :src="`${pics.base}${src}`" style="height: 100%;width:100%;"/>
 							</el-carousel-item>
 						</el-carousel>
 					</div>
 					<div class="home-card-change-item" style='margin-top: 0px;'>
-						<div style="height: 100%" ref="homeLineRef"></div>
+						<div style="height:95%;margin-top: auto;margin-bottom: auto;" ref="homeLineRef"></div>
 					</div>
 				</div>
 			</el-col>
@@ -27,21 +28,22 @@
 				:md="12"
 				:lg="12"
 				:xl="12"
+				style='height:100%'
 			>
-			<div class='home-card-item' >
-				<ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto" >
+			<div class='home-card-item' ref='right'>
+				<ul v-infinite-scroll="load"  class="infinite-list" style="overflow: auto;" >
 					<el-carousel :interval="5000" arrow="always" v-if='!isCollapse'>
 							<el-carousel-item v-for="(src, index) in pics.pictureArray" :key="index">
 								<img :src="`${pics.base}${src}`" style="height: 100%;width:100%"/>
 							</el-carousel-item>
-						</el-carousel>
+					</el-carousel>
 					<li v-for="(item, index) in info.infoArray" :key="index" class="infinite-list-item" @click="openUrl(item.address)">
 						<div class="left-content">
 							<div class="text-line-title">{{ item.title }}</div>
 							<div class="text-line-content">{{item.pre_content}}</div>
 						</div>
 						<div class="right-content">
-							<img :src="`${info.base}${item.picture}`" style="height: 60px;width:100px"/>
+							<img :src="`${info.base}${item.picture}`" style="height: 100%;width:100px;"/>
 						</div>
 					</li>
 				</ul>
@@ -65,7 +67,6 @@ const storesTagsViewRoutes = useTagsViewRoutes();
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
 const { isTagsViewCurrenFull } = storeToRefs(storesTagsViewRoutes);
-
 const message = ref(ElMessage);
 const screenWidth = ref(window.innerWidth)
 const isCollapse = ref(screenWidth.value >= 768)
@@ -145,6 +146,7 @@ const getInfo = (start:number,end:number)  => {
 
 const load = () => {
 	if (info.infoArray.length >= info.maxInfos) {
+		getInfo(1,5);
 		return;
 	} else {
 		info.start = info.end + 1;
@@ -155,16 +157,17 @@ const load = () => {
 		}
 		getInfo(info.start,info.end);
 	}
+	
 }
 
 const openUrl = (address:string) => {
         window.open(address);
     }
 
-onMounted(() => {
+onMounted(async () => {
 	initEchartsResize();
 	getGraph();
-	getInfo(1,10);
+	getInfo(1,10);	
 });
 // 由于页面缓存原因，keep-alive
 onActivated(() => {
@@ -295,13 +298,16 @@ const initLineChart = () => {
 $homeNavLengh: 8;
 
 .home-container {
-	overflow: hidden;
+	height: 100%;
 	.home-card-three {
-
+		height: 100%;
+		overflow: hidden;
+		max-height: calc(85vh);
 		.infinite-list {
 			overflow-y: hidden;
-			@media only screen and (max-width: 768px) {height:650px;};
-			@media only screen and (min-width: 768px) {height:600px;};
+			/*@media only screen and (max-width: 768px) {height:650px;};
+			@media only screen and (min-width: 768px) {height:600px;};*/
+			height: 100%;
 			width: 100%;
 			padding: 0;
 			margin: 0;
@@ -312,7 +318,7 @@ $homeNavLengh: 8;
 				display: flex;
 				//align-items: center;
 				justify-content: center;
-				height: 70px;
+				height: 15%;
 				
 				
 				.left-content {
@@ -320,10 +326,10 @@ $homeNavLengh: 8;
 				}
 
 				.right-content {
-					
-					margin-top: 5px;
+					margin-top: auto;
 					margin-right: 10px;
-					margin-bottom: 5px;
+					margin-bottom: auto;
+					height: 90%;
 				}
 
 				.text-line-title {
@@ -342,7 +348,7 @@ $homeNavLengh: 8;
 			
 		.home-card-item {
 			width: 100%;
-			height: 650px;
+			height: 100%;
 			border-radius: 4px;
 			transition: all ease 0.3s;
 			padding: 20px;
@@ -368,30 +374,16 @@ $homeNavLengh: 8;
 				font-weight: bold;
 				height: 30px;
 			}
-			.el-carousel__item h3 {
-				color: #475669;
-				opacity: 0.75;
-				line-height: 300px;
-				margin: 0;
-				text-align: center;
-				}
-
-				.el-carousel__item:nth-child(2n) {
-				background-color: #99a9bf;
-				}
-
-				.el-carousel__item:nth-child(2n + 1) {
-				background-color: #d3dce6;
-				}
 		}
 
 		.home-card-change-item {
 			width: 100%;
-			@media only screen and (max-width: 768px) {height:350px;};
-			@media only screen and (min-width: 768px) {height:325px;};
+			height:50%;
+			/*@media only screen and (max-width: 768px) {height:350px;};
+			@media only screen and (min-width: 768px) {height:325px;};*/
 			border-radius: 4px;
 			transition: all ease 0.3s;
-			padding: 20px;
+			
 			overflow: hidden;
 			background: var(--el-color-white);
 			color: var(--el-text-color-primary);
@@ -414,48 +406,18 @@ $homeNavLengh: 8;
 				font-weight: bold;
 				height: 30px;
 			}
-			.home-monitor {
-				height: 100%;
-				.flex-warp-item {
-					width: 25%;
-					height: 111px;
-					display: flex;
-					.flex-warp-item-box {
-						margin: auto;
-						text-align: center;
-						color: var(--el-text-color-primary);
-						display: flex;
-						border-radius: 5px;
-						background: var(--next-bg-color);
-						cursor: pointer;
-						transition: all 0.3s ease;
-						&:hover {
-							background: var(--el-color-primary-light-9);
-							transition: all 0.3s ease;
-						}
-					}
-					@for $i from 0 through $homeNavLengh {
-						.home-animation#{$i} {
-							opacity: 0;
-							animation-name: error-num;
-							animation-duration: 0.5s;
-							animation-fill-mode: forwards;
-							animation-delay: calc($i/10) + s;
-						}
-					}
-				}
-			}
-			
 		}
 	}
 	.home-card-three {
+		height: 100%;
 		.home-card-item {
-			@media only screen and (max-width: 768px) {
+			/*@media only screen and (max-width: 768px) {
 				height:700px;
 			}
 			@media only screen and (min-width: 768px) {
 				height:650px;
-			}
+			}*/
+			height: 100%;
 			width: 100%;
 			overflow: hidden;
 			.home-monitor {

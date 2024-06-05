@@ -7,7 +7,7 @@
 			view-class="layout-main-scroll"
 		>
 			<LayoutParentView />
-			<LayoutFooter v-if="isFooter" />
+			<!--<LayoutFooter v-if="isFooter" />-->
 		</el-scrollbar>
 		<el-backtop :target="setBacktopClass" />
 	</el-main>
