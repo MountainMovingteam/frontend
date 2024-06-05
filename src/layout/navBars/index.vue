@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts" name="layoutNavBars">
-import { defineAsyncComponent, computed } from 'vue';
+import { defineAsyncComponent, computed,onMounted,ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useThemeConfig } from '/@/stores/themeConfig';
 
@@ -18,10 +18,19 @@ const TagsView = defineAsyncComponent(() => import('/@/layout/navBars/tagsView/t
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
 
+const setShowTagsView = ref(true);
 // 是否显示 tagsView
-const setShowTagsView = computed(() => {
+/*const setShowTagsView = computed(() => {
 	let { layout, isTagsview } = themeConfig.value;
 	return layout !== 'classic' && isTagsview;
+});*/
+
+onMounted(() => {
+	setShowTagsView.value = window.innerWidth >= 768;
+});
+
+window.addEventListener('resize', () => {
+    setShowTagsView.value = window.innerWidth >= 768;
 });
 </script>
 

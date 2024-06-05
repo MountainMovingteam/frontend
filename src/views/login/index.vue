@@ -72,6 +72,7 @@ const getThemeConfig = computed(() => {
 // 页面加载时
 onMounted(() => {
 	NextLoading.done();
+	isCollapse.value = window.innerWidth >= 1201;
 });
 window.addEventListener('resize', () => {
     isCollapse.value = window.innerWidth >= 1201;
