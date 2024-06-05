@@ -2,7 +2,7 @@
 	<div class="el-menu-horizontal-warp">
 		<div class="mobile-bottom-nav">
 			<router-link v-for="(item, index) in menuLists" :key="index" :to="item.path" class="nav-item" :class="{ active: item.path === state.defaultActive }">
-			<span>{{ $t(item.meta.title) }}</span>
+			<span>{{ $t(item.meta.bottomName) }}</span>
 			</router-link>
   </div>
 	</div>
@@ -14,11 +14,7 @@ import { useRoute, onBeforeRouteUpdate, RouteRecordRaw } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useRoutesList } from '/@/stores/routesList';
 import { useThemeConfig } from '/@/stores/themeConfig';
-import other from '/@/utils/other';
 import mittBus from '/@/utils/mitt';
-
-// 引入组件
-const SubItem = defineAsyncComponent(() => import('/@/layout/navMenu/subItem.vue'));
 
 // 定义父组件传过来的值
 const props = defineProps({
@@ -41,7 +37,8 @@ const state = reactive({
 
 // 获取父级菜单数据
 const menuLists = computed(() => {
-	return <RouteItems>props.menuList;
+	return <RouteItems>props.menuList.filter((item:any) => item.meta.isBottom)
+    .sort((a:any, b:any) => a.meta.bottomOrder - b.meta.bottomOrder);
 });
 // 路由过滤递归函数
 const filterRoutesFun = <T extends RouteItem>(arr: T[]): T[] => {
@@ -78,10 +75,6 @@ const setCurrentRouterHighlight = (currentRoute: RouteToFrom) => {
 		else state.defaultActive = path;
 	}
 };
-// 打开外部链接
-const onALinkClick = (val: RouteItem) => {
-	other.handleOpenLink(val);
-};
 // 页面加载前
 onBeforeMount(() => {
 	setCurrentRouterHighlight(route);
@@ -99,6 +92,8 @@ onBeforeRouteUpdate((to) => {
 </script>
 
 <style scoped lang="scss">
+
+.el-menu-horizontal-warp {
 .mobile-bottom-nav {
   position: fixed;
   bottom: 0;
@@ -119,5 +114,6 @@ onBeforeRouteUpdate((to) => {
 
 .nav-item.active {
   color: blue; /* Adjust the active color as needed */
+}
 }
 </style>

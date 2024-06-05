@@ -46,6 +46,11 @@
 			<template #dropdown>
 				<el-dropdown-menu>
 					<el-dropdown-item command="/home">{{ $t('message.user.dropdown1') }}</el-dropdown-item>
+					<router-link :to="item.path" v-slot="{ href }" v-for="(item, index) in menuLists" :key="index" style="text-decoration: none;" v-if='isPhone'>
+						<el-dropdown-item :command="href" :class="{ active: item.path === state.defaultActive }" style="text-decoration: none;">
+							{{ $t(item.meta.title) }}
+						</el-dropdown-item>
+					</router-link>
 					<el-dropdown-item command="/personal">{{ $t('message.user.dropdown2') }}</el-dropdown-item>
 					<el-dropdown-item divided command="logOut">{{ $t('message.user.dropdown5') }}</el-dropdown-item>
 				</el-dropdown-menu>
@@ -56,7 +61,7 @@
 </template>
 
 <script setup lang="ts" name="layoutBreadcrumbUser">
-import { defineAsyncComponent, ref, unref, computed, reactive, onMounted } from 'vue';
+import { defineAsyncComponent, ref, unref, computed, reactive, onMounted,onBeforeMount } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessageBox, ElMessage, ClickOutside as vClickOutside } from 'element-plus';
 import screenfull from 'screenfull';
@@ -66,7 +71,8 @@ import { useUserInfo } from '/@/stores/userInfo';
 import { useThemeConfig } from '/@/stores/themeConfig';
 import mittBus from '/@/utils/mitt';
 import { Session, Local } from '/@/utils/storage';
-
+import { useRoutesList } from '/@/stores/routesList';
+import { useRoute, onBeforeRouteUpdate, RouteRecordRaw } from 'vue-router';
 // 引入组件
 const UserNews = defineAsyncComponent(() => import('/@/layout/navBars/topBar/userNews.vue'));
 const Search = defineAsyncComponent(() => import('/@/layout/navBars/topBar/search.vue'));
@@ -81,11 +87,16 @@ const storesThemeConfig = useThemeConfig();
 const { userInfos } = storeToRefs(stores);
 const { themeConfig } = storeToRefs(storesThemeConfig);
 const searchRef = ref();
+const isPhone = ref(false);
 const state = reactive({
 	isScreenfull: false,
 	disabledI18n: 'zh-cn',
 	disabledSize: 'large',
+	menuList: [] as RouteItems,
+	defaultActive: '' as string | undefined,
 });
+const storesRouter = useRoutesList();
+const { routesList } = storeToRefs(storesRouter);
 const showNotice = ref<boolean>(true);
 // 设置分割样式
 const layoutUserFlexNum = computed(() => {
@@ -170,12 +181,90 @@ const initI18nOrSize = (value: string, attr: string) => {
 };
 // 页面加载时
 onMounted(() => {
+	setFilterRoutes();
 	if (Local.get('themeConfig')) {
 		initI18nOrSize('globalComponentSize', 'disabledSize');
 		initI18nOrSize('globalI18n', 'disabledI18n');
 	}
 	if (Local.get('role') == 1) {
 		showNotice.value = false;
+	}
+	isPhone.value = window.innerWidth <= 767;
+});
+
+window.addEventListener('resize', () => {
+    isPhone.value = window.innerWidth <= 767;
+});
+//过滤
+
+const setFilterRoutes = () => {
+	state.menuList = filterRoutesFun(routesList.value);
+};
+
+const filterRoutesFun = <T extends RouteItem>(arr: T[]): T[] => {
+	return arr
+		.filter((item: T) => !item.meta?.isHide)
+		.map((item: T) => {
+			item = Object.assign({}, item);
+			if (item.children) item.children = filterRoutesFun(item.children);
+			return item;
+		});
+};
+
+const route = useRoute();
+
+// 获取父级菜单数据
+const menuLists = computed(() => {
+	console.log( <RouteItems>state.menuList.filter((item:any) => !item.meta.isBottom));
+	return <RouteItems>state.menuList.filter((item:any) => !item.meta.isBottom)
+});
+// 路由过滤递归函数
+const filterRoutesFun2 = <T extends RouteItem>(arr: T[]): T[] => {
+	return arr
+		.filter((item: T) => !item.meta?.isHide)
+		.map((item: T) => {
+			item = Object.assign({}, item);
+			if (item.children) item.children = filterRoutesFun2(item.children);
+			return item;
+		});
+};
+// 传送当前子级数据到菜单中
+const setSendClassicChildren = (path: string) => {
+	const currentPathSplit = path.split('/');
+	let currentData: MittMenu = { children: [] };
+	filterRoutesFun2(routesList.value).map((v, k) => {
+		if (v.path === `/${currentPathSplit[1]}`) {
+			v['k'] = k;
+			currentData['item'] = { ...v };
+			currentData['children'] = [{ ...v }];
+			if (v.children) currentData['children'] = v.children;
+		}
+	});
+	return currentData;
+};
+// 设置页面当前路由高亮
+const setCurrentRouterHighlight = (currentRoute: RouteToFrom) => {
+	const { path, meta } = currentRoute;
+	if (themeConfig.value.layout === 'classic') {
+		state.defaultActive = `/${path?.split('/')[1]}`;
+	} else {
+		const pathSplit = meta?.isDynamic ? meta.isDynamicPath!.split('/') : path!.split('/');
+		if (pathSplit.length >= 4 && meta?.isHide) state.defaultActive = pathSplit.splice(0, 3).join('/');
+		else state.defaultActive = path;
+	}
+};
+// 页面加载前
+onBeforeMount(() => {
+	setCurrentRouterHighlight(route);
+});
+// 路由更新时
+onBeforeRouteUpdate((to) => {
+	// 修复：https://gitee.com/lyt-top/vue-next-admin/issues/I3YX6G
+	setCurrentRouterHighlight(to);
+	// 修复经典布局开启切割菜单时，点击tagsView后左侧导航菜单数据不变的问题
+	let { layout, isClassicSplitMenu } = themeConfig.value;
+	if (layout === 'classic' && isClassicSplitMenu) {
+		mittBus.emit('setSendClassicChildren', setSendClassicChildren(to.path));
 	}
 });
 </script>

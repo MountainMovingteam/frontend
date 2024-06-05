@@ -60,6 +60,9 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isIframe: false,
 					roles: ['admin', 'user'],
 					icon: 'iconfont icon-shouye',
+					isBottom:true,
+					bottomName:'首页',
+					bottomOrder:3
 				},
 			},
 			{
@@ -75,6 +78,9 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isIframe: false,
 					roles: ['admin', 'user'],
 					icon: 'ele-Calendar',
+					isBottom:true,
+					bottomName:'预约',
+					bottomOrder:1
 				},
 			},
 			{
@@ -90,6 +96,7 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isIframe: false,
 					roles: ['admin'],
 					icon: 'ele-Location',
+					isBottom:false,
 				},
 			},
 			{
@@ -105,6 +112,7 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isIframe: false,
 					roles: ['admin'],
 					icon: 'ele-Microphone',
+					isBottom:false,
 				},
 			},
 			{
@@ -120,6 +128,9 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isIframe: false,
 					roles: ['admin', 'user'],
 					icon: 'iconfont icon-gerenzhongxin',
+					isBottom:true,
+					bottomName:'个人',
+					bottomOrder:5
 				},
 			}, //component: () => import('/@/layout/routerView/parent.vue')多级嵌套时，最外层component
 			{
@@ -135,6 +146,7 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isIframe: false,
 					roles: ['user'],
 					icon: 'iconfont icon-gerenzhongxin',
+					isBottom:false,
 				},
 			},
 			{
@@ -150,6 +162,9 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isIframe: false,
 					roles: ['admin', 'user'],
 					icon: 'iconfont icon-gerenzhongxin',
+					isBottom:true,
+					bottomName:'常见问题',
+					bottomOrder:4
 				},
 			},
 			{
@@ -165,6 +180,9 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isIframe: false,
 					roles: ['admin', 'user'],
 					icon: 'iconfont icon-shenqingkaiban',
+					isBottom:true,
+					bottomName:'答题',
+					bottomOrder:2
 				},
 			},
 		],
