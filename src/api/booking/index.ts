@@ -37,7 +37,7 @@ export function getPlaceDetails() {
 	return client.withAuth(client.GET, url, {});
 }
 
-export function upload(file: File) {
+export function upload(formData: FormData) {
 	let url = baseURL + '/api/order/file';
-	return client.withAuth(client.GET, url, {data : {file: file}});
+	return client.withAuth(client.POST, url, {data : formData});
 }

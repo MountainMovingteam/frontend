@@ -59,19 +59,27 @@
                 <el-upload
                     class="upload-demo"
                     drag
-                    :before-upload="onImport"
+                    :limit="1"
+                    :before-upload="beforeUpload"
+                    v-model:file-list="uploadFile"
+                    ref="uploadRef"
+                    action="#"
+                    :auto-upload="false"
                     style="margin-bottom: 30px;"
                 >
                   <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                   <div class="el-upload__text">
                     点击此处上传文件批量导入团队信息
                   </div>
+
                   <template #tip>
                     <div class="el-upload__tip">
                       请上传excel文件，格式要求为两列（学号，姓名），无需提供负责人的信息
                     </div>
                   </template>
                 </el-upload>
+              <el-button type="success" style="margin-left: 43%;margin-bottom: 10px" @click="UploadAll">提交文件</el-button>
+
 
               <template v-for="(member, index) in state.teamMembers" >
                 <el-row class="mb10" type="flex" justify="space-between">
@@ -165,7 +173,7 @@ import {defineAsyncComponent, reactive, onMounted, ref} from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRoutesList } from '/@/stores/routesList';
 import { i18n } from '/@/i18n';
-import {ElMessage} from "element-plus";
+import {ElMessage, type UploadInstance} from "element-plus";
 import {groupBooking, singleBooking, upload} from "/@/api/booking";
 import {PropType} from "vue-demi";
 import {reqInfo} from "/@/api/user";
@@ -233,7 +241,10 @@ const state = reactive({
   teamMembers: [
     { name: '', studentId: '', phone: '', college: ''}
   ],
-  personalInfo: { name: '', studentId: '', phone: '', college: ''}, // 初始个人信息
+  personalInfo: { name: '', studentId: '', phone: '', college: ''},
+  resolvedList: [
+      { name: '', id: ''}
+  ],
   ruleForm: {
     menuSuperior: [],
     menuType: 'menu',
@@ -650,34 +661,50 @@ const onSubmit = () => {
   }
 };
 
-const onImport = (file: File) => {
+const uploadRef = ref<UploadInstance>();
+const uploadFile = ref<any[]>();
+
+const beforeUpload = (file: File) => {
   const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === 'application/vnd.ms-excel';
   if (!isExcel) {
-    ElMessage.error('只允许上传Excel文件');
+    ElMessage.error('请上传excel文件');
     return false;
   }
+  console.log(file);
+  return true;
+};
 
-  const response = upload(file);
-  response.then(response => {
-    const list = response.data;
-    console.log(list);
+const UploadAll = () => {
+  if (uploadFile.value != undefined) {
+    const formData = new FormData();
+    formData.append('file', uploadFile.value[0].raw);
 
-    state.teamMembers.splice(1);
-    list.forEach((item: { name: string, id: string }) => {
-      state.teamMembers.push({ name: item.name, studentId: item.id, phone: '', college: ''});
-    })
+    const response = upload(formData);
+    response.then(response => {
+      state.resolvedList = response.data;
+      console.log(response.data);
 
-    ElMessage({
-      type: 'success',
-      message: '解析成功!',
+      state.teamMembers.splice(1);
+      console.log(state.resolvedList);
+      state.resolvedList.forEach(item => {
+        console.log(item);
+        //state.teamMembers.push({ name: item.name, studentId: item.id, phone: '', college: ''});
+      })
+      // for (let i = 0; i < state.resolvedList.length; i++) {
+      //   state.teamMembers.push({ name: state.resolvedList[i].name, studentId: state.resolvedList[i].id, phone: '', college: ''});
+      // }
+
+      ElMessage({
+        type: 'success',
+        message: '解析成功!',
+      });
+    }).catch(() => {
+      ElMessage({
+        type: 'error',
+        message: '解析文件失败，请重试!',
+      });
     });
-  }).catch(() => {
-    ElMessage({
-      type: 'error',
-      message: '解析文件失败，请重试!',
-    });
-  });
-
+  }
 }
 
 // 页面加载时
