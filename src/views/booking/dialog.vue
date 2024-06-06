@@ -664,13 +664,21 @@ const onSubmit = () => {
 const uploadRef = ref<UploadInstance>();
 const uploadFile = ref<any[]>();
 
+// const handleExceed: UploadProps['onExceed'] = (files) => {
+//   uploadRef.value!.clearFiles();
+//   uploadFile.value = [];
+//   const file = files[0] as UploadRawFile
+//   file.uid = genFileId();
+//   uploadFile.value?.push(file);
+//   uploadRef.value!.handleStart(file);
+// }
+
 const beforeUpload = (file: File) => {
   const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === 'application/vnd.ms-excel';
   if (!isExcel) {
     ElMessage.error('请上传excel文件');
     return false;
   }
-  console.log(file);
   return true;
 };
 
@@ -681,19 +689,20 @@ const UploadAll = () => {
 
     const response = upload(formData);
     response.then(response => {
-      state.resolvedList = response.data;
-      console.log(response.data);
-
+      state.resolvedList =  Object.values(response.data).find(Array.isArray);
+      console.log(state.resolvedList)
+      if (state.resolvedList.length > 19) {
+        ElMessage({
+          type: 'error',
+          message: '团队预约不得超过20人，文件中无需填写负责人的信息！',
+        });
+        return false;
+      }
       state.teamMembers.splice(1);
-      console.log(state.resolvedList);
       state.resolvedList.forEach(item => {
-        console.log(item);
-        //state.teamMembers.push({ name: item.name, studentId: item.id, phone: '', college: ''});
+        console.log(item.name)
+        state.teamMembers.push({ name: item.name, studentId: item.id, phone: '', college: ''});
       })
-      // for (let i = 0; i < state.resolvedList.length; i++) {
-      //   state.teamMembers.push({ name: state.resolvedList[i].name, studentId: state.resolvedList[i].id, phone: '', college: ''});
-      // }
-
       ElMessage({
         type: 'success',
         message: '解析成功!',
