@@ -79,7 +79,7 @@
                     </div>
                   </template>
                 </el-upload>
-              <el-button type="success" style="margin-left: 43%;margin-bottom: 10px" @click="UploadAll">提交文件</el-button>
+              <el-button type="success" style="margin-bottom: 10px" class="success-button" @click="UploadAll">提交文件</el-button>
 
 
               <template v-for="(member, index) in state.teamMembers" >
@@ -755,5 +755,25 @@ defineExpose({
 }
 .el-upload__tip {
   color: #909399;
+}
+/* For small screens (max-width: 600px) */
+@media (max-width: 600px) {
+  .success-button {
+    margin-left: 35%;
+  }
+}
+
+/* For medium screens (min-width: 601px and max-width: 1024px) */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .success-button {
+    margin-left: 43%;
+  }
+}
+
+/* For large screens (min-width: 1025px) */
+@media (min-width: 1025px) {
+  .success-button {
+    margin-left: 43%;
+  }
 }
 </style>
