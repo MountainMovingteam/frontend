@@ -66,6 +66,7 @@
                     action="#"
                     :auto-upload="false"
                     style="margin-bottom: 30px;"
+                    :on-exceed="handleExceed"
                 >
                   <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                   <div class="el-upload__text">
@@ -173,7 +174,7 @@ import {defineAsyncComponent, reactive, onMounted, ref} from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRoutesList } from '/@/stores/routesList';
 import { i18n } from '/@/i18n';
-import {ElMessage, type UploadInstance} from "element-plus";
+import {ElMessage, genFileId, type UploadInstance, UploadProps, UploadRawFile} from "element-plus";
 import {groupBooking, singleBooking, upload} from "/@/api/booking";
 import {PropType} from "vue-demi";
 import {reqInfo} from "/@/api/user";
@@ -215,8 +216,7 @@ const props = defineProps({
 const emit = defineEmits(['refresh', 'updateCampus', 'updateBookingWay']);
 
 // 引入组件
-const IconSelector = defineAsyncComponent(() => import('/@/components/iconSelector/index.vue'));
-
+defineAsyncComponent(() => import('/@/components/iconSelector/index.vue'));
 // 定义变量内容
 const menuDialogFormRef = ref();
 const stores = useRoutesList();
@@ -664,14 +664,14 @@ const onSubmit = () => {
 const uploadRef = ref<UploadInstance>();
 const uploadFile = ref<any[]>();
 
-// const handleExceed: UploadProps['onExceed'] = (files) => {
-//   uploadRef.value!.clearFiles();
-//   uploadFile.value = [];
-//   const file = files[0] as UploadRawFile
-//   file.uid = genFileId();
-//   uploadFile.value?.push(file);
-//   uploadRef.value!.handleStart(file);
-// }
+const handleExceed: UploadProps['onExceed'] = (files) => {
+  uploadRef.value!.clearFiles();
+  uploadFile.value = [];
+  const file = files[0] as UploadRawFile
+  file.uid = genFileId();
+  uploadFile.value?.push(file);
+  uploadRef.value!.handleStart(file);
+}
 
 const beforeUpload = (file: File) => {
   const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === 'application/vnd.ms-excel';
@@ -701,7 +701,9 @@ const UploadAll = () => {
       state.teamMembers.splice(1);
       state.resolvedList.forEach(item => {
         console.log(item.name)
-        state.teamMembers.push({ name: item.name, studentId: item.id, phone: '', college: ''});
+        let name = item.name === 'None' ? '' : item.name;
+        let id = item.id === 'None' ? '' : item.id;
+        state.teamMembers.push({ name: name, studentId: id, phone: '', college: ''});
       })
       ElMessage({
         type: 'success',
