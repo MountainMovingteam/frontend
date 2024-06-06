@@ -1,5 +1,4 @@
 <template>
-  <keep-alive>
   <div>
     <el-card v-if="showOriginal" class="main-card" shadow="always">
       <el-alert
@@ -28,7 +27,7 @@
     <div v-if="showQuestions" >
       <div class="scrollbar-container">
 
-    <div v-for="(question, index) in questions" :key="index">
+    <div v-for="(question, index) in state.questions" :key="index">
       <el-card class="question_card" shadow="hover">
 
         <template #header>
@@ -123,13 +122,14 @@
     </div>
 
   </div>
-  </keep-alive>
+
 </template>
 
 <script setup lang="ts">
-import {computed, onBeforeUnmount, onMounted, ref} from 'vue';
+import {computed, onMounted, reactive, ref} from 'vue';
 import {useRouter} from "vue-router";
 import {RefreshLeft} from "@element-plus/icons-vue";
+import {getQuestions} from "/@/api/answer";
 
 export interface Question {
   question_id: number;
@@ -159,6 +159,23 @@ export interface Result {
   correct: boolean;
   correct_ans: number;
 }
+
+const state = reactive<any>({
+  questions: [
+    {
+      question_id: 0,
+      type: 0,
+      content: {
+        a_option: "string",
+        b_option: "string",
+        c_option: "string",
+        d_option: "string",
+        title: "string"
+      }
+    }
+  ],
+  answers: [] as Answer[],
+})
 
 const questions = ref<Question[]>([]);
 const answers = ref<Answer[]>([]);
@@ -234,29 +251,30 @@ const handleCheckboxChange = (index: number, selectedOption: string) => {
 };
 
 const initQuestions = () => {
-  questions.value.splice(0, questions.value.length);
-  for (let i = 1; i <= 10; i++) {
-    let content = {
-      a_option: `${i}a******************** ******************** ******************************** **************** *********** *********************8`,
-      b_option: `${i}b问页面时：在哪里，去哪里，若是不合型网站。不合适就会引起用户操作不适（方向不明确）。 以下是索条、帮助按钮、`,
-      c_option: `${i}c哪里，去哪里，怎样去的问题。 一般导航会有「侧栏导航」和「顶部导航」2 种类型。选择合适的导航#选择哪里，去哪里，怎样去的问题。 一般导航会有「侧栏导航」和「顶部导航」2 种类型。选择合适的导航#选择 文字太多会溢出 只能这样调整`,
-      d_option: `${i}d侧栏导航#可导航栏固定在左侧，提高导航可见性，方便页面之间切换侧栏导航#可导航栏固定在左侧，提高导航可见性，方便页面之间切换`,
-      title: `这个题目的序号为${i}导航可以解决用户在访问页面时：在哪里，去哪里，怎样去的问题。 一般导航会有「侧栏导航」和「顶部导航」2 种类型。选择合适的导航#选择合适的导航可以让用户在产品的使用过程中非常流畅，相反若是不合适就会引起用户操作不适（方向不明确）。 以下是「侧栏导航」和 「顶部导航」的区别。
-      侧栏导航#可导航栏固定在左侧，提高导航可见性，方便页面之间切换； `,
-    };
-    let question = {
-      question_id: i,
-      type: i % 2,
-      content: content,
-    }
-    questions.value.push(question);
-  }
+
+  // for (let i = 1; i <= 10; i++) {
+  //   let content = {
+  //     a_option: `${i}a******************** ******************** ******************************** **************** *********** *********************8`,
+  //     b_option: `${i}b问页面时：在哪里，去哪里，若是不合型网站。不合适就会引起用户操作不适（方向不明确）。 以下是索条、帮助按钮、`,
+  //     c_option: `${i}c哪里，去哪里，怎样去的问题。 一般导航会有「侧栏导航」和「顶部导航」2 种类型。选择合适的导航#选择哪里，去哪里，怎样去的问题。 一般导航会有「侧栏导航」和「顶部导航」2 种类型。选择合适的导航#选择 文字太多会溢出 只能这样调整`,
+  //     d_option: `${i}d侧栏导航#可导航栏固定在左侧，提高导航可见性，方便页面之间切换侧栏导航#可导航栏固定在左侧，提高导航可见性，方便页面之间切换`,
+  //     title: `这个题目的序号为${i}导航可以解决用户在访问页面时：在哪里，去哪里，怎样去的问题。 一般导航会有「侧栏导航」和「顶部导航」2 种类型。选择合适的导航#选择合适的导航可以让用户在产品的使用过程中非常流畅，相反若是不合适就会引起用户操作不适（方向不明确）。 以下是「侧栏导航」和 「顶部导航」的区别。
+  //     侧栏导航#可导航栏固定在左侧，提高导航可见性，方便页面之间切换； `,
+  //   };
+  //   let question = {
+  //     question_id: i,
+  //     type: i % 2,
+  //     content: content,
+  //   }
+  //   questions.value.push(question);
+  // }
   // ********** TODO ***************** 实际调用接口接受questionList的值
-  // const response = getQuestions(10);
-  // response.then(response =>{
-  //   state.questionList = response.data;
-  //   questions.value = response.data;
-  // });
+  const response = getQuestions(10);
+   response.then(response => {
+     state.questions = response.data;
+     questions.value = response.data;
+     console.log(state.questions);
+   });
 }
 
 const initAnswers = () => {
@@ -285,17 +303,18 @@ const router = useRouter();
 
 router.beforeEach((to, from, next) => {
   // 切换路由之前存储
-  saveDataToLocalStorage();
-  next();
+  //saveDataToLocalStorage();
+  //next();
 });
 
 onMounted(() => {
+  initQuestions();
   // 加载页面时先加载本地存储，如果不存在就手动赋初值
-  restoreDataFromLocalStorage();
+  //restoreDataFromLocalStorage();
 });
 
 window.addEventListener('beforeunload', () => {
-  saveDataToLocalStorage();
+  //saveDataToLocalStorage();
 });
 
 // 保存数据到本地存储
