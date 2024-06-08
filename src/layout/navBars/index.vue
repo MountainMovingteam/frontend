@@ -1,7 +1,7 @@
 <template>
 	<div class="layout-navbars-container">
 		<BreadcrumbIndex />
-		<TagsView v-if="setShowTagsView" />
+		<TagsView v-if="setShowTagsView && showTagsView" />
 	</div>
 </template>
 
@@ -18,7 +18,7 @@ const TagsView = defineAsyncComponent(() => import('/@/layout/navBars/tagsView/t
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
 
-//const setShowTagsView = ref(true);
+const showTagsView = ref(true);
 // 是否显示 tagsView
 const setShowTagsView = computed(() => {
 	let { layout, isTagsview } = themeConfig.value;
@@ -26,11 +26,11 @@ const setShowTagsView = computed(() => {
 });
 
 onMounted(() => {
-	setShowTagsView.value = window.innerWidth >= 768;
+	showTagsView.value = window.innerWidth >= 768;
 });
 
 window.addEventListener('resize', () => {
-    setShowTagsView.value = window.innerWidth >= 768;
+    showTagsView.value = window.innerWidth >= 768;
 });
 </script>
 
