@@ -12,7 +12,7 @@ export function search(field: any) {
 }
 
 export function answer(field: any) {
-	return client.withAuth(client.POST, baseURL + API.SEARCH, { data: { ...field } });
+	return client.withAuth(client.POST, baseURL + API.ANSWER, { data: { ...field } });
 }
 
 export function reqAvatar() {
