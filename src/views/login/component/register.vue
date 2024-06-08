@@ -128,7 +128,7 @@ const onRegister = async () => {
  	} else {
 		try {
 			let data = {id: state.ruleForm.student_id, name: state.ruleForm.userName,password: await encrypt(state.ruleForm.password), comfirmPassword:await encrypt(state.ruleForm.password_confirm),
-				email:state.ruleForm.email,phone:'',academy:0,avatar:''}
+				email:state.ruleForm.email,phone:'',academy:0,avatar:'',email_code:state.ruleForm.code}
 			const response = await useLoginApi().register(data);
 			ElMessage.success('注册成功,请登录');
 			emit('refresh');
