@@ -240,6 +240,7 @@ li {
     margin-right: 10px;
     margin-bottom: 10px;
     margin-top: -10px;
+    margin-left: 10px;
     /* Add negative margin to the avatar */
 }
 
