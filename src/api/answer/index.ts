@@ -12,7 +12,7 @@ export function getQuestions(question_num: number) {
 }
 
 export const getAnswers = (question_num: number,
-                           list: {question_id: number, student_answer: number[]}[]) => {
+                           list: {question_id: number, student_answer: number }[]) => {
     let url = baseURL + 'api/question/query/answer';
     return client.withAuth(client.POST, url, {
         data: {
