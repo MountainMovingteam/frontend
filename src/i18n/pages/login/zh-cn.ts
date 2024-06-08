@@ -19,6 +19,8 @@ export default {
 		placeholder2: '请输入用户名',
 		placeholder3: '请输入密码',
 		placeholder4: '请重复密码',
+		placeholder6: '请输入邮箱',
+		placeholder7: '请输入验证码',
 		btnText: '注 册',
 	},
 	signInText: '欢迎回来！',

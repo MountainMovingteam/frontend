@@ -111,6 +111,7 @@ function getTime() {
 // Show details of selected card
 async function showDetails(card: { problem_id: number; content: string }) {
     const result = await answer({ problem_id: card.problem_id });
+    console.log(result)
     if (result.status != 200) {
         ElMessage({ message: '无法获取答案，请稍后重试。', type: 'error' });
     } else {
@@ -240,6 +241,7 @@ li {
     margin-right: 10px;
     margin-bottom: 10px;
     margin-top: -10px;
+    margin-left: 10px;
     /* Add negative margin to the avatar */
 }
 

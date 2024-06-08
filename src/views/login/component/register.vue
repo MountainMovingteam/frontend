@@ -15,6 +15,23 @@
 			</el-input>
 		</el-form-item>
 		<el-form-item class="login-animation3">
+			<el-input text :placeholder="$t('message.register.placeholder6')" v-model="state.ruleForm.email" clearable autocomplete="off">
+				<template #prefix>
+					<el-icon class="el-input__icon"><ele-Message /></el-icon>
+				</template>
+				<template #append>
+					<el-button @click='getCode'> 获取验证码 </el-button>
+				</template>
+			</el-input>
+		</el-form-item>
+		<el-form-item class="login-animation4">
+			<el-input text :placeholder="$t('message.register.placeholder7')" v-model="state.ruleForm.code" clearable autocomplete="off">
+				<template #prefix>
+					<el-icon class="el-input__icon"><ele-Message /></el-icon>
+				</template>
+			</el-input>
+		</el-form-item>
+		<el-form-item class="login-animation5">
 			<el-input
 				:type="state.isShowPassword ? 'text' : 'password'"
 				:placeholder="$t('message.register.placeholder3')"
@@ -34,7 +51,7 @@
 				</template>
 			</el-input>
 		</el-form-item>
-		<el-form-item class="login-animation4">
+		<el-form-item class="login-animation6">
 			<el-input
 				:type="state.isShowPassword_confirm ? 'text' : 'password'"
 				:placeholder="$t('message.register.placeholder4')"
@@ -54,7 +71,7 @@
 				</template>
 			</el-input>
 		</el-form-item>
-		<el-form-item class="login-animation5">
+		<el-form-item class="login-animation7">
 			<el-button round type="primary" v-waves class="login-content-submit" @click="onRegister" :loading="state.loading.register">
 				<span>{{ $t('message.register.btnText') }}</span>
 			</el-button>
@@ -86,11 +103,21 @@ const state = reactive({
 		userName: '',
 		password: '',
 		password_confirm: '',
+		email:'',
+		code:''
 	},
 	loading: {
 		register: false,
 	},
 });
+
+const getCode = () => {
+	try {
+		const response =  useLoginApi().getCode({email:state.ruleForm.email});
+	} catch (error:any) {
+		ElMessage.warning(error.response.data.reason);
+	}
+}
 
 const onRegister = async () => {
 	state.loading.register = true;
@@ -101,14 +128,14 @@ const onRegister = async () => {
  	} else {
 		try {
 			let data = {id: state.ruleForm.student_id, name: state.ruleForm.userName,password: await encrypt(state.ruleForm.password), comfirmPassword:await encrypt(state.ruleForm.password_confirm),
-				email:'',phone:'',academy:0,avatar:''}
+				email:state.ruleForm.email,phone:'',academy:0,avatar:''}
 			const response = await useLoginApi().register(data);
 			ElMessage.success('注册成功,请登录');
 			emit('refresh');
 			router.push('/home');
 		} catch (error:any) {
 			console.error('Error registerg in:', error.response);
-			ElMessage.warning('注册失败');
+			ElMessage.warning(error.response.data.reason);
 		} finally {
 			state.loading.register = false;
 		}
@@ -147,8 +174,16 @@ const registerSuccess = (isNoPower: boolean | undefined) => { //注册后直接�
 
 <style scoped lang="scss">
 .login-content-form {
-	margin-top: 10px;
-	@for $i from 1 through 4 {
+	.el-form-item {
+    margin-bottom: 8px; // reduce spacing between form items
+	}
+	.el-input {
+		height: 36px; // reduce input height
+		.el-input__inner {
+		height: 100%; // ensure inner input matches parent height
+		}
+	}
+	@for $i from 1 through 7 {
 		.login-animation#{$i} {
 			opacity: 0;
 			animation-name: error-num;
@@ -159,13 +194,11 @@ const registerSuccess = (isNoPower: boolean | undefined) => { //注册后直接�
 	}
 	.login-content-code {
 		width: 100%;
-		padding: 0;
 	}
 	.login-content-submit {
 		width: 100%;
 		letter-spacing: 2px;
 		font-weight: 300;
-		margin-top: 0px;
 	}
 	.login-msg {
 		color: var(--el-text-color-placeholder);

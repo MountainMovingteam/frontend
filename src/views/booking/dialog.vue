@@ -56,6 +56,32 @@
           <el-col v-if="state.data.bookingWay === 'group'" :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form :model="state" :rules="rules" ref="form">
               <el-form-item label="团队信息" :span="24"></el-form-item>
+                <el-upload
+                    class="upload-demo"
+                    drag
+                    :limit="1"
+                    :before-upload="beforeUpload"
+                    v-model:file-list="uploadFile"
+                    ref="uploadRef"
+                    action="#"
+                    :auto-upload="false"
+                    style="margin-bottom: 30px;"
+                    :on-exceed="handleExceed"
+                >
+                  <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                  <div class="el-upload__text">
+                    点击此处上传文件批量导入团队信息
+                  </div>
+
+                  <template #tip>
+                    <div class="el-upload__tip">
+                      请上传excel文件，格式要求为两列（学号，姓名），无需提供负责人的信息
+                    </div>
+                  </template>
+                </el-upload>
+              <el-button type="success" style="margin-bottom: 10px" class="success-button" @click="UploadAll">提交文件</el-button>
+
+
               <template v-for="(member, index) in state.teamMembers" >
                 <el-row class="mb10" type="flex" justify="space-between">
                   <span style="margin-left: 5px; font-weight: bold;">成员{{ index === 0 ? index + 1 + '（负责人）' : index + 1 }}</span>
@@ -148,10 +174,11 @@ import {defineAsyncComponent, reactive, onMounted, ref} from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRoutesList } from '/@/stores/routesList';
 import { i18n } from '/@/i18n';
-import {ElMessage} from "element-plus";
-import {groupBooking, singleBooking} from "/@/api/booking";
+import {ElMessage, genFileId, type UploadInstance, UploadProps, UploadRawFile} from "element-plus";
+import {groupBooking, singleBooking, upload} from "/@/api/booking";
 import {PropType} from "vue-demi";
 import {reqInfo} from "/@/api/user";
+import {UploadFilled} from "@element-plus/icons-vue";
 // import { setBackEndControlRefreshRoutes } from "/@/router/backEnd";
 
 const props = defineProps({
@@ -189,8 +216,7 @@ const props = defineProps({
 const emit = defineEmits(['refresh', 'updateCampus', 'updateBookingWay']);
 
 // 引入组件
-const IconSelector = defineAsyncComponent(() => import('/@/components/iconSelector/index.vue'));
-
+defineAsyncComponent(() => import('/@/components/iconSelector/index.vue'));
 // 定义变量内容
 const menuDialogFormRef = ref();
 const stores = useRoutesList();
@@ -215,7 +241,10 @@ const state = reactive({
   teamMembers: [
     { name: '', studentId: '', phone: '', college: ''}
   ],
-  personalInfo: { name: '', studentId: '', phone: '', college: ''}, // 初始个人信息
+  personalInfo: { name: '', studentId: '', phone: '', college: ''},
+  resolvedList: [
+      { name: '', id: ''}
+  ],
   ruleForm: {
     menuSuperior: [],
     menuType: 'menu',
@@ -632,6 +661,63 @@ const onSubmit = () => {
   }
 };
 
+const uploadRef = ref<UploadInstance>();
+const uploadFile = ref<any[]>();
+
+const handleExceed: UploadProps['onExceed'] = (files) => {
+  uploadRef.value!.clearFiles();
+  uploadFile.value = [];
+  const file = files[0] as UploadRawFile
+  file.uid = genFileId();
+  uploadFile.value?.push(file);
+  uploadRef.value!.handleStart(file);
+}
+
+const beforeUpload = (file: File) => {
+  const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === 'application/vnd.ms-excel';
+  if (!isExcel) {
+    ElMessage.error('请上传excel文件');
+    return false;
+  }
+  return true;
+};
+
+const UploadAll = () => {
+  if (uploadFile.value != undefined) {
+    const formData = new FormData();
+    formData.append('file', uploadFile.value[0].raw);
+
+    const response = upload(formData);
+    response.then(response => {
+      state.resolvedList =  Object.values(response.data).find(Array.isArray);
+      console.log(state.resolvedList)
+      if (state.resolvedList.length > 19) {
+        ElMessage({
+          type: 'error',
+          message: '团队预约不得超过20人，文件中无需填写负责人的信息！',
+        });
+        return false;
+      }
+      state.teamMembers.splice(1);
+      state.resolvedList.forEach(item => {
+        console.log(item.name)
+        let name = item.name === 'None' ? '' : item.name;
+        let id = item.id === 'None' ? '' : item.id;
+        state.teamMembers.push({ name: name, studentId: id, phone: '', college: ''});
+      })
+      ElMessage({
+        type: 'success',
+        message: '解析成功!',
+      });
+    }).catch(() => {
+      ElMessage({
+        type: 'error',
+        message: '解析文件失败，请重试!',
+      });
+    });
+  }
+}
+
 // 页面加载时
 onMounted(() => {
   state.menuData = getMenuData(routesList.value);
@@ -660,5 +746,34 @@ defineExpose({
   content: '*';
   color: red;
   margin-left: 4px;
+}
+.upload-demo {
+  width: 100%;
+}
+.el-upload__text {
+  color: #409EFF;
+}
+.el-upload__tip {
+  color: #909399;
+}
+/* For small screens (max-width: 600px) */
+@media (max-width: 600px) {
+  .success-button {
+    margin-left: 35%;
+  }
+}
+
+/* For medium screens (min-width: 601px and max-width: 1024px) */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .success-button {
+    margin-left: 43%;
+  }
+}
+
+/* For large screens (min-width: 1025px) */
+@media (min-width: 1025px) {
+  .success-button {
+    margin-left: 43%;
+  }
 }
 </style>

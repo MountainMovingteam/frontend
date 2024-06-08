@@ -36,3 +36,8 @@ export function getPlaceDetails() {
 	let url = baseURL + '/api/order/getInfo';
 	return client.withAuth(client.GET, url, {});
 }
+
+export function upload(formData: FormData) {
+	let url = baseURL + '/api/order/file';
+	return client.withAuth(client.POST, url, {data : formData});
+}

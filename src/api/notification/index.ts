@@ -1,8 +1,11 @@
+import { log } from 'console';
 import client from '../client';
 
 enum API {
 	GET_NOTICE = '/api/base/notice', //个人信息
-	GET_NOTICE_DETAIL = '/api/base/notice/info'
+	GET_NOTICE_DETAIL = '/api/base/notice/info',
+	IS_READ = '/api/base/read',
+	DELETE_MESSAGE = '/api/base/notice/delete'
 }
 const baseURL = 'http://47.93.19.22:8000';
 
@@ -26,3 +29,20 @@ export function reqNoticeDetail(data : any) {
 	const reponse = client.withAuth(client.POST, url, {data:data});
 	return reponse;
 }
+
+
+export function readEmail(data : any) {
+	let url = baseURL + API.IS_READ;
+	const reponse = client.withAuth(client.POST, url, {data:data});
+	return reponse;
+}
+
+export function deleteEmail(data : any) {
+	let url = baseURL + API.DELETE_MESSAGE;
+	const reponse = client.withAuth(client.DELETE, url, {data:data});
+	return reponse;
+}
+
+
+
+
