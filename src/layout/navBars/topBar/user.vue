@@ -190,16 +190,39 @@ const initI18nOrSize = (value: string, attr: string) => {
 };
 // 页面加载时
 
-onMounted(() => {
-	setFilterRoutes();
-
 onMounted(async () => {
+	setFilterRoutes();
 	if (Local.get('themeConfig')) {
 		initI18nOrSize('globalComponentSize', 'disabledSize');
 		initI18nOrSize('globalI18n', 'disabledI18n');
 	}
 	if (Local.get('role') == 1) {
 		showNotice.value = false;
+	}
+	try {
+		const result = await reqNotice();
+		var mark = 0;
+		for (let i = 0; i < result.data.notice_list.length; i++) {
+			const item = result.data.notice_list[i];
+			if (!item.status) {
+				Local.remove('userInfo');
+				userInfos.value.notRead = true;
+				Local.set('userInfo', userInfos.value);
+				Session.remove('userInfo');
+				Session.set('userInfo', userInfos.value);
+				mark = 1;
+				break; // 跳出整个循环
+			}
+		}
+		if (mark == 0) {
+			Local.remove('userInfo')
+			userInfos.value.notRead = false;
+			Local.set('userInfo', userInfos.value)
+			Session.remove('userInfo')
+			Session.set('userInfo', userInfos.value)
+		}
+	} catch (error) {
+		console.log('debug:信息加载问题');
 	}
 
 	isPhone.value = window.innerWidth <= 767;
@@ -278,33 +301,6 @@ onBeforeRouteUpdate((to) => {
 	let { layout, isClassicSplitMenu } = themeConfig.value;
 	if (layout === 'classic' && isClassicSplitMenu) {
 		mittBus.emit('setSendClassicChildren', setSendClassicChildren(to.path));
-	}
-
-
-	try {
-		const result = await reqNotice();
-		var mark = 0;
-		for (let i = 0; i < result.data.notice_list.length; i++) {
-			const item = result.data.notice_list[i];
-			if (!item.status) {
-				Local.remove('userInfo');
-				userInfos.value.notRead = true;
-				Local.set('userInfo', userInfos.value);
-				Session.remove('userInfo');
-				Session.set('userInfo', userInfos.value);
-				mark = 1;
-				break; // 跳出整个循环
-			}
-		}
-		if (mark == 0) {
-			Local.remove('userInfo')
-			userInfos.value.notRead = false;
-			Local.set('userInfo', userInfos.value)
-			Session.remove('userInfo')
-			Session.set('userInfo', userInfos.value)
-		}
-	} catch (error) {
-		console.log('debug:信息加载问题');
 	}
 });
 </script>
