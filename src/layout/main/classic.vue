@@ -22,6 +22,7 @@ const LayoutAside = defineAsyncComponent(() => import('/@/layout/component/aside
 const LayoutHeader = defineAsyncComponent(() => import('/@/layout/component/header.vue'));
 const LayoutMain = defineAsyncComponent(() => import('/@/layout/component/main.vue'));
 const LayoutTagsView = defineAsyncComponent(() => import('/@/layout/navBars/tagsView/tagsView.vue'));
+const LayoutFooter = defineAsyncComponent(() => import('/@/layout/footer/index.vue'));
 
 // 定义变量内容
 const layoutMainRef = ref<InstanceType<typeof LayoutMain>>();

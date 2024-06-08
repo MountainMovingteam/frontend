@@ -53,6 +53,9 @@ declare type RouteItem<T = any> = {
 		isDynamicPath?: string;
 		isIframeOpen?: string;
 		loading?: boolean;
+		isBottom?:boolean;
+		bottomOrder?:number;
+		bottomName?:string;
 	};
 	children: T[];
 	query?: { [key: string]: T };
