@@ -18,12 +18,12 @@ const TagsView = defineAsyncComponent(() => import('/@/layout/navBars/tagsView/t
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
 
-const setShowTagsView = ref(true);
+//const setShowTagsView = ref(true);
 // 是否显示 tagsView
-/*const setShowTagsView = computed(() => {
+const setShowTagsView = computed(() => {
 	let { layout, isTagsview } = themeConfig.value;
 	return layout !== 'classic' && isTagsview;
-});*/
+});
 
 onMounted(() => {
 	setShowTagsView.value = window.innerWidth >= 768;
