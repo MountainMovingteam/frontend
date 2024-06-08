@@ -210,6 +210,10 @@ const refreshData = () => {
   state.personalInfo.studentId = '';
   state.personalInfo.phone = '';
   state.assistant = '';
+  teamData.tableData.data = [];
+  singleData.tableData.data = [];
+  state.hasTeam = false;
+  state.individual = 0;
 }
 
 
@@ -339,12 +343,12 @@ const onRejectRow = async (row:EmptyObjectType,reason:any) => {
   } 
   try {
     const response = await rejectOppointment(data);
-    ElMessage.success('删除成功');
+    ElMessage.success('驳回成功');
     tableRef.value.dealChoice();
   } catch (error) {
-      ElMessage.error('删除失败')
+      ElMessage.error('驳回失败')
   }
-  
+  getTableData();
 
 }
 
