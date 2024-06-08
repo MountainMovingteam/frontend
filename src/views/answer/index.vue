@@ -254,13 +254,9 @@ const initAnswers = () => {
   }
 }
 
-const generateNumberArray = (a: boolean, b: boolean, c: boolean, d: boolean): number[] => {
-  const result: number[] = [];
-  result.push(a ? 1 : 0);
-  result.push(b ? 1 : 0);
-  result.push(c ? 1 : 0);
-  result.push(d ? 1 : 0);
-  return result;
+const generateNumberArray = (a: boolean, b: boolean, c: boolean, d: boolean): number => {
+  const binaryStr = `${Number(a)}${Number(b)}${Number(c)}${Number(d)}`;
+  return parseInt(binaryStr, 2);
 };
 
 const router = useRouter();
@@ -272,6 +268,8 @@ router.beforeEach((to, from, next) => {
 });
 
 onMounted(() => {
+  // initQuestions();
+  // initAnswers();
   // 加载页面时先加载本地存储，如果不存在就手动赋初值
   restoreDataFromLocalStorage();
 });
@@ -293,17 +291,17 @@ function saveDataToLocalStorage() {
 // 从本地存储中恢复数据
 function restoreDataFromLocalStorage() {
   const storedQuestions = localStorage.getItem('questions');
-  if (storedQuestions !== null){
-    questions.value = JSON.parse(storedQuestions);
-  } else {
+  if (storedQuestions == null){
     initQuestions();
+  } else {
+    questions.value = JSON.parse(storedQuestions);
   }
 
   const storedAnswers = localStorage.getItem('answers');
-  if (storedAnswers !== null) {
-    answers.value = JSON.parse(storedAnswers);
-  } else {
+  if (storedAnswers == null) {
     initAnswers();
+  } else {
+    answers.value = JSON.parse(storedAnswers);
   }
 
   const storedResults = localStorage.getItem('results');
@@ -312,24 +310,24 @@ function restoreDataFromLocalStorage() {
   }
 
   const storedShowOriginal = localStorage.getItem('showOriginal');
-  if (storedShowOriginal !== null) {
-    showOriginal.value = JSON.parse(storedShowOriginal);
-  } else {
+  if (storedShowOriginal == null) {
     showOriginal.value = true;
+  } else {
+    showOriginal.value = JSON.parse(storedShowOriginal);
   }
 
   const storedShowQuestions = localStorage.getItem('showQuestions');
-  if (storedShowQuestions !== null) {
-    showQuestions.value = JSON.parse(storedShowQuestions);
-  } else {
+  if (storedShowQuestions == null) {
     showQuestions.value = false;
+  } else {
+    showQuestions.value = JSON.parse(storedShowQuestions);
   }
 
   const storedShowResult = localStorage.getItem('showResult');
-  if (storedShowResult !== null) {
-    showResult.value = JSON.parse(storedShowResult);
-  } else {
+  if (storedShowResult == null) {
     showResult.value = false;
+  } else {
+    showResult.value = JSON.parse(storedShowResult);
   }
 }
 
@@ -348,16 +346,14 @@ const switch2Main = () => {
 }
 
 const submitAnswers = () => {
-  let list: { question_id: number; student_answer: number[] }[] = [];
+  let list: { question_id: number; student_answer: number }[] = [];
   answers.value.forEach((item, index) => {
-    let student_answer = generateNumberArray(item.a_option, item.b_option, item.c_option,item.d_option);
+    let student_answer = generateNumberArray(item.a_option, item.b_option, item.c_option, item.d_option);
     list.push({question_id: questions.value[index].question_id, student_answer: student_answer});
   });
-  console.log(list);
-  // ********** TODO ***************** 实际调用接口接受answerData的值
   const response = getAnswers(10, list);
   response.then(response =>{
-    results.value = Object.values(response.data.list).find(Array.isArray);
+    results.value = response.data.list;
     console.log(results.value);
     showResult.value = true;
   })
