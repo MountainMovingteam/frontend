@@ -38,7 +38,8 @@
             </li>
         </div>
         <div class="sendBox">
-            <el-input v-model="msg" placeholder="请输入消息" class="input-with-select" @keyup.enter="sendMessage">
+            <el-input v-model="msg" placeholder="输入问题关键词获取相关问题，点击即可获取回答，例：输入'体验馆'" class="input-with-select"
+                @keyup.enter="sendMessage">
                 <template #append>
                     <el-button @click="sendMessage" type="primary">发送</el-button>
                 </template>
