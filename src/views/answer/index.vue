@@ -106,6 +106,16 @@
     </div>
       </div>
 
+      <div v-if="showResult" style="margin-left: 7%;margin-right: 7%;">
+        <el-alert
+            :title="`本次得分${score}分，继续加油！`"
+            type="success"
+            effect="dark"
+            :closable="false"
+        />
+      </div>
+
+
     <div class="flex-warp-item-box" style="display: flex; justify-content: center; margin-top: 20px; margin-bottom: 20px;">
       <el-button v-if="showQuestions && !showResult" type="success" size="large" @click="submitAnswers">
         <el-icon>
@@ -166,6 +176,15 @@ const results = ref<Result[]>([]);
 const showOriginal = ref(true);
 const showQuestions = ref(false);
 const showResult = ref(false);
+const score = ref(0);
+
+const computeScore = () => {
+  results.value.forEach(item => {
+    if (item.correct === true) {
+      score.value += 10;
+    }
+  })
+}
 
 const correctType = computed(() => {
   return results.value.reduce((acc: any, curr: any) => {
@@ -286,6 +305,7 @@ function saveDataToLocalStorage() {
   localStorage.setItem('showOriginal', JSON.stringify(showOriginal.value));
   localStorage.setItem('showQuestions', JSON.stringify(showQuestions.value));
   localStorage.setItem('showResult', JSON.stringify(showResult.value));
+  localStorage.setItem('score', JSON.stringify(score.value));
 }
 
 // 从本地存储中恢复数据
@@ -305,7 +325,9 @@ function restoreDataFromLocalStorage() {
   }
 
   const storedResults = localStorage.getItem('results');
-  if (storedResults !== null) {
+  if (storedResults == null) {
+    score.value = 0;
+  } else {
     results.value = JSON.parse(storedResults);
   }
 
@@ -329,6 +351,13 @@ function restoreDataFromLocalStorage() {
   } else {
     showResult.value = JSON.parse(storedShowResult);
   }
+
+  const storedScore = localStorage.getItem('score');
+  if (storedScore == null) {
+    score.value = 0;
+  } else {
+    score.value = JSON.parse(storedScore);
+  }
 }
 
 const switch2Questions = () => {
@@ -337,12 +366,14 @@ const switch2Questions = () => {
   showOriginal.value = false;
   showQuestions.value = true;
   showResult.value = false;
+  score.value = 0;
 }
 
 const switch2Main = () => {
   showOriginal.value = true;
   showQuestions.value = false;
   showResult.value = false;
+  score.value = 0;
 }
 
 const submitAnswers = () => {
@@ -354,7 +385,7 @@ const submitAnswers = () => {
   const response = getAnswers(10, list);
   response.then(response =>{
     results.value = response.data.list;
-    console.log(results.value);
+    computeScore();
     showResult.value = true;
   })
 };
