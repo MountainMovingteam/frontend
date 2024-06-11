@@ -76,7 +76,7 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isKeepAlive: true,
 					isAffix: false,
 					isIframe: false,
-					roles: ['admin', 'user'],
+					roles: ['user'],
 					icon: 'ele-Calendar',
 					isBottom:true,
 					bottomName:'预约',
@@ -96,7 +96,9 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isIframe: false,
 					roles: ['admin'],
 					icon: 'ele-Location',
-					isBottom:false,
+					isBottom:true,
+					bottomName:'场次',
+					bottomOrder:2
 				},
 			},
 			{
@@ -112,7 +114,9 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isIframe: false,
 					roles: ['admin'],
 					icon: 'ele-Microphone',
-					isBottom:false,
+					isBottom:true,
+					bottomName:'讲解员',
+					bottomOrder:1
 				},
 			},
 			{
@@ -178,7 +182,7 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isKeepAlive: true,
 					isAffix: false,
 					isIframe: false,
-					roles: ['admin', 'user'],
+					roles: ['user'],
 					icon: 'iconfont icon-shenqingkaiban',
 					isBottom:true,
 					bottomName:'答题',

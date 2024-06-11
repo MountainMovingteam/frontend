@@ -4,19 +4,13 @@
         <el-checkbox-group v-model="checkList">
           <el-row>
             <el-col :span="12">
-              <el-checkbox label="Option A" value="Value A" />
+              <el-checkbox label="Option A" value="存在重复人员" />
             </el-col>
             <el-col :span="12">
-              <el-checkbox label="Option B" value="Value B" />
+              <el-checkbox label="Option B" value="当前时间体验馆关闭，给您带来的麻烦烦请谅解" />
             </el-col>
             <el-col :span="12">
-              <el-checkbox label="Option C" value="Value C" />
-            </el-col>
-            <el-col :span="12">
-              <el-checkbox label="Option D" value="Value D" />
-            </el-col>
-            <el-col :span="12">
-              <el-checkbox label="Option E" value="Value E" />
+              <el-checkbox label="Option C" value="提供的信息不完整" />
             </el-col>
           </el-row>
         </el-checkbox-group>

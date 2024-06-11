@@ -64,21 +64,6 @@ const notice = reactive<any>({
 })
 const isSelectAll = ref(false)
 
-const load = () => {
-	if (notice.noticeArray.length >= notice.maxNotices) {
-		return;
-	} else {
-		notice.start = notice.end + 1;
-		if (notice.start + 9 < notice.maxNotices) {
-			notice.end = notice.start + 9;
-		} else {
-			notice.end = notice.maxNotices;
-		}
-		getInfo(notice.start,notice.end);
-	}
-}
-
-
 const getInfo = (start:number,end:number)  => {
 	const data = {
 		start:start,
@@ -133,8 +118,8 @@ onMounted(() => {
 });
 
 const openDialog = (i:any) => {
-	DetailDialogRef.value.openDialog(notice.noticeArray[i].notice_id);
-	notice.noticeArray[i].status=true;
+	DetailDialogRef.value.openDialog(noticeList.value[i].notice_id);
+	noticeList.value[i].status=true;
 }
 
 const selectAll  = () => {
