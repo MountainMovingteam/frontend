@@ -332,7 +332,7 @@ const initPieChart = async () => {
 		const option = {
 			backgroundColor: state.charts.bgColor,
 			title: {
-				text: '房屋建筑工程',
+				text: '答题正确率',
 				x: 'left',
 				textStyle: { fontSize: '15', color: state.charts.color },
 			},
