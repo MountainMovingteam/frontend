@@ -1,7 +1,7 @@
 <template>
 	<div class="layout-logo" v-if="setShowLogo" @click="onThemeConfigChange">
 		<img :src="TeamLogo" class="layout-logo-medium-img" />
-		<span>{{ themeConfig.globalTitle }}</span>
+		<span style='color: aliceblue;'>{{ themeConfig.globalTitle }}</span>
 	</div>
 	<div class="layout-logo-size" v-else @click="onThemeConfigChange">
 		<img :src="TeamLogo" class="layout-logo-size-img" />
