@@ -17,9 +17,9 @@
 			</el-sub-menu>
 			<template v-else>
 				<el-menu-item :index="val.path" :key="val.path">
-					<SvgIcon :name="val.meta.icon" />
+					<SvgIcon style='color: aliceblue;' :name="val.meta.icon" />
 					<template #title v-if="!val.meta.isLink || (val.meta.isLink && val.meta.isIframe)">
-						<span>{{ $t(val.meta.title) }}</span>
+						<span style='color: aliceblue;'>{{ $t(val.meta.title) }}</span>
 					</template>
 					<template #title v-else>
 						<a class="w100" @click.prevent="onALinkClick(val)">{{ $t(val.meta.title) }}</a>
