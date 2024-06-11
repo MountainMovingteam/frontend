@@ -416,7 +416,7 @@ const changeInfo = () => {
 		Session.remove('userInfo')
 		Session.set('userInfo', userInfos.value)
 	}).catch(error => {
-		message.value.error('修改失败');
+		message.value.error(error.response.data.reason);
 	})
 }
 
