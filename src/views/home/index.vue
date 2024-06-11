@@ -313,11 +313,11 @@ const initPieChart = async () => {
 		//getvalue.push(response.data.);
 		console.log(response.data);
 		if (response.data.question_num == 0) {
-			getvalue.push(100);
-			getvalue.push(0);
+			getvalue.push((100).toFixed(2));
+			getvalue.push((0).toFixed(2));
 		} else {
-			getvalue.push(response.data.correct_rate);
-			getvalue.push(1-response.data.correct_rate);
+			getvalue.push((response.data.correct_rate * 100).toFixed(2));
+			getvalue.push(((1-response.data.correct_rate) * 100).toFixed(2));
 		}
 		
 	} finally {
