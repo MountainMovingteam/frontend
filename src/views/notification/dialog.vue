@@ -44,14 +44,18 @@ const state = reactive({
 });
 
 // 打开弹窗
-const openDialog = (id:number) => {
+const openDialog = (id:number,type:number) => {
 	  state.dialog.isShowDialog = true;
     const data = {notice_id : id}
     const response = reqNoticeDetail(data);
     response.then(response => {
       state.notice.content = response.data.content;
       state.notice.time = response.data.time;
-      state.dialog.title = '驳回申请'
+      if (type == 0) {
+        state.dialog.title = '驳回通知'
+      } else {
+        state.dialog.title = '提醒通知'
+      }
     }).catch(error => {
       message.value.error('通知加载失败');
     })

@@ -15,7 +15,7 @@
 							<el-badge :is-dot="!item.status" style='margin-left: 10%;'/>
 						</div>
 						<div class="left-content" @click='openDialog(index)'>
-							<div class="text-line-title">驳回通知</div>
+							<div class="text-line-title">{{ item.type === 0 ? '驳回通知' :  '提醒通知' }}</div>
 							<div class="text-line-content">{{ item.key_words }}</div>
 						</div>
 						<div class="right-content" @click='openDialog(index)'>
@@ -118,7 +118,7 @@ onMounted(() => {
 });
 
 const openDialog = (i:any) => {
-	DetailDialogRef.value.openDialog(noticeList.value[i].notice_id);
+	DetailDialogRef.value.openDialog(noticeList.value[i].notice_id,noticeList.value[i].type);
 	noticeList.value[i].status=true;
 }
 
