@@ -17,7 +17,7 @@
 						<div class="personal-user-right">
 							<el-row>
 								<el-col :span="24" class="personal-title mb18">{{ currentTime
-								}}，{{ state.personalForm.name }}.Life is like a box of chocolate！ </el-col>
+								}}，{{ state.personalForm.name }} </el-col>
 								<el-col :span="24">
 									<el-row>
 										<el-col :xs="24" :sm="8" class="personal-item mb6">
@@ -146,7 +146,7 @@
 						<div class="personal-edit-safe-item">
 							<div class="personal-edit-safe-item-left">
 								<div class="personal-edit-safe-item-left-label">账户密码</div>
-								<div class="personal-edit-safe-item-left-value">当前密码强度：强</div>
+<!--								<div class="personal-edit-safe-item-left-value">当前密码强度：强</div>-->
 							</div>
 							<div class="personal-edit-safe-item-right">
 								<el-button text type="primary" @click='changePassword'>立即修改</el-button>
@@ -440,12 +440,18 @@ const onConfirmChange = async () => {
 
 	try {
 		const response = await modifyPassword(data);
-		message.value.success('修改成功');
-		changePw.loading = false;
-		clearCpwInfo();
-	}
+    if (changePw.newPassword == changePw.newConfirmPassword) {
+      message.value.success('修改成功');
+      changePw.loading = false;
+      clearCpwInfo();
+    }else {
+      message.value.error('两次输入的新密码不一致');
+      changePw.loading = false;
+    }
+  }
 	catch (error) {
-		message.value.error('修改失败');
+		message.value.error(error.response.data.reason);
+    changePw.loading = false;
 	}
 }
 
