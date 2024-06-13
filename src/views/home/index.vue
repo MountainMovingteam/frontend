@@ -250,13 +250,11 @@ const foamtDate = (lastMonday:any) => {
 }
 
 const initLineChart = async() => {
-	var getDate = <any>['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
-	var getNumber = <any>[0, 41.1, 30.4, 65.1, 53.3, 53.3, 53.3, 41.1, 30.4, 65.1, 53.3, 10];
+	var getDate = <any>[];
+	var getNumber = <any>[10, 15, 13, 18, 20, 0, 0, 12, 11, 14, 16, 19];
 	getDate = calDate();	
 	try {
 		const response = await getFlow();
-		getDate = [];
-		getDate = calDate();
 		getNumber = [];
 		getNumber = response.data.list.map((item:any) => item.number)
 	} finally {
