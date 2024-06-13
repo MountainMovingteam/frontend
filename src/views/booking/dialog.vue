@@ -700,7 +700,7 @@ const UploadAll = () => {
     const response = upload(formData);
     response.then(response => {
       state.resolvedList =  Object.values(response.data).find(Array.isArray);
-      console.log(state.resolvedList)
+      // console.log(state.resolvedList)
       if (state.resolvedList.length > 19) {
         ElMessage({
           type: 'error',
@@ -710,7 +710,7 @@ const UploadAll = () => {
       }
       state.teamMembers.splice(1);
       state.resolvedList.forEach(item => {
-        console.log(item.name)
+        // console.log(item.name)
         let name = item.name === 'None' ? '' : item.name;
         let id = item.id === 'None' ? '' : item.id;
         state.teamMembers.push({ name: name, studentId: id, phone: '', college: ''});
