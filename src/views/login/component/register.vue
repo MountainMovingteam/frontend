@@ -20,7 +20,7 @@
 					<el-icon class="el-input__icon"><ele-Message /></el-icon>
 				</template>
 				<template #append>
-					<el-button @click='getCode'> 获取验证码 </el-button>
+					<el-button id="getCodeButton" @click='getCode' :disabled="countdown > 0"> 获取验证码 </el-button>
 				</template>
 			</el-input>
 		</el-form-item>
@@ -31,7 +31,7 @@
 				</template>
 			</el-input>
 		</el-form-item>
-		<el-form-item class="login-animation5">
+		<el-form-item class="login-animation5" >
 			<el-input
 				:type="state.isShowPassword ? 'text' : 'password'"
 				:placeholder="$t('message.register.placeholder3')"
@@ -80,7 +80,7 @@
 </template>
 
 <script setup lang="ts" name="register">
-import { reactive, computed } from 'vue';
+import { reactive, computed,ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { initFrontEndControlRoutes } from '/@/router/frontEnd';
 import { useRoute, useRouter } from 'vue-router';
@@ -92,7 +92,7 @@ import { encrypt } from '/@/utils/rsa';
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
-
+const countdown = ref(0);
 const emit = defineEmits(['refresh']);
 // 定义变量内容
 const state = reactive({
@@ -112,8 +112,29 @@ const state = reactive({
 });
 
 const getCode = () => {
+	if (state.ruleForm.email == '') {
+		ElMessage.error('邮箱为空');
+		return;
+	}
 	try {
 		const response =  useLoginApi().getCode({email:state.ruleForm.email});
+		const button = document.getElementById('getCodeButton') as HTMLButtonElement; // 替换 'yourButtonId' 为按钮的实际 id
+		if (button != null) {
+			button.disabled = true;
+
+			// 设置倒计时
+			countdown.value = 60;
+			const timer = setInterval(() => {
+				if (countdown.value > 0) {
+					countdown.value--;
+					button.innerText = `${countdown.value} 秒后重新获取`;
+				} else {
+					clearInterval(timer);
+					button.disabled = false;
+					button.innerText = '获取验证码';
+				}
+			}, 1000);
+		}
 	} catch (error:any) {
 		ElMessage.warning(error.response.data.reason);
 	}
