@@ -154,10 +154,6 @@ li {
     padding: 10px;
     border-radius: 10px;
     margin-bottom: 5px;
-    max-width: 60%;
-    /* 控制消息框的最大宽度 */
-    word-wrap: break-word;
-    word-break: break-all;
 }
 
 .robot {
@@ -224,6 +220,10 @@ li {
     .robot .robotMessage {
         max-width: 90vh;
     }
+
+    .user .userMessage {
+        max-width: 90vh;
+    }
 }
 
 @media (max-width: 768px) {
@@ -232,6 +232,9 @@ li {
     }
 
     .robot .robotMessage {
+        max-width: 40vh;
+    }
+    .user .userMessage {
         max-width: 40vh;
     }
 }
