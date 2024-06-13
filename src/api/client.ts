@@ -30,14 +30,14 @@ async function withAuth(func: Function, url: String, options:any) {
   try {
     const headers = { Authorization: Local.get('access') };
     options.headers = headers;
-    console.log(options);
+    ////console..log(options);
     
     const response = await func(url, options);
     return response;
   } catch (error:any) {
-    console.log(error.response.data.message)
+    ////console..log(error.response.data.message)
     if (error.response.request.status == 401) {
-        console.log("超时")
+        ////console..log("超时")
         ElMessage({
         type: 'error',
         message: '连接超时，请重新登录'

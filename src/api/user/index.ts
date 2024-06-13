@@ -33,7 +33,7 @@ export function reqAvatar() {
 
 export function modifyBaseInfo(data: FormData) {
 	let url = baseURL + API.USER_EDIT_INFO;
-	console.log(data);
+	////console..log(data);
 	const reponse = client.withAuth(client.POST, url, { data: data });
 	return reponse;
 }

@@ -330,9 +330,9 @@ onMounted(() => {
 });
 
 const onRejectRow = async (row:EmptyObjectType,reason:any) => {
-  console.log(row.order_id);
-  console.log(state.data.time_index);
-  console.log(state.data.week_num);
+  //console..log(row.order_id);
+  //console..log(state.data.time_index);
+  //console..log(state.data.week_num);
   const data = {
     option:reason,
     week_num:state.data.week_num,

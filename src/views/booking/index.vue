@@ -298,10 +298,10 @@ const getTableData = () => {
   const response = getPlaceDetails();
   response.then(response => {
     state.place_details = response.data;
-    // console.log(state.place_details[0])
-    // console.log(state.place_details[0].time_index)
-    // console.log(state.place_details.__v_raw)
-    // console.log(state.place_details);
+    // //console..log(state.place_details[0])
+    // //console..log(state.place_details[0].time_index)
+    // //console..log(state.place_details.__v_raw)
+    // //console..log(state.place_details);
     const daysOfWeek = getDaysOfWeek();
     let tuesdayColor = [];
     let colors = [];
@@ -474,8 +474,8 @@ function getScreenSize() {
 
 
 const onCellClick = (info: any) => {
-  // console.log('点击的行数据:', info.row);
-  // console.log('点击的列数据:', info.column);
+  // //console..log('点击的行数据:', info.row);
+  // //console..log('点击的列数据:', info.column);
   selectedRow.value = info.row;
   selectedColumn.value = info.column;
 }

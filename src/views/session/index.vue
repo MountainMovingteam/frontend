@@ -421,8 +421,8 @@ function getScreenSize() {
 }
 
 const onCellClick = (info: any) => {
-  console.log('点击的行数据:', info.row);
-  console.log('点击的列数据:', info.column);
+  //console..log('点击的行数据:', info.row);
+  //console..log('点击的列数据:', info.column);
   selectedRow.value = info.row;
   selectedColumn.value = info.column;
   nextTick(() => {
