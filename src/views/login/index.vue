@@ -51,7 +51,7 @@ const Account = defineAsyncComponent(() => import('/@/views/login/component/acco
 const Register = defineAsyncComponent(() => import('/@/views/login/component/register.vue'));
 const screenWidth = ref(window.innerWidth)
 const isCollapse = ref(screenWidth.value >= 1200)
-console.log(isCollapse.value);
+//console..log(isCollapse.value);
 
 // 定义变量内容
 const storesThemeConfig = useThemeConfig();

@@ -142,7 +142,7 @@ const getInfo = (start:number,end:number)  => {
   	response.then(response => {
 		info.maxInfos = response.data.total;
 		info.infoArray = info.infoArray.concat(response.data.list);
-		console.log(info.infoArray);
+		//console..log(info.infoArray);
 		
 	}).catch(error => {
 		message.value.error('推送加载失败');
@@ -222,7 +222,7 @@ watch(screenWidth, (newValue, oldValue) => {
   } else {
     isCollapse.value = true
   }
-  console.log("值发生了变更", newValue, oldValue, isCollapse.value)
+  //console..log("值发生了变更", newValue, oldValue, isCollapse.value)
 })
 
 const calDate = () => {

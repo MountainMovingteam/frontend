@@ -116,8 +116,8 @@ const setHeader = computed(() => {
 
 const handleCellClick = (row: number, column: number, text: string) => {
     emit('cellClick', {row: row, column: column});
-    console.log(row);
-    console.log(column);
+    ////console..log(row);
+    ////console..log(column);
 }
 // 表格多选改变时，用于导出
 const onSelectionChange = (val: EmptyObjectType[]) => {

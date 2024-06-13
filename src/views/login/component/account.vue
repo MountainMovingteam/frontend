@@ -79,7 +79,7 @@ const onSignIn = async () => {
 			id:state.ruleForm.id,
 			password:await encrypt(state.ruleForm.password),
 		}
-		console.log(secret.password);
+		//console..log(secret.password);
 		
 		//const response = await useLoginApi().signIn(state.ruleForm);
 		const response = await useLoginApi().signIn(secret);
@@ -87,9 +87,9 @@ const onSignIn = async () => {
 		Local.set('access',response.token) //access 本地持久化存储
 		Session.set('role',response.role)
 		Local.set('role',response.role)
-		console.log(Local.get('access'))
+		//console..log(Local.get('access'))
 		const isNoPower = await initFrontEndControlRoutes();
-		console.log(isNoPower);
+		//console..log(isNoPower);
 		signInSuccess(isNoPower);
 	} catch (error) {
 		console.error('Error signing in:', error);
@@ -100,7 +100,7 @@ const onSignIn = async () => {
 };
 // 登录成功后的跳转
 const signInSuccess = (isNoPower: boolean | undefined) => {
-	console.log(isNoPower);
+	//console..log(isNoPower);
 	
 	if (isNoPower) {
 		ElMessage.warning('抱歉，您没有登录权限');

@@ -85,7 +85,7 @@ const submit = () => {
 const handleFileChange = (event: any) => {
   const selectedFiles = event.target.files; // 获取用户选择的文件列表
   fileList.value = [];
- console.log(selectedFiles);
+ //console..log(selectedFiles);
  fileList.value = Array.from(selectedFiles);
  state.avatar = URL.createObjectURL(fileList.value[0]);
 };

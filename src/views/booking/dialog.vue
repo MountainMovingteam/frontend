@@ -331,7 +331,7 @@ const isDisabled = (index: number) => {
 
 const refreshData = () => {
   state.teamMembers.splice(state.selectedCapacity[state.events.indexOf(state.selectedEvent)]);
-  // console.log(state.selectedCapacity[state.events.indexOf(state.selectedEvent)]);
+  // //console..log(state.selectedCapacity[state.events.indexOf(state.selectedEvent)]);
   // const firstMember = state.teamMembers[0];
   // firstMember.name = '';
   // firstMember.studentId = '';
@@ -412,12 +412,12 @@ const openDialog = (type: string, row?: any) => {
   if (state.data.campus === 'shahe') {
     start += 28;
   }
-  // console.log("start" + start);
+  // //console..log("start" + start);
   state.selectedCapacity = [];
   for (let i = start;i < start + 4;i++) {
     state.selectedCapacity.push(state.capacity[i]);
   }
-  // console.log(state.selectedCapacity);
+  // //console..log(state.selectedCapacity);
   state.accessibleEvents = [];
   for(let i = start; i < start + 4;i++) {
     if (state.data.bookingWay === 'group') {
@@ -700,7 +700,7 @@ const UploadAll = () => {
     const response = upload(formData);
     response.then(response => {
       state.resolvedList =  Object.values(response.data).find(Array.isArray);
-      // console.log(state.resolvedList)
+      // //console..log(state.resolvedList)
       if (state.resolvedList.length > 19) {
         ElMessage({
           type: 'error',
@@ -710,7 +710,7 @@ const UploadAll = () => {
       }
       state.teamMembers.splice(1);
       state.resolvedList.forEach(item => {
-        // console.log(item.name)
+        // //console..log(item.name)
         let name = item.name === 'None' ? '' : item.name;
         let id = item.id === 'None' ? '' : item.id;
         state.teamMembers.push({ name: name, studentId: id, phone: '', college: ''});

@@ -230,7 +230,7 @@ export default {
             });
             this.deleteDialogVisible = false;
             //this.filteredCommentators;
-            //console.log( this.deleteDialogVisible )
+            ////console..log( this.deleteDialogVisible )
         },
         cancelDelete() {
             // 用户点击直接清空按钮后的操作
@@ -285,7 +285,7 @@ export default {
         //     this.commentators.unshift(commentator);
         // }
         deleteCommentator(num: any) {
-            //console.log(num)
+            ////console..log(num)
             this.commentators = this.commentators.filter(item => item.num != num);
         },
 

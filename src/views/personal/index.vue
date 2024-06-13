@@ -376,7 +376,7 @@ const cancelBooking = (v: any) => {
 		"week_num": v.week_num,
 		"time_index": info2TimeIndex(v)
 	}).then(response => {
-		console.log(response)
+		//console..log(response)
 		if (response.data.success) {
 			ElMessage.success('取消预约成功');
 			getBookingInfo();
@@ -406,7 +406,7 @@ const changeInfo = () => {
 	const formData = assemblyFormData();
 
 	const response = modifyBaseInfo(formData);
-	//console.log(formData);
+	////console..log(formData);
 
 	response.then(response => {
 		message.value.success('修改成功');

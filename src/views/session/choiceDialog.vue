@@ -76,7 +76,7 @@
   };
 
   const confirm = () => {
-    console.log(checkList.value);
+    //console..log(checkList.value);
     if (hasOtherReason.value) {
       if (state.otherReason == '') {
         ElMessage.warning('请输入理由');

@@ -165,7 +165,7 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 					isAffix: false,
 					isIframe: false,
 					roles: ['admin', 'user'],
-					icon: 'iconfont icon-gerenzhongxin',
+					icon: 'ele-Service',
 					isBottom:true,
 					bottomName:'常见问题',
 					bottomOrder:4

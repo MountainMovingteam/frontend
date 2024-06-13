@@ -222,7 +222,7 @@ onMounted(async () => {
 			Session.set('userInfo', userInfos.value)
 		}
 	} catch (error) {
-		console.log('debug:信息加载问题');
+		////console..log('debug:信息加载问题');
 	}
 
 	isPhone.value = window.innerWidth <= 767;
@@ -251,7 +251,7 @@ const route = useRoute();
 
 // 获取父级菜单数据
 const menuLists = computed(() => {
-	console.log( <RouteItems>state.menuList.filter((item:any) => !item.meta.isBottom));
+	////console..log( <RouteItems>state.menuList.filter((item:any) => !item.meta.isBottom));
 	return <RouteItems>state.menuList.filter((item:any) => !item.meta.isBottom)
 });
 // 路由过滤递归函数

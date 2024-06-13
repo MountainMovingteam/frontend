@@ -59,7 +59,7 @@ export const useUserInfo = defineStore('userInfo', {
 							reqAvatar().then((avatar) => {
 								const ava = "http://47.93.19.22:8000" + avatar.data.avatar_url
 								userInfos.photo = ava;
-								console.log(userInfos);
+								////console..log(userInfos);
 								Session.set('userInfo', userInfos);
 								Local.set('userInfo', userInfos);
 								resolve(userInfos);

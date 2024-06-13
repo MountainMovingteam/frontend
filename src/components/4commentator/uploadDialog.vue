@@ -41,8 +41,8 @@ export default {
 
         const submitUploadAll = () => {
             if (uploadFile != undefined && uploadFile.value != undefined) {
-                // console.log(uploadFile.value[0])
-                // console.log("is click upload")
+                // //console..log(uploadFile.value[0])
+                // //console..log("is click upload")
                 const formData = new FormData();
                 formData.append('file', uploadFile.value[0].raw);
                 return myFormDataPOST('/api/manage/lecturer/upload', formData)
