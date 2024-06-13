@@ -17,7 +17,7 @@ export default {
 	register: {
 		placeholder1: '请输入学号',
 		placeholder2: '请输入用户名',
-		placeholder3: '请输入密码',
+		placeholder3: '6-16位密码, 字母+数字',
 		placeholder4: '请重复密码',
 		placeholder6: '请输入邮箱',
 		placeholder7: '请输入验证码',

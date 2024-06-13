@@ -256,7 +256,7 @@ const initQuestions = () => {
   const response = getQuestions(10);
   response.then(response =>{
     questions.value =  Object.values(response.data).find(Array.isArray);
-    console.log(questions.value)
+    // console.log(questions.value)
   });
 }
 

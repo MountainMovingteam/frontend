@@ -75,7 +75,8 @@
 
                   <template #tip>
                     <div class="el-upload__tip">
-                      请上传excel文件，格式要求为两列（学号，姓名），无需提供负责人的信息
+                      请上传excel文件，格式要求为两列（学号，姓名），无需提供负责人的信息，
+                      <a href="javascript:void(0);" @click="downloadModel()">点击这里下载模板文件</a>
                     </div>
                   </template>
                 </el-upload>
@@ -179,6 +180,7 @@ import {groupBooking, singleBooking, upload} from "/@/api/booking";
 import {PropType} from "vue-demi";
 import {reqInfo} from "/@/api/user";
 import {UploadFilled} from "@element-plus/icons-vue";
+import download from "/@/utils/exportXLSX";
 // import { setBackEndControlRefreshRoutes } from "/@/router/backEnd";
 
 const props = defineProps({
@@ -375,6 +377,14 @@ function initializeDays(): string[] {
     days.push(dayString);
   }
   return days;
+}
+
+const downloadModel = () => {
+  const json = [{
+    "学号": "",
+    "姓名": ""
+  }]
+  download(json, '团队预约导入模板.xlsx');
 }
 
 // 获取 pinia 中的路由
@@ -690,7 +700,7 @@ const UploadAll = () => {
     const response = upload(formData);
     response.then(response => {
       state.resolvedList =  Object.values(response.data).find(Array.isArray);
-      console.log(state.resolvedList)
+      // console.log(state.resolvedList)
       if (state.resolvedList.length > 19) {
         ElMessage({
           type: 'error',
@@ -700,7 +710,7 @@ const UploadAll = () => {
       }
       state.teamMembers.splice(1);
       state.resolvedList.forEach(item => {
-        console.log(item.name)
+        // console.log(item.name)
         let name = item.name === 'None' ? '' : item.name;
         let id = item.id === 'None' ? '' : item.id;
         state.teamMembers.push({ name: name, studentId: id, phone: '', college: ''});

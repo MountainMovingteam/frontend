@@ -120,7 +120,7 @@ const windowHeight = ref(window.innerHeight)
 
 const selectedLocation = ref('xueyuan');
 const selectedWay = ref('group');
-const events = ['8:00-9:30', '10:00-11:30', '14:00-15:30', '16:00-17:30'];
+const events = ['8:00~9:30', '10:00~11:30', '14:00~15:30', '16:00~17:30'];
 
 const selectedRow = ref(0);
 const selectedColumn = ref(0);
@@ -129,12 +129,10 @@ const selectedSingleColors = ref();
 const capacity = ref();
 
 const updateCampus = (campus: string) => {
-  console.log('hiiiiiiiiiiiiiiiiiiiiiiiiii')
   selectLocation(campus);
 }
 
 const updateBookingWay = (bookingway: string) => {
-  console.log('he')
   selectWay(bookingway);
 }
 
@@ -300,10 +298,10 @@ const getTableData = () => {
   const response = getPlaceDetails();
   response.then(response => {
     state.place_details = response.data;
-    console.log(state.place_details[0])
-    console.log(state.place_details[0].time_index)
-    console.log(state.place_details.__v_raw)
-    console.log(state.place_details);
+    // console.log(state.place_details[0])
+    // console.log(state.place_details[0].time_index)
+    // console.log(state.place_details.__v_raw)
+    // console.log(state.place_details);
     const daysOfWeek = getDaysOfWeek();
     let tuesdayColor = [];
     let colors = [];
@@ -335,7 +333,6 @@ const getTableData = () => {
       for (let i = 0;i < 7;i++) {
         if (daysOfWeek[i] === '二') {
           let index = 4 * i + 2;
-          console.log(index)
           let place_detail = state.place_details[index];
           if (place_detail.enrolled < place_detail.capacity) {
             tuesdayColor.push("#99FF99");
@@ -376,7 +373,7 @@ const getTableData = () => {
 
     for (let i = 0; i < 4; i++) {
       stateXyGroup.tableData.data.splice(i, 1, {
-        event: `第${i + 1}场 ${events[i]}`,
+        event: `${events[i]}`,
         day1: daysOfWeek[0] === '六' || daysOfWeek[0] === '日'? "#f54545": colors[i + 1],
         day2: daysOfWeek[1] === '六' || daysOfWeek[1] === '日'? "#f54545": colors[i + 1 + 4],
         day3: daysOfWeek[2] === '六' || daysOfWeek[2] === '日'? "#f54545": colors[i + 1 + 8],
@@ -387,7 +384,7 @@ const getTableData = () => {
       });
 
       stateShGroup.tableData.data.splice(i, 1, {
-        event: `第${i + 1}场 ${events[i]}`,
+        event: `${events[i]}`,
         day1: daysOfWeek[0] === '六' || daysOfWeek[0] === '日'? "#f54545": colors[28 + i + 1],
         day2: daysOfWeek[1] === '六' || daysOfWeek[1] === '日'? "#f54545": colors[28 + i + 1 + 4],
         day3: daysOfWeek[2] === '六' || daysOfWeek[2] === '日'? "#f54545": colors[28 + i + 1 + 8],
@@ -398,7 +395,7 @@ const getTableData = () => {
       });
 
       stateXySingle.tableData.data.splice(i, 1, {
-        event: `第${i + 1}场 ${events[i]}`,
+        event: `${events[i]}`,
         day1: daysOfWeek[0] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
         day2: daysOfWeek[1] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
         day3: daysOfWeek[2] === '二' && i >= 2? tuesdayColor[i - 2]: "#f54545",
@@ -409,7 +406,7 @@ const getTableData = () => {
       });
 
       stateShSingle.tableData.data.splice(i, 1, {
-        event: `第${i + 1}场 \n\n ${events[i]}`,
+        event: `${events[i]}`,
         day1: daysOfWeek[0] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
         day2: daysOfWeek[1] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
         day3: daysOfWeek[2] === '二' && i >= 2? tuesdayColor[i]: "#f54545",
@@ -477,8 +474,8 @@ function getScreenSize() {
 
 
 const onCellClick = (info: any) => {
-  console.log('点击的行数据:', info.row);
-  console.log('点击的列数据:', info.column);
+  // console.log('点击的行数据:', info.row);
+  // console.log('点击的列数据:', info.column);
   selectedRow.value = info.row;
   selectedColumn.value = info.column;
 }

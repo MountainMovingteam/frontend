@@ -234,7 +234,6 @@ li {
     .robot .robotMessage {
         max-width: 40vh;
     }
-
     .user .userMessage {
         max-width: 40vh;
     }
