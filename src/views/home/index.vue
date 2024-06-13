@@ -59,12 +59,13 @@ import { reactive, onMounted, ref, watch, nextTick, onActivated, markRaw,compute
 import { storeToRefs } from 'pinia';
 import { useThemeConfig } from '/@/stores/themeConfig';
 import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
-import { getInfoList,getPicList,getQuestionHistory } from '/@/api/mainpage/index'
+import { getInfoList,getPicList,getQuestionHistory,getFlow } from '/@/api/mainpage/index'
 import { ElMessage } from 'element-plus';
 import { Local} from '/@/utils/storage';
 import * as echarts from 'echarts';
 // 定义变量内容
 import router from '/@/router';
+import { utimes } from 'fs';
 const storesTagsViewRoutes = useTagsViewRoutes();
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
@@ -224,94 +225,91 @@ watch(screenWidth, (newValue, oldValue) => {
   console.log("值发生了变更", newValue, oldValue, isCollapse.value)
 })
 
-const initLineChart = () => {
-	if (!state.global.dispose.some((b: any) => b === state.global.homeChartOne)) state.global.homeChartOne.dispose();
-	state.global.homeChartOne = markRaw(echarts.init(homeLineRef.value, state.charts.theme));
-	const option = {
-		backgroundColor: state.charts.bgColor,
-		title: {
-			text: '参观人数',
-			x: 'left',
-			textStyle: { fontSize: '15', color: state.charts.color },
-		},
-		grid: { top: 70, right: 20, bottom: 30, left: 30 },
-		tooltip: { trigger: 'axis' },
-		legend: { data: ['人数', '最新成交价'], right: 0 },
-		xAxis: {
-			data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-		},
-		yAxis: [
-			{
-				type: 'value',
-				name: '人数',
-				splitLine: { show: true, lineStyle: { type: 'dashed', color: '#f5f5f5' } },
+const calDate = () => {
+	let today = new Date();
+	let dayOfWeek = today.getDay();
+	if (dayOfWeek === 0) {
+		dayOfWeek = 7;
+	}
+	let lastMonday = new Date(today);
+	lastMonday.setDate(today.getDate() - dayOfWeek - 6);
+	let result = <any>[];
+	let currentDate = new Date(lastMonday);
+    while (currentDate <= today) {
+        result.push(foamtDate(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+	return result;
+}
+
+const foamtDate = (lastMonday:any) => {
+	let month = (lastMonday.getMonth() + 1).toString().padStart(2, '0'); // 月份从0开始，所以要加1
+	let date = lastMonday.getDate().toString().padStart(2, '0');
+	let formattedDate = `${month}.${date}`;
+	return formattedDate;
+}
+
+const initLineChart = async() => {
+	var getDate = <any>['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+	var getNumber = <any>[0, 41.1, 30.4, 65.1, 53.3, 53.3, 53.3, 41.1, 30.4, 65.1, 53.3, 10];
+	getDate = calDate();	
+	try {
+		const response = await getFlow();
+		getDate = [];
+		getDate = calDate();
+		getNumber = [];
+		getNumber = response.data.list.map((item:any) => item.number)
+	} finally {
+		if (!state.global.dispose.some((b: any) => b === state.global.homeChartOne)) state.global.homeChartOne.dispose();
+		state.global.homeChartOne = markRaw(echarts.init(homeLineRef.value, state.charts.theme));
+		const option = {
+			backgroundColor: state.charts.bgColor,
+			title: {
+				text: '参观人数',
+				x: 'left',
+				textStyle: { fontSize: '15', color: state.charts.color },
 			},
-		],
-		series: [
-			{
-				name: '人数',
-				type: 'line',
-				symbolSize: 6,
-				symbol: 'circle',
-				smooth: true,
-				data: [0, 41.1, 30.4, 65.1, 53.3, 53.3, 53.3, 41.1, 30.4, 65.1, 53.3, 10],
-				lineStyle: { color: '#fe9a8b' },
-				itemStyle: { color: '#fe9a8b', borderColor: '#fe9a8b' },
-				areaStyle: {
-					color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-						{ offset: 0, color: '#fe9a8bb3' },
-						{ offset: 1, color: '#fe9a8b03' },
-					]),
-				},
+			grid: { top: 70, right: 20, bottom: 30, left: 30 },
+			tooltip: { trigger: 'axis' },
+			legend: { data: ['人数', '最新成交价'], right: 0 },
+			xAxis: {
+				data: getDate,
 			},
-			/*{
-				name: '最新成交价',
-				type: 'line',
-				symbolSize: 6,
-				symbol: 'circle',
-				smooth: true,
-				data: [0, 24.1, 7.2, 15.5, 42.4, 42.4, 42.4, 24.1, 7.2, 15.5, 42.4, 0],
-				lineStyle: { color: '#9E87FF' },
-				itemStyle: { color: '#9E87FF', borderColor: '#9E87FF' },
-				areaStyle: {
-					color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-						{ offset: 0, color: '#9E87FFb3' },
-						{ offset: 1, color: '#9E87FF03' },
-					]),
+			yAxis: [
+				{
+					type: 'value',
+					name: '人数',
+					splitLine: { show: true, lineStyle: { type: 'dashed', color: '#f5f5f5' } },
 				},
-				emphasis: {
-					itemStyle: {
-						color: {
-							type: 'radial',
-							x: 0.5,
-							y: 0.5,
-							r: 0.5,
-							colorStops: [
-								{ offset: 0, color: '#9E87FF' },
-								{ offset: 0.4, color: '#9E87FF' },
-								{ offset: 0.5, color: '#fff' },
-								{ offset: 0.7, color: '#fff' },
-								{ offset: 0.8, color: '#fff' },
-								{ offset: 1, color: '#fff' },
-							],
-						},
-						borderColor: '#9E87FF',
-						borderWidth: 2,
+			],
+			series: [
+				{
+					name: '人数',
+					type: 'line',
+					symbolSize: 6,
+					symbol: 'circle',
+					smooth: true,
+					data: getNumber,
+					lineStyle: { color: '#fe9a8b' },
+					itemStyle: { color: '#fe9a8b', borderColor: '#fe9a8b' },
+					areaStyle: {
+						color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+							{ offset: 0, color: '#fe9a8bb3' },
+							{ offset: 1, color: '#fe9a8b03' },
+						]),
 					},
 				},
-			},*/
-		],
-	};
-	state.global.homeChartOne.setOption(option);
-	state.myCharts.push(state.global.homeChartOne);
+			],
+		};
+		state.global.homeChartOne.setOption(option);
+		state.myCharts.push(state.global.homeChartOne);
+	}
 };
 
 const initPieChart = async () => {
 	var getvalue = <any>[];
 	try {
 		const response = await getQuestionHistory();
-		//getvalue.push(response.data.);
-		console.log(response.data);
 		if (response.data.question_num == 0) {
 			getvalue.push((100).toFixed(2));
 			getvalue.push((0).toFixed(2));
