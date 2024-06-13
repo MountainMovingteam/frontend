@@ -74,7 +74,7 @@ async function sendMessage() {
     const result = await search({ keywords: msg.value.trim() });
 
     if (result.data.num == 0 || result.status != 200) {
-        info.value.push({ isRobot: true, content: '对不起，我无法回答您的问题。', time: getTime() });
+        info.value.push({ isRobot: true, content: '对不起，我无法回答您的问题。如果您输入的是一个完整的问题，请缩略为单个关键词。', time: getTime() });
     } else {
         let cards: any = [];
         for (let i = 0; i < result.data.num; i++) {
