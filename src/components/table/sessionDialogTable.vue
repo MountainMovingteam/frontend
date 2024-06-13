@@ -11,7 +11,7 @@
 			@selection-change="onSelectionChange"
 		>
 			<el-table-column type="selection" :reserve-selection="true" width="30" v-if="config.isSelection" />
-			<el-table-column type="index" label="序号" width='' v-if="config.isSerialNo" />
+			<el-table-column type="index" label="序号" width='80px' v-if="config.isSerialNo" />
 			<el-table-column
 				v-for="(item, index) in setHeader"
 				:key="index"

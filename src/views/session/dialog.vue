@@ -112,7 +112,6 @@ const teamData = reactive<any>({
       {key: 'name', colWidth: '', title: '负责人姓名', type: 'text', isCheck: true},
       {key: 'student_id', colWidth: '', title: '负责人学号', type: 'text', isCheck: true},
       {key: 'phone', colWidth: '', title: '负责人电话', type: 'text', isCheck: true},
-      {key: 'status', colWidth: '', title: '预约状态', type: 'label', isCheck: true},
       {key: 'op', colWidth: '', title: '操作', type: 'button',btType:'danger', isCheck: true},
     ],    // 配置项
     config: {
@@ -133,7 +132,6 @@ const singleData = reactive<any>({
       {key: 'name', colWidth: '', title: '姓名', type: 'text', isCheck: true},
       {key: 'student_id', colWidth: '', title: '学号', type: 'text', isCheck: true},
       {key: 'phone', colWidth: '', title: '电话', type: 'text', isCheck: true},
-      {key: 'status', colWidth: '', title: '预约状态', type: 'label', isCheck: true},
       {key: 'op', colWidth: '', title: '操作', type: 'button',btType:'danger', isCheck: true},
     ],    // 配置项
     config: {
