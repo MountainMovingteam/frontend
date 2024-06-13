@@ -373,24 +373,24 @@ const getTableData = () => {
 
         xyTable1.tableData.data.push({
           event: `第${i}场 ${events[i-1]}`,
-          day1: {text: texts[i+56], color: colors[i+56]}, // 使用颜色名称
-          day2: {text: texts[i +60], color: colors[i + 60]}, // 使用十六进制颜色码
-          day3: {text: texts[i + 64], color: colors[i + 64]}, // 使用 RGB 颜色值
-          day4: {text: texts[i + 68], color: colors[i + 68]},
-          day5: {text: texts[i + 72], color: colors[i + 72]},
-          day6: {text: texts[i + 76], color: colors[i + 76]},
-          day7: {text: texts[i + 80], color: colors[i + 80]},
+          day1: {text: texts[i], color: colors[i+56]}, // 使用颜色名称
+          day2: {text: texts[i +4], color: colors[i + 60]}, // 使用十六进制颜色码
+          day3: {text: texts[i + 8], color: colors[i + 64]}, // 使用 RGB 颜色值
+          day4: {text: texts[i + 12], color: colors[i + 68]},
+          day5: {text: texts[i + 16], color: colors[i + 72]},
+          day6: {text: texts[i + 20], color: colors[i + 76]},
+          day7: {text: texts[i + 24], color: colors[i + 80]},
         });
 
         shTable1.tableData.data.push({
           event: `第${i}场 \n\n ${events[i-1]}`,
-          day1: {text: texts[i+84], color: colors[i+84]}, // 使用颜色名称
-          day2: {text: texts[i + 88], color: colors[i + 88]}, // 使用十六进制颜色码
-          day3: {text: texts[i + 92], color: colors[i + 92]}, // 使用 RGB 颜色值
-          day4: {text: texts[i + 96], color: colors[i + 96]},
-          day5: {text: texts[i + 100], color: colors[i + 100]},
-          day6: {text: texts[i + 104], color: colors[i + 104]},
-          day7: {text: texts[i + 108], color: colors[i + 108]},
+          day1: {text: texts[i+28], color: colors[i+84]}, // 使用颜色名称
+          day2: {text: texts[i + 32], color: colors[i + 88]}, // 使用十六进制颜色码
+          day3: {text: texts[i + 36], color: colors[i + 92]}, // 使用 RGB 颜色值
+          day4: {text: texts[i + 40], color: colors[i + 96]},
+          day5: {text: texts[i + 44], color: colors[i + 100]},
+          day6: {text: texts[i + 48], color: colors[i + 104]},
+          day7: {text: texts[i + 52], color: colors[i + 108]},
         });
       }
     xyTable0.tableData.config.total = xyTable0.tableData.data.length;
