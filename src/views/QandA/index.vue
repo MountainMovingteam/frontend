@@ -1,10 +1,10 @@
 <template>
-    <div class="chatContainer">
+    <div class="chatContainer" style="margin-top: 30px;">
         <div class="chatContent" ref="chatBox">
             <li v-for="(item, index) in info" :key="index" :class="[item.isRobot ? 'robot' : 'user']">
                 <div style="display: flex;">
                     <div v-if="item.isRobot" class="avatar">
-                        <img src="../../../public/logo.png" alt="机器人头像">
+                        <img src="../../../public/logo.png">
                     </div>
                     <div style="display: block;" v-if="item.isRobot">
                         <div class="robotMessage">
@@ -29,17 +29,14 @@
                         <span class="messageTime">{{ item.time }}</span>
                     </div>
                     <div v-if="!item.isRobot" class="avatar">
-                        <img :src="avatar" alt="用户头像">
+                        <img :src="avatar">
                     </div>
 
                 </div>
-
-
             </li>
         </div>
         <div class="sendBox">
-            <el-input v-model="msg" placeholder="输入问题关键词获取相关问题，点击即可获取回答，例：输入'体验馆'" class="input-with-select"
-                @keyup.enter="sendMessage">
+            <el-input v-model="msg" placeholder="输入问题关键词获取相关问题" class="input-with-select" @keyup.enter="sendMessage">
                 <template #append>
                     <el-button @click="sendMessage" type="primary">发送</el-button>
                 </template>
@@ -54,25 +51,24 @@ import { ElInput, ElButton, ElMessage } from 'element-plus';
 import { search, answer, reqAvatar } from '/@/api/QandA';
 
 const msg = ref('');
-const avatar = ref('')
+const avatar = ref('');
 const info = ref<Array<{ isRobot: boolean; content: string; time: string; cards?: Array<{ problem_id: number; content: string }> }>>([]);
 
 onMounted(async () => {
     await reqAvatar().then((res) => {
-        console.log(res)
         avatar.value = 'http://47.93.19.22:8000' + res.data.avatar_url;
     });
-    console.log(avatar.value);
+
+    info.value.push({ isRobot: true, content: "输入问题关键词获取相关问题，点击即可获取回答，例：输入'体验馆'", time: getTime() });
+    scrollToBottom();
 });
 
-// Function to send message
 async function sendMessage() {
     if (!msg.value.trim()) {
         ElMessage({ message: '不能发送空消息！', type: 'error' });
         return;
     }
 
-    // Simulate user message
     info.value.push({ isRobot: false, content: msg.value.trim(), time: getTime() });
 
     const result = await search({ keywords: msg.value.trim() });
@@ -89,11 +85,10 @@ async function sendMessage() {
         info.value.push({ isRobot: true, cards: cards, time: getTime(), content: '' });
     }
 
-    msg.value = ''; // Clear input
+    msg.value = '';
     scrollToBottom();
 }
 
-// Scroll to the bottom of chat content
 function scrollToBottom() {
     nextTick(() => {
         const chatBox = document.getElementById('chatBox');
@@ -103,16 +98,13 @@ function scrollToBottom() {
     });
 }
 
-// Helper function to get current time
 function getTime() {
     const now = new Date();
     return `${now.getHours()}:${now.getMinutes()}`;
 }
 
-// Show details of selected card
 async function showDetails(card: { problem_id: number; content: string }) {
     const result = await answer({ problem_id: card.problem_id });
-    console.log(result)
     if (result.status != 200) {
         ElMessage({ message: '无法获取答案，请稍后重试。', type: 'error' });
     } else {
@@ -147,7 +139,7 @@ ul {
 }
 
 li {
-    margin-bottom: 10px;
+    margin-top: 10px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -162,7 +154,10 @@ li {
     padding: 10px;
     border-radius: 10px;
     margin-bottom: 5px;
-    /* Add margin to the message box */
+    max-width: 60%;
+    /* 控制消息框的最大宽度 */
+    word-wrap: break-word;
+    word-break: break-all;
 }
 
 .robot {
@@ -177,7 +172,6 @@ li {
     padding: 10px;
     border-radius: 10px;
     margin-bottom: 5px;
-    /* Add margin to the message box */
 }
 
 .cardList {
@@ -203,7 +197,7 @@ li {
     font-size: 12px;
     color: #999;
     margin-top: 5px;
-    float: right
+    float: right;
 }
 
 .sendBox {
@@ -226,11 +220,19 @@ li {
     .cardItem {
         width: 45vw;
     }
+
+    .robot .robotMessage {
+        max-width: 90vh;
+    }
 }
 
 @media (max-width: 768px) {
     .cardItem {
         width: 70vw;
+    }
+
+    .robot .robotMessage {
+        max-width: 40vh;
     }
 }
 
@@ -243,7 +245,6 @@ li {
     margin-bottom: 10px;
     margin-top: -10px;
     margin-left: 10px;
-    /* Add negative margin to the avatar */
 }
 
 .avatar img {
